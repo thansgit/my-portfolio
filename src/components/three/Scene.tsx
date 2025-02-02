@@ -22,7 +22,7 @@ const Scene = () => (
       <Suspense fallback={null}>
         <ambientLight intensity={0.5} />
         <Background />
-        <Physics interpolate gravity={[0, -60, 0]} timeStep={1 / 60}>
+        <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
           <BandWrapper />
         </Physics>
       </Suspense>
