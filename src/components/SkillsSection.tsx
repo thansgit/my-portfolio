@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card";
 
 export function SkillsSection() {
-  const skills = ["React", "Node.js", "TypeScript", "MongoDB"]
+  const skills = ["React", "Node.js", "TypeScript", "MongoDB"];
 
   return (
     <section className="mt-8">
@@ -16,5 +16,5 @@ export function SkillsSection() {
         ))}
       </div>
     </section>
-  )
+  );
 }

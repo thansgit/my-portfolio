@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
 export function Navigation() {
   return (
@@ -8,18 +8,30 @@ export function Navigation() {
       <Link href="#" className="text-yellow-500 font-medium">
         About
       </Link>
-      <Link href="#" className="text-zinc-400 hover:text-white transition-colors">
+      <Link
+        href="#"
+        className="text-zinc-400 hover:text-white transition-colors"
+      >
         Resume
       </Link>
-      <Link href="#" className="text-zinc-400 hover:text-white transition-colors">
+      <Link
+        href="#"
+        className="text-zinc-400 hover:text-white transition-colors"
+      >
         Portfolio
       </Link>
-      <Link href="#" className="text-zinc-400 hover:text-white transition-colors">
+      <Link
+        href="#"
+        className="text-zinc-400 hover:text-white transition-colors"
+      >
         Blog
       </Link>
-      <Link href="#" className="text-zinc-400 hover:text-white transition-colors">
+      <Link
+        href="#"
+        className="text-zinc-400 hover:text-white transition-colors"
+      >
         Contact
       </Link>
     </nav>
-  )
+  );
 }
