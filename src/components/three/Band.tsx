@@ -101,7 +101,7 @@ export default function Band({
     }
 
     if (fixed.current) {
-
+      // Fix most of the jitter when over pulling the card
       [j1, j2].forEach((ref) => {
         const current = ref.current!;
         if (!current.lerped) {
@@ -118,19 +118,14 @@ export default function Band({
       curve.points[3].copy(fixed.current.translation());
       (band.current!.geometry as MeshLineGeometry).setPoints(curve.getPoints(32));
 
-      // Move velocity reset to end of frame
+      // Tilt correction - moved inside the main frame update
       ang.copy(card.current!.angvel());
-      
-      requestAnimationFrame(() => {
-        const dampening = 0.25; // Keep 80% of velocity
-        ang.copy(card.current!.angvel())
-        rot.copy(card.current!.rotation())
-        card.current!.setAngvel({
-          x: ang.x,
-          y: ang.y - rot.y * dampening,
-          z: ang.z
-        }, true);
-      });
+      rot.copy(card.current!.rotation());
+      card.current!.setAngvel({
+        x: ang.x,
+        y: ang.y - rot.y * 0.25,
+        z: ang.z
+      }, true);
     }
   });
 
@@ -143,12 +138,12 @@ export default function Band({
 
   bandTexture.wrapS = bandTexture.wrapT = THREE.RepeatWrapping;
   bandTexture.repeat.set(1, 1);
-  cardTexture.wrapS = cardTexture.wrapT = THREE.RepeatWrapping;
-  cardTexture.repeat.set(1, 1);
+  // cardTexture.wrapS = cardTexture.wrapT = THREE.RepeatWrapping;
+  // cardTexture.repeat.set(1, 1);
 
   return (
     <>
-      <RigidBody ref={fixed} position={position} {...segmentProps} />
+      <RigidBody ref={fixed} position={position} {...segmentProps} type="fixed" />
       <RigidBody
         position={[position[0] + 0.5, position[1], position[2]]}
         ref={j1}
@@ -175,10 +170,12 @@ export default function Band({
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
+          depthTest={false}
           resolution={[width, height]}
           lineWidth={1}
           map={bandTexture}
           useMap={1}
+          repeat={[-3, 1]}
         />
       </mesh>
       <RigidBody
@@ -188,30 +185,29 @@ export default function Band({
         position={[position[0] + 2, position[1], position[2]]}
       >
         <CuboidCollider args={[0.8, 1.125, 0.01]} />
-        <mesh
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-
+        <group 
+          position={[0, 0.5, -0.05]}
+          scale={1}
+          onPointerOver={() => hover(true)}
+          onPointerOut={() => hover(false)}
           onPointerDown={(e) => {
-            (e.target as HTMLElement)?.setPointerCapture(e.pointerId);
-            drag(
-              new THREE.Vector3()
-                .copy(e.point)
-                .sub(vec.copy(card.current!.translation()))
-            )
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+            drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current!.translation())))
           }}
           onPointerUp={(e) => {
-            (e.target as HTMLElement)?.releasePointerCapture(e.pointerId);
+            (e.target as HTMLElement).releasePointerCapture(e.pointerId);
             drag(false);
           }}
         >
-          <planeGeometry args={[0.8 * 2, 1.125 * 2]} />
-          <meshBasicMaterial
-            color="white"
-            side={THREE.DoubleSide}
-            map={cardTexture}
-          />
-        </mesh>
+          <mesh>
+            <planeGeometry args={[0.8 * 2, 1.125 * 2]} />
+            <meshBasicMaterial
+              color="white"
+              side={THREE.DoubleSide}
+              map={cardTexture}
+            />
+          </mesh>
+        </group>
       </RigidBody>
     </>
   );

@@ -30,7 +30,7 @@ const BandWrapper = () => {
   // For mobile: don't subtract half width to keep it centered
   // For desktop: keep subtracting half width
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
-  
+
   return <Band position={[xPosition, 5, 0]} />;
 };
 
