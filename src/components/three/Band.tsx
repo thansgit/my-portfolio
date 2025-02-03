@@ -12,7 +12,7 @@ import {
   RapierRigidBody,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
-import { useTexture } from "@react-three/drei";
+import { useTexture, useGLTF } from "@react-three/drei";
 
 //Had to add this to fix typescript error Property 'meshLineGeometry' does not exist on type 'JSX.IntrinsicElements'.ts(2339)
 declare global {
@@ -67,6 +67,8 @@ export default function Band({
       ])
   );
 
+  const { nodes, materials } = useGLTF('/cardtest.glb')
+
   useEffect(() => {
     if (hovered) {
       document.body.style.cursor = dragged ? 'grabbing' : 'grab'
@@ -112,13 +114,14 @@ export default function Band({
       });
 
       // Calculate catmul curve
-      curve.points[0].copy(j3.current!.translation());
-      curve.points[1].copy(j2.current!.lerped!);
-      curve.points[2].copy(j1.current!.lerped!);
-      curve.points[3].copy(fixed.current.translation());
+      curve.points[0].copy(fixed.current.translation());
+      curve.points[1].copy(j1.current!.lerped!);
+      curve.points[2].copy(j2.current!.lerped!);
+      curve.points[3].copy(j3.current!.translation());
+      
       (band.current!.geometry as MeshLineGeometry).setPoints(curve.getPoints(32));
 
-      // Tilt correction - moved inside the main frame update
+      // Tilt correction
       ang.copy(card.current!.angvel());
       rot.copy(card.current!.rotation());
       card.current!.setAngvel({
@@ -170,7 +173,7 @@ export default function Band({
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
-          depthTest={false}
+          depthTest={true}
           resolution={[width, height]}
           lineWidth={1}
           map={bandTexture}
@@ -185,9 +188,11 @@ export default function Band({
         position={[position[0] + 2, position[1], position[2]]}
       >
         <CuboidCollider args={[0.8, 1.125, 0.01]} />
-        <group 
-          position={[0, 0.5, -0.05]}
-          scale={1}
+        <group
+          scale={40
+          }
+          position={[0, -0.4, -0.05]}
+          rotation={[Math.PI * 1.5, 0, 0]}
           onPointerOver={() => hover(true)}
           onPointerOut={() => hover(false)}
           onPointerDown={(e) => {
@@ -199,16 +204,12 @@ export default function Band({
             drag(false);
           }}
         >
-          <mesh>
-            <planeGeometry args={[0.8 * 2, 1.125 * 2]} />
-            <meshBasicMaterial
-              color="white"
-              side={THREE.DoubleSide}
-              map={cardTexture}
-            />
-          </mesh>
+<primitive object={nodes.Scene} />
+
         </group>
       </RigidBody>
     </>
   );
 }
+
+useGLTF.preload('/cardtest.glb')
