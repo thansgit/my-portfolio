@@ -37,19 +37,21 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
       </a>
       <a
         href="#portfolio"
-        className="text-zinc-400 hover:text-white transition-colors"
+        onClick={(e) => handleClick("portfolio", e)}
+        className={`${
+          activeSection === "portfolio" ? "text-yellow-500" : "text-zinc-400"
+        } hover:text-white transition-colors`}
+        aria-current={activeSection === "portfolio" ? "page" : undefined}
       >
         Portfolio
       </a>
       <a
-        href="#blog"
-        className="text-zinc-400 hover:text-white transition-colors"
-      >
-        Blog
-      </a>
-      <a
         href="#contact"
-        className="text-zinc-400 hover:text-white transition-colors"
+        onClick={(e) => handleClick("contact", e)}
+        className={`${
+          activeSection === "contact" ? "text-yellow-500" : "text-zinc-400"
+        } hover:text-white transition-colors`}
+        aria-current={activeSection === "contact" ? "page" : undefined}
       >
         Contact
       </a>

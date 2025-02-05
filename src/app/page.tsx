@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Navigation } from "@/components/Navigation"
 import { AboutSection } from "@/components/AboutSection"
 import { ResumeSection } from "@/components/ResumeSection"
+import { PortfolioSection } from "@/components/PortfolioSection"
+import { ContactSection } from "@/components/ContactSection"
 import Scene from '@/components/three/Scene'
 
 export default function Page() {
@@ -21,6 +23,18 @@ export default function Page() {
         return (
           <div className="w-full">
             <ResumeSection />
+          </div>
+        );
+      case "portfolio":
+        return (
+          <div className="w-full">
+            <PortfolioSection />
+          </div>
+        );
+      case "contact":
+        return (
+          <div className="w-full">
+            <ContactSection />
           </div>
         );
       default:
