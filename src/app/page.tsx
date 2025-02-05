@@ -8,38 +8,44 @@ import { PortfolioSection } from "@/components/PortfolioSection"
 import { ContactSection } from "@/components/ContactSection"
 import Scene from '@/components/three/Scene'
 
-export default function Page() {
-  const [activeSection, setActiveSection] = useState<string>("about");
+const sections = {
+  about: AboutSection,
+  resume: ResumeSection,
+  portfolio: PortfolioSection,
+  contact: ContactSection,
+} as const;
 
-  const renderActiveSection = () => {
-    switch (activeSection) {
-      case "about":
-        return <AboutSection />;
-      case "resume":
-        return <ResumeSection />;
-      case "portfolio":
-        return <PortfolioSection />;
-      case "contact":
-        return <ContactSection />;
-      default:
-        return null;
-    }
-  };
+export default function Page() {
+  const [activeSection, setActiveSection] = useState<keyof typeof sections>("about");
+
+  const ActiveSection = sections[activeSection];
 
   return (
-    <div className="relative min-h-screen text-white">
+    <div className="min-h-screen text-white">
       <div className="fixed inset-0 pointer-events-none">
         <Scene />
       </div>
-      <div className="relative z-10 md:left-[35%] left-0 p-8 md:top-0 top-[700px]">
+      
+      {/* Main Content */}
+      <div className="relative z-10 md:ml-[35%] p-8 pb-24 md:pb-8 mt-[60vh] md:mt-0">
         <main className="max-w-4xl">
           <div className="bg-zinc-900/80 backdrop-blur-sm rounded-xl p-6">
-            <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
+            {/* Desktop Navigation */}
+            <div className="hidden md:block">
+              <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
+            </div>
+            
+            {/* Active Section Content */}
             <div className="w-full">
-              {renderActiveSection()}
+              <ActiveSection />
             </div>
           </div>
         </main>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="md:hidden">
+        <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
       </div>
     </div>
   );
