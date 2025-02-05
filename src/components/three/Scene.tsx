@@ -25,7 +25,7 @@ const BandWrapper = () => {
 
   // For mobile: no offset, just center it (0)
   // For desktop: keep the -0.35 offset
-  const xOffset = isMobile ? 0 : 0.2;
+  const xOffset = isMobile ? 0 : 0.25;
   
   // For mobile: don't subtract half width to keep it centered
   // For desktop: keep subtracting half width

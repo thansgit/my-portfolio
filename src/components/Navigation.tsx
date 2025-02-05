@@ -4,8 +4,12 @@ import Link from "next/link";
 
 export function Navigation() {
   return (
-    <nav className="flex gap-6 text-sm mb-8">
-      <Link href="#" className="text-yellow-500 font-medium">
+    <nav aria-label="Main navigation" className="flex gap-6 text-sm mb-8">
+      <Link 
+        href="#about" 
+        className="text-yellow-500 font-medium"
+        aria-current="page"
+      >
         About
       </Link>
       <Link

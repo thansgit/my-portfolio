@@ -14,6 +14,8 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
 import { useTexture, useGLTF } from "@react-three/drei";
 
+useGLTF.preload('/cardtest.glb')
+
 //Had to add this to fix typescript error Property 'meshLineGeometry' does not exist on type 'JSX.IntrinsicElements'.ts(2339)
 declare global {
   namespace JSX {
@@ -76,9 +78,9 @@ export default function Band({
     }
   }, [hovered, dragged])
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 0.5]);
   useSphericalJoint(j3, card, [[0, 0, 0], [0, 1.45, 0]]);
 
   const segmentProps = {
@@ -134,7 +136,7 @@ export default function Band({
 
   const [bandTexture, cardTexture] = useTexture([
     "/bandplaceholder.jpg",
-    "/cardplaceholder.jpg", // Add your card texture in public folder
+    "/cardplaceholder.jpg",
   ]);
 
   curve.curveType = 'chordal'
@@ -167,7 +169,7 @@ export default function Band({
         {...segmentProps}
 
       >
-        <BallCollider args={[0.1]} />
+        <BallCollider args={[0.05]} />
       </RigidBody>
       <mesh ref={band}>
         <meshLineGeometry />
@@ -175,7 +177,7 @@ export default function Band({
           color="white"
           depthTest={true}
           resolution={[width, height]}
-          lineWidth={1}
+          lineWidth={0.75}
           map={bandTexture}
           useMap={1}
           repeat={[-3, 1]}
@@ -189,9 +191,9 @@ export default function Band({
       >
         <CuboidCollider args={[0.8, 1.125, 0.01]} />
         <group
-          scale={40
+          scale={25
           }
-          position={[0, -0.4, -0.05]}
+          position={[0, 0.2, -0.05]}
           rotation={[Math.PI * 1.5, 0, 0]}
           onPointerOver={() => hover(true)}
           onPointerOut={() => hover(false)}
@@ -212,4 +214,4 @@ export default function Band({
   );
 }
 
-useGLTF.preload('/cardtest.glb')
+
