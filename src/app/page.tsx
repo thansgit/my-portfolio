@@ -14,47 +14,33 @@ export default function Page() {
   const renderActiveSection = () => {
     switch (activeSection) {
       case "about":
-        return (
-          <div className="w-full">
-            <AboutSection />
-          </div>
-        );
+        return <AboutSection />;
       case "resume":
-        return (
-          <div className="w-full">
-            <ResumeSection />
-          </div>
-        );
+        return <ResumeSection />;
       case "portfolio":
-        return (
-          <div className="w-full">
-            <PortfolioSection />
-          </div>
-        );
+        return <PortfolioSection />;
       case "contact":
-        return (
-          <div className="w-full">
-            <ContactSection />
-          </div>
-        );
+        return <ContactSection />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen text-white">
-      <div className="fixed inset-0">
+    <div className="relative min-h-screen text-white">
+      <div className="fixed inset-0 pointer-events-none">
         <Scene />
       </div>
-      <div className="absolute md:left-[35%] left-0 p-8 md:top-0 top-[700px]">
+      <div className="relative z-10 md:left-[35%] left-0 p-8 md:top-0 top-[700px]">
         <main className="max-w-4xl">
           <div className="bg-zinc-900/80 backdrop-blur-sm rounded-xl p-6">
             <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
-            {renderActiveSection()}
+            <div className="w-full">
+              {renderActiveSection()}
+            </div>
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }
