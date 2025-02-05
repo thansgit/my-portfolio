@@ -39,7 +39,7 @@ interface ExtendedRigidBody extends RapierRigidBody {
 }
 
 export default function Band({
-  position = [-3, 4, 0],
+  position = [0, 0, 0],
   maxSpeed = 50,
   minSpeed = 10,
 }: BandProps = {}) {

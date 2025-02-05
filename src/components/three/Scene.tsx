@@ -31,7 +31,7 @@ const BandWrapper = () => {
   // For desktop: keep subtracting half width
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
 
-  return <Band position={[xPosition, 5, 0]} />;
+  return <Band position={[xPosition, 4, 0]} />;
 };
 
 const Scene = () => (
