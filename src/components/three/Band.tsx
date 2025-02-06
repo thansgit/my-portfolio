@@ -125,7 +125,15 @@ export default function Band({
 
       // Update ribbon geometry
       if (ribbonRef.current) {
-        const curve = new CatmullRomCurve3(newPoints);
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3().copy(fixed.current.translation()),
+          new THREE.Vector3().copy(j1.current!.lerped!),
+          new THREE.Vector3().copy(j2.current!.lerped!),
+          new THREE.Vector3().copy(j3.current!.translation()),
+        ]);
+        
+        curve.curveType = 'chordal';
+
         const segments = 50;
         const positions = [];
         const uvs = [];
