@@ -2,7 +2,7 @@
 
 import * as THREE from "three";
 import { useEffect, useRef, useState } from "react";
-import { extend, useThree, useFrame } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
@@ -11,22 +11,10 @@ import {
   useSphericalJoint,
   RapierRigidBody,
 } from "@react-three/rapier";
-import { MeshLineGeometry, MeshLineMaterial } from "meshline";
-import { useTexture, useGLTF } from "@react-three/drei";
+import { useTexture, useGLTF, Line } from "@react-three/drei";
+import { CatmullRomCurve3, Vector3 } from 'three';
 
 useGLTF.preload('/cardtest.glb')
-
-//Had to add this to fix typescript error Property 'meshLineGeometry' does not exist on type 'JSX.IntrinsicElements'.ts(2339)
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      meshLineGeometry: any;
-      meshLineMaterial: any;
-    }
-  }
-}
-
-extend({ MeshLineGeometry, MeshLineMaterial });
 
 interface BandProps {
   position?: [number, number, number];
@@ -59,17 +47,20 @@ export default function Band({
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false)
   const { width, height } = useThree((state) => state.size);
-  const [curve] = useState(
-    () =>
-      new THREE.CatmullRomCurve3([
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-      ])
-  );
 
   const { nodes, materials } = useGLTF('/cardtest.glb')
+
+  const [points, setPoints] = useState([
+    new THREE.Vector3(position[0], position[1], position[2]),
+    new THREE.Vector3(position[0] + 0.5, position[1], position[2]),
+    new THREE.Vector3(position[0] + 1, position[1], position[2]),
+    new THREE.Vector3(position[0] + 1.5, position[1], position[2]),
+  ]);
+
+  // Add texture
+  const bandTexture = useTexture("/bandplaceholder.jpg");
+  const ribbonRef = useRef<THREE.Mesh>(null);
+  const ribbonWidth = 0.075; // Adjust this value to change band width
 
   useEffect(() => {
     if (hovered) {
@@ -89,7 +80,6 @@ export default function Band({
     angularDamping: 2,
     linearDamping: 2,
   };
-
 
   useFrame((state, delta) => {
     if (dragged) {
@@ -115,13 +105,14 @@ export default function Band({
         current.lerped!.lerp(current.translation(), delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed)));
       });
 
-      // Calculate catmul curve
-      curve.points[0].copy(fixed.current.translation());
-      curve.points[1].copy(j1.current!.lerped!);
-      curve.points[2].copy(j2.current!.lerped!);
-      curve.points[3].copy(j3.current!.translation());
-      
-      (band.current!.geometry as MeshLineGeometry).setPoints(curve.getPoints(32));
+      // Update points from physics
+      const newPoints = [
+        new THREE.Vector3().copy(fixed.current.translation()),
+        new THREE.Vector3().copy(j1.current!.lerped!),
+        new THREE.Vector3().copy(j2.current!.lerped!),
+        new THREE.Vector3().copy(j3.current!.translation()),
+      ];
+      setPoints(newPoints);
 
       // Tilt correction
       ang.copy(card.current!.angvel());
@@ -131,20 +122,58 @@ export default function Band({
         y: ang.y - rot.y * 0.25,
         z: ang.z
       }, true);
+
+      // Update ribbon geometry
+      if (ribbonRef.current) {
+        const curve = new CatmullRomCurve3(newPoints);
+        const segments = 50;
+        const positions = [];
+        const uvs = [];
+
+        for (let i = 0; i <= segments; i++) {
+          const t = i / segments;
+          const point = curve.getPoint(t);
+          const tangent = curve.getTangent(t);
+          const normal = new Vector3(0, 0, 1);
+          const binormal = new Vector3().crossVectors(tangent, normal).normalize();
+
+          // Create two vertices for each point to make a ribbon
+          positions.push(
+            point.x + binormal.x * ribbonWidth, 
+            point.y + binormal.y * ribbonWidth, 
+            point.z + binormal.z * ribbonWidth
+          );
+          positions.push(
+            point.x - binormal.x * ribbonWidth, 
+            point.y - binormal.y * ribbonWidth, 
+            point.z - binormal.z * ribbonWidth
+          );
+
+          // UV coordinates for texture mapping
+          uvs.push(t, 0);
+          uvs.push(t, 1);
+        }
+
+        // Create faces
+        const indices = [];
+        for (let i = 0; i < segments; i++) {
+          const v1 = i * 2;
+          const v2 = v1 + 1;
+          const v3 = v1 + 2;
+          const v4 = v1 + 3;
+
+          indices.push(v1, v2, v3);
+          indices.push(v2, v4, v3);
+        }
+
+        const geometry = ribbonRef.current.geometry;
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geometry.setIndex(indices);
+        geometry.computeVertexNormals();
+      }
     }
   });
-
-  const [bandTexture, cardTexture] = useTexture([
-    "/bandplaceholder.jpg",
-    "/cardplaceholder.jpg",
-  ]);
-
-  curve.curveType = 'chordal'
-
-  bandTexture.wrapS = bandTexture.wrapT = THREE.RepeatWrapping;
-  bandTexture.repeat.set(1, 1);
-  // cardTexture.wrapS = cardTexture.wrapT = THREE.RepeatWrapping;
-  // cardTexture.repeat.set(1, 1);
 
   return (
     <>
@@ -171,16 +200,39 @@ export default function Band({
       >
         <BallCollider args={[0.05]} />
       </RigidBody>
-      <mesh ref={band}>
-        <meshLineGeometry />
-        <meshLineMaterial
-          color="white"
-          depthTest={true}
-          resolution={[width, height]}
-          lineWidth={0.75}
+      <Line
+        points={points}
+        color="#FF0000"
+        lineWidth={0}
+        segments={false}
+        transparent={true}
+        opacity={0.2}
+        depthTest={false}
+        dashed={false}
+      />
+      <mesh ref={ribbonRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={4}
+            array={new Float32Array(12)}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-uv"
+            count={4}
+            array={new Float32Array(8)}
+            itemSize={2}
+          />
+        </bufferGeometry>
+        <meshStandardMaterial
           map={bandTexture}
-          useMap={1}
-          repeat={[-3, 1]}
+          transparent={false}
+          opacity={1}
+          side={THREE.DoubleSide}
+          toneMapped={false}
+          depthTest={true}
+          depthWrite={true}
         />
       </mesh>
       <RigidBody
