@@ -32,7 +32,6 @@ export default function Band({
   minSpeed = 10,
 }: BandProps = {}) {
   // References for the band and the joints
-  const band = useRef<THREE.Mesh | null>(null);
   const fixed = useRef<RapierRigidBody>(null);
   const j1 = useRef<ExtendedRigidBody | null>(null);
   const j2 = useRef<ExtendedRigidBody | null>(null);
@@ -56,11 +55,6 @@ export default function Band({
     new THREE.Vector3(position[0] + 1, position[1], position[2]),
     new THREE.Vector3(position[0] + 1.5, position[1], position[2]),
   ]);
-
-  // Add texture
-  const bandTexture = useTexture("/bandplaceholder.jpg");
-  const ribbonRef = useRef<THREE.Mesh>(null);
-  const ribbonWidth = 0.075; // Adjust this value to change band width
 
   useEffect(() => {
     if (hovered) {
@@ -122,64 +116,6 @@ export default function Band({
         y: ang.y - rot.y * 0.25,
         z: ang.z
       }, true);
-
-      // Update ribbon geometry
-      if (ribbonRef.current) {
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3().copy(fixed.current.translation()),
-          new THREE.Vector3().copy(j1.current!.lerped!),
-          new THREE.Vector3().copy(j2.current!.lerped!),
-          new THREE.Vector3().copy(j3.current!.translation()),
-        ]);
-        
-        curve.curveType = 'chordal';
-
-        const segments = 50;
-        const positions = [];
-        const uvs = [];
-
-        for (let i = 0; i <= segments; i++) {
-          const t = i / segments;
-          const point = curve.getPoint(t);
-          const tangent = curve.getTangent(t);
-          const normal = new Vector3(0, 0, 1);
-          const binormal = new Vector3().crossVectors(tangent, normal).normalize();
-
-          // Create two vertices for each point to make a ribbon
-          positions.push(
-            point.x + binormal.x * ribbonWidth, 
-            point.y + binormal.y * ribbonWidth, 
-            point.z + binormal.z * ribbonWidth
-          );
-          positions.push(
-            point.x - binormal.x * ribbonWidth, 
-            point.y - binormal.y * ribbonWidth, 
-            point.z - binormal.z * ribbonWidth
-          );
-
-          // UV coordinates for texture mapping
-          uvs.push(t, 0);
-          uvs.push(t, 1);
-        }
-
-        // Create faces
-        const indices = [];
-        for (let i = 0; i < segments; i++) {
-          const v1 = i * 2;
-          const v2 = v1 + 1;
-          const v3 = v1 + 2;
-          const v4 = v1 + 3;
-
-          indices.push(v1, v2, v3);
-          indices.push(v2, v4, v3);
-        }
-
-        const geometry = ribbonRef.current.geometry;
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-        geometry.setIndex(indices);
-        geometry.computeVertexNormals();
-      }
     }
   });
 
@@ -210,39 +146,13 @@ export default function Band({
       </RigidBody>
       <Line
         points={points}
-        color="#FF0000"
-        lineWidth={0}
-        segments={false}
-        transparent={true}
-        opacity={0.2}
-        depthTest={false}
-        dashed={false}
+        color="white"
+        lineWidth={6}
+        // segments={true}
+        transparent={false}
+        opacity={1}
+        depthTest={true}
       />
-      <mesh ref={ribbonRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={4}
-            array={new Float32Array(12)}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-uv"
-            count={4}
-            array={new Float32Array(8)}
-            itemSize={2}
-          />
-        </bufferGeometry>
-        <meshStandardMaterial
-          map={bandTexture}
-          transparent={false}
-          opacity={1}
-          side={THREE.DoubleSide}
-          toneMapped={false}
-          depthTest={true}
-          depthWrite={true}
-        />
-      </mesh>
       <RigidBody
         ref={card}
         {...segmentProps}
@@ -251,10 +161,10 @@ export default function Band({
       >
         <CuboidCollider args={[0.8, 1.125, 0.01]} />
         <group
-          scale={25
+          scale={2
           }
-          position={[0, 0.2, -0.05]}
-          rotation={[Math.PI * 1.5, 0, 0]}
+          position={[0, 0.1, -0.05]}
+          rotation={[Math.PI * 0.5, 0, 0]}
           onPointerOver={() => hover(true)}
           onPointerOut={() => hover(false)}
           onPointerDown={(e) => {
@@ -266,7 +176,7 @@ export default function Band({
             drag(false);
           }}
         >
-<primitive object={nodes.Scene} />
+          <primitive object={nodes.Scene} />
 
         </group>
       </RigidBody>

@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { ViewportManager } from './viewport/index';
+import { Perf } from 'r3f-perf';
 
 const Scene = () => (
   <div 
@@ -22,6 +23,7 @@ const Scene = () => (
       }}
       resize={{ scroll: false }}
     >
+      {process.env.NODE_ENV === 'development' && <Perf position="top-left" />}
       <ViewportManager />
     </Canvas>
   </div>
