@@ -33,7 +33,7 @@ export default function Page() {
                 <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
                 <div className="flex items-center space-x-4">
                   <a 
-                    href="www.linkedin.com/in/timo-hanski-731413247" 
+                    href="https://linkedin.com/in/timo-hanski-731413247" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-zinc-400 hover:text-yellow-500 transition-colors"
@@ -73,7 +73,7 @@ export default function Page() {
         <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
         <div className="fixed top-4 right-4 flex space-x-4 z-50">
           <a 
-            href="https://linkedin.com/in/yourprofile" 
+            href="https://linkedin.com/in/timo-hanski-731413247" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-zinc-400 hover:text-yellow-500 transition-colors bg-zinc-900/80 backdrop-blur-sm p-2 rounded-full"
@@ -85,7 +85,7 @@ export default function Page() {
             </svg>
           </a>
           <a 
-            href="https://github.com/yourusername" 
+            href="https://github.com/thansgit" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-zinc-400 hover:text-yellow-500 transition-colors bg-zinc-900/80 backdrop-blur-sm p-2 rounded-full"
