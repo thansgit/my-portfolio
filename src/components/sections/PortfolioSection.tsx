@@ -42,10 +42,10 @@ export function PortfolioSection() {
         {portfolioItems.map((item) => (
           <Card 
             key={item.title} 
-            className="group bg-zinc-800 border-zinc-700 overflow-hidden cursor-pointer"
+            className="group bg-zinc-800 border-zinc-700 overflow-hidden"
             tabIndex={0}
-            role="button"
-            aria-label={`View ${item.title} project`}
+            role="region"
+            aria-label={`${item.title} project`}
           >
             <CardContent className="p-0 relative">
               <div className="aspect-video relative overflow-hidden bg-black">
@@ -67,7 +67,7 @@ export function PortfolioSection() {
                         href={item.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
+                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700 cursor-pointer"
                         aria-label={`View live demo of ${item.title}`}
                         onClick={(e) => e.stopPropagation()}
                         tabIndex={0}
@@ -80,7 +80,7 @@ export function PortfolioSection() {
                         href={item.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
+                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700 cursor-pointer"
                         aria-label={`View ${item.title} source code on GitHub`}
                         onClick={(e) => e.stopPropagation()}
                         tabIndex={0}
