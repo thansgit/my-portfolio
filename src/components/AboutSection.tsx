@@ -26,7 +26,7 @@ export function AboutSection() {
     },
   ];
 
-  const skills = ["React", "Node.js", "TypeScript", "Django", "Kotlin", "Python", "Three.js"];
+  const skills = ["React", "Node.js", "TypeScript", "Django", "Kotlin", "Python", "Three.js", "Cypress"];
 
   return (
     <section>

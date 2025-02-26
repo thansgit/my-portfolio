@@ -1,59 +1,40 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionTitle } from "@/components/SectionTitle";
+import { FaGithub } from "react-icons/fa";
 
 interface PortfolioItem {
   title: string;
   category: string;
   imageUrl: string;
+  githubUrl?: string; // Optional GitHub URL
 }
 
 export function PortfolioSection() {
   const portfolioItems: PortfolioItem[] = [
     {
-      title: "Nagark App",
+      title: "Blog / Social media",
       category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
+      imageUrl: "/blogapp.gif",
+      githubUrl: "https://github.com/yourusername/blog-app",
     },
     {
-      title: "Ambition Guru",
+      title: "Old portfolio site",
       category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
+      imageUrl: "/portfolio.gif",
+      githubUrl: "https://github.com/yourusername/portfolio",
     },
     {
-      title: "Soclair",
+      title: "Mine Sweeper GUI",
       category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
+      imageUrl: "/minesweeper.gif",
+      githubUrl: "https://github.com/yourusername/minesweeper",
     },
     {
-      title: "Tolma",
+      title: "To-Do app",
       category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
-    },
-    {
-      title: "Saara",
-      category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
-    },
-    {
-      title: "Ifood",
-      category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
-    },
-    {
-      title: "MeroDate",
-      category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
-    },
-    {
-      title: "Weather App",
-      category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
-    },
-    {
-      title: "Music App",
-      category: "Application",
-      imageUrl: "/cardplaceholder.jpg",
+      imageUrl: "/todo.gif",
+      githubUrl: "https://github.com/yourusername/todo-app",
     },
   ];
 
@@ -71,17 +52,33 @@ export function PortfolioSection() {
             aria-label={`View ${item.title} project`}
           >
             <CardContent className="p-0 relative">
-              <div className="aspect-video relative overflow-hidden">
+              <div className="aspect-video relative overflow-hidden bg-black">
                 <Image
                   src={item.imageUrl}
                   alt={item.title}
                   fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="object-contain transition-transform duration-300 group-hover:scale-110"
                 />
               </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
-                <p className="text-sm text-zinc-400">{item.category}</p>
+              <div className="h-px w-full bg-zinc-700"></div>
+              <div className="p-4 flex justify-between items-center bg-zinc-800">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
+                  <p className="text-sm text-zinc-400">{item.category}</p>
+                </div>
+                {item.githubUrl && (
+                  <a 
+                    href={item.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
+                    aria-label={`View ${item.title} source code on GitHub`}
+                    onClick={(e) => e.stopPropagation()}
+                    tabIndex={0}
+                  >
+                    <FaGithub className="w-5 h-5" />
+                  </a>
+                )}
               </div>
             </CardContent>
           </Card>
