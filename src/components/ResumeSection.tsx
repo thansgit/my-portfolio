@@ -16,49 +16,35 @@ interface ExperienceItem {
 export const ResumeSection = () => {
   const education: EducationItem[] = [
     {
-      school: "Lorem Ipsum University",
-      degree: "Master of Science in Computer Engineering",
-      duration: "2018 — 2020"
+      school: "Tampereen yliopisto",
+      degree: "Bachelor of Science in Computer Engineering",
+      duration: "2019 — 2024"
     },
-    {
-      school: "Dolor Sit Academy",
-      degree: "Bachelor of Technology",
-      duration: "2014 — 2018"
-    }
   ];
 
   const experience: ExperienceItem[] = [
     {
-      company: "Tech Innovations Corp",
-      position: "Senior Software Engineer",
-      duration: "2022 — Present",
+      company: "Haltu",
+      position: "Fullstack Developer",
+      duration: "2023 — 2024",
       responsibilities: [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        "Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse."
+        "Developed applications using Kotlin, Django, Python, TypeScript, and React.",
+        "Performed maintenance tasks and managed deployments in Linux environments.",
+        "Acted as a customer-facing developer, bridging communication between technical teams and clients.",
+        "Gained experience across the full development lifecycle by working on diverse projects from start to finish.",
+        "Used GitHub for version control, collaboration, and code reviews.",
       ]
     },
     {
-      company: "Digital Solutions Ltd",
-      position: "Software Developer",
-      duration: "2020 — 2022",
+      company: "Here Technologies",
+      position: "Frontend Developer",
+      duration: "2022 — 2023",
       responsibilities: [
-        "Consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
-        "Ut labore et dolore magna aliqua, ut enim ad minim veniam.",
-        "Quis nostrud exercitation ullamco laboris nisi ut aliquip.",
-        "Ex ea commodo consequat, duis aute irure dolor in reprehenderit."
-      ]
-    },
-    {
-      company: "Creative Tech Labs",
-      position: "Junior Developer",
-      duration: "2019 — 2020",
-      responsibilities: [
-        "Excepteur sint occaecat cupidatat non proident.",
-        "Sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem.",
-        "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit."
+        "Developed and maintained frontend features using TypeScript and React.",
+        "Collaborated on UI design.",
+        "Wrote and maintained Cypress tests to ensure code quality and reliability.",
+        "Conducted feature demos for stakeholders to showcase new functionalities.",
+        "Managed tasks and workflows using Jira for project tracking.",
       ]
     }
   ];

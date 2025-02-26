@@ -9,24 +9,24 @@ interface ServiceItem {
 export function AboutSection() {
   const services: ServiceItem[] = [
     {
-      title: "Mobile Apps",
-      description: "Professional development of applications for Android and iOS.",
-    },
-    {
-      title: "Web Development",
-      description: "High-quality development of sites at the professional level.",
-    },
-    {
-      title: "UI/UX Design",
-      description: "The most modern and high-quality design made at a professional level.",
+      title: "Frontend Development",
+      description: "Building and maintaining websites and web applications with a focus on clean code and great user experiences.",
     },
     {
       title: "Backend Development",
-      description: "High-performance backend services designed for scalability and seamless user experience.",
+      description: "Creating and maintaining backend services that are scalable and performant.",
+    },
+    {
+      title: "UI/UX Design",
+      description: "Designing and implementing interfaces that are intuitive, responsive, and visually appealing.",
+    },
+    {
+      title: "Mobile Development",
+      description: "Developing Android applications using modern tools and frameworks.",
     },
   ];
 
-  const skills = ["React", "Node.js", "TypeScript", "MongoDB"];
+  const skills = ["React", "Node.js", "TypeScript", "Django", "Kotlin", "Python", "Three.js"];
 
   return (
     <section>
@@ -35,16 +35,17 @@ export function AboutSection() {
       {/* About Text */}
       <div className="text-zinc-400 space-y-4 mb-12">
         <p>
-          A passionate full-stack developer with strong expertise in web
-          development, REST APIs, UI/UX, and data management solutions. Proven
-          track record in delivering cutting-edge solutions, including API
-          integration and performance optimization.
+        Developer with experience in both consultancy work and product companies.
+        I’m comfortable working across the stack, but I especially enjoy frontend development.
         </p>
         <p>
-          If you're seeking a skilled developer to breathe life into your
-          project and exceed your expectations, I'm here to collaborate and
-          create magic together. Reach out, and let's transform your vision into
-          reality!
+        My time as a consultant taught me to solve problems flexibly for different clients, while working in a larger product company gave me hands-on experience with CI/CD pipelines,
+        automated testing, and building maintainable systems at scale.
+        I aim to write code that's straightforward to use today and easy to improve tomorrow, whether it's a quick fix or a long-term solution.
+        </p>
+        <p>
+        If you're looking for a developer who can adapt to your needs and deliver results, let's talk!
+        I'm open to new opportunities and excited to discuss how I could contribute to your team.
         </p>
       </div>
 
