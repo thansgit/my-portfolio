@@ -5,7 +5,7 @@ import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
 import { ViewportState } from '../types';
 import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../constants/viewport';
-import Band from '../Band';
+import { Band } from '../Band';
 import { Background } from '../Background';
 
 // Context

@@ -11,8 +11,7 @@ import {
   useSphericalJoint,
   RapierRigidBody,
 } from "@react-three/rapier";
-import { useTexture, useGLTF, Line } from "@react-three/drei";
-import { CatmullRomCurve3, Vector3 } from 'three';
+import { useGLTF, Line } from "@react-three/drei";
 import { BandProps, ExtendedRigidBody } from "./types";
 
 useGLTF.preload('/cardtest.glb')
@@ -35,10 +34,9 @@ export const Band = ({
   const dir = new THREE.Vector3();
 
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
-  const [hovered, hover] = useState(false)
-  const { width, height } = useThree((state) => state.size);
-
-  const { nodes, materials } = useGLTF('/cardtest.glb')
+  const [hovered, hover] = useState(false);
+  
+  const { nodes } = useGLTF('/cardtest.glb');
 
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
@@ -139,7 +137,6 @@ export const Band = ({
         points={points}
         color="white"
         lineWidth={6}
-        // segments={true}
         transparent={false}
         opacity={1}
         depthTest={true}
@@ -152,8 +149,7 @@ export const Band = ({
       >
         <CuboidCollider args={[0.8, 1.125, 0.01]} />
         <group
-          scale={2
-          }
+          scale={2}
           position={[0, 0.1, -0.05]}
           rotation={[Math.PI * 0.5, 0, 0]}
           onPointerOver={() => hover(true)}
@@ -168,13 +164,10 @@ export const Band = ({
           }}
         >
           <primitive object={nodes.Scene} />
-
         </group>
       </RigidBody>
     </>
   );
 }
-
-export default Band;
 
 

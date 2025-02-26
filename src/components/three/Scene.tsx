@@ -8,11 +8,7 @@ export const Scene = () => (
   <div className="fixed inset-0 w-screen h-screen overflow-hidden">
     <Canvas
       camera={{ position: [0, 0, 13], fov: 25 }}
-      style={{ 
-        position: "absolute",
-        width: '100%',
-        height: '100%'
-      }}
+      className="absolute w-full h-full"
       resize={{ scroll: false }}
     >
       {process.env.NODE_ENV === 'development' && <Perf position="top-left" />}
