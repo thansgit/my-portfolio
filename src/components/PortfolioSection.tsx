@@ -1,40 +1,43 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionTitle } from "@/components/SectionTitle";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 interface PortfolioItem {
   title: string;
-  category: string;
   imageUrl: string;
+  technologies: string[]; // Array of technologies used
   githubUrl?: string; // Optional GitHub URL
+  liveUrl?: string; // Optional live demo URL
 }
 
 export function PortfolioSection() {
   const portfolioItems: PortfolioItem[] = [
     {
       title: "Blog / Social media",
-      category: "Application",
       imageUrl: "/blogapp.gif",
-      githubUrl: "https://github.com/yourusername/blog-app",
+      technologies: ["React-redux", "Express", "Node", "MongoDB", "tailwindCSS",],
+      githubUrl: "https://github.com/thansgit/blog-app",
+      liveUrl: "https://lol-blog-app.netlify.app/",
     },
     {
       title: "Old portfolio site",
-      category: "Application",
       imageUrl: "/portfolio.gif",
-      githubUrl: "https://github.com/yourusername/portfolio",
+      technologies: ["React", "Bootstrap", "CSS"],
+      githubUrl: "https://github.com/thansgit/portfolio",
+      liveUrl: "https://thansgitportfolio.netlify.app/",
     },
     {
       title: "Mine Sweeper GUI",
-      category: "Application",
       imageUrl: "/minesweeper.gif",
-      githubUrl: "https://github.com/yourusername/minesweeper",
+      technologies: ["C++17", "QT"],
+      githubUrl: "https://github.com/thansgit/minesweeper_gui",
     },
     {
       title: "To-Do app",
-      category: "Application",
       imageUrl: "/todo.gif",
-      githubUrl: "https://github.com/yourusername/todo-app",
+      technologies: ["React", "Express", "Mongoose", "MongoDB"],
+      githubUrl: "https://github.com/thansgit/to-do",
     },
   ];
 
@@ -61,24 +64,50 @@ export function PortfolioSection() {
                 />
               </div>
               <div className="h-px w-full bg-zinc-700"></div>
-              <div className="p-4 flex justify-between items-center bg-zinc-800">
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
-                  <p className="text-sm text-zinc-400">{item.category}</p>
+              <div className="p-4 flex flex-col gap-2 bg-zinc-800">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                  
+                  <div className="flex space-x-2">
+                    {item.liveUrl && (
+                      <a 
+                        href={item.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
+                        aria-label={`View live demo of ${item.title}`}
+                        onClick={(e) => e.stopPropagation()}
+                        tabIndex={0}
+                      >
+                        <FaExternalLinkAlt className="w-4 h-4" />
+                      </a>
+                    )}
+                    {item.githubUrl && (
+                      <a 
+                        href={item.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
+                        aria-label={`View ${item.title} source code on GitHub`}
+                        onClick={(e) => e.stopPropagation()}
+                        tabIndex={0}
+                      >
+                        <FaGithub className="w-5 h-5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-                {item.githubUrl && (
-                  <a 
-                    href={item.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700"
-                    aria-label={`View ${item.title} source code on GitHub`}
-                    onClick={(e) => e.stopPropagation()}
-                    tabIndex={0}
-                  >
-                    <FaGithub className="w-5 h-5" />
-                  </a>
-                )}
+                
+                <div className="flex flex-wrap gap-1">
+                  {item.technologies.map((tech) => (
+                    <span 
+                      key={`${item.title}-${tech}`}
+                      className="px-2 py-1 text-xs rounded bg-zinc-700 text-zinc-300"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
