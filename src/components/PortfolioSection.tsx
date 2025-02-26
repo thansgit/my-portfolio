@@ -17,7 +17,7 @@ export function PortfolioSection() {
       title: "Blog / Social media",
       imageUrl: "/blogapp.gif",
       technologies: ["React-redux", "Express", "Node", "MongoDB", "tailwindCSS",],
-      githubUrl: "https://github.com/thansgit/blog-app",
+      githubUrl: "https://github.com/thansgit/lol-service",
       liveUrl: "https://lol-blog-app.netlify.app/",
     },
     {
