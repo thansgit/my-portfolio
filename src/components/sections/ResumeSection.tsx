@@ -1,4 +1,5 @@
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { DownloadIcon } from "lucide-react";
 import { EducationItem, ExperienceItem } from "./types";
 
 export const ResumeSection = () => {
@@ -37,9 +38,30 @@ export const ResumeSection = () => {
     }
   ];
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      (e.currentTarget as HTMLAnchorElement).click();
+    }
+  };
+
   return (
     <section>
-      <SectionTitle>Resume</SectionTitle>
+      <div className="mb-6">
+        <SectionTitle>Resume</SectionTitle>
+        <div className="mt-4">
+          <a 
+            href="/resume.pdf" 
+            download
+            className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-zinc-900 rounded-md hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            aria-label="Download resume as PDF"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+          >
+            <DownloadIcon size={16} />
+            <span className="font-medium">Resume PDF</span>
+          </a>
+        </div>
+      </div>
       
       {/* Experience Section */}
       <div className="mb-12">
