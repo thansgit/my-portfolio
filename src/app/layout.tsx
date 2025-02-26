@@ -7,8 +7,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Portto",
-  description: "Portfolio of a software engineer",
+  title: "Timo Hanski - Software Developer Portfolio",
+  description: "Portfolio of Timo Hanski, a Software Developer specializing in React, TypeScript, Three.js and full-stack development. View my projects, skills, and experience.",
+  keywords: "Timo Hanski, software developer, web developer, full-stack developer, React, TypeScript, Three.js, JavaScript, portfolio, Finland, developer portfolio",
+  authors: [{ name: "Timo Hanski" }],
+  creator: "Timo Hanski",
+  publisher: "Timo Hanski",
+  // openGraph: {
+  //   type: "website",
+  //   locale: "en_US",
+  //   url: "https://timohanski.com", // Replace with your actual domain when you have it
+  //   title: "Timo Hanski - Software Developer Portfolio",
+  //   description: "Portfolio of Timo Hanski, a Software Developer specializing in React, TypeScript, Three.js and full-stack development",
+  //   siteName: "Timo Hanski Portfolio",
+  // },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  metadataBase: new URL("https://timohanski.com"), // Replace with your actual domain
 };
 
 export default function RootLayout({
