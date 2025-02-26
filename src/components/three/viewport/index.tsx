@@ -1,22 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, Suspense } from 'react';
+import React, { createContext, useContext, useState, useEffect, Suspense } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
+import { ViewportState } from '../types';
+import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../constants/viewport';
 import Band from '../Band';
-import Background from '../Background';
-
-// Constants
-const MOBILE_BREAKPOINT = 768;
-const RESIZE_DELAY = 500;
-const MOBILE_OFFSET = 0;
-const DESKTOP_OFFSET = 0.25;
-
-// Types
-interface ViewportState {
-  isMobile: boolean;
-  isVisible: boolean;
-}
+import { Background } from '../Background';
 
 // Context
 const ViewportContext = createContext<ViewportState>({

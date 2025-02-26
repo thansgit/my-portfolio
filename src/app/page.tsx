@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Navigation } from "@/components/Navigation"
-import { AboutSection } from "@/components/AboutSection"
-import { ResumeSection } from "@/components/ResumeSection"
-import { PortfolioSection } from "@/components/PortfolioSection"
-import { ContactSection } from "@/components/ContactSection"
-import Scene from '@/components/three/Scene'
+import { Navigation } from "@/components/layout";
+import { AboutSection, ResumeSection, PortfolioSection, ContactSection } from "@/components/sections";
+import { Scene } from '@/components/three';
 
 const sections = {
   about: AboutSection,

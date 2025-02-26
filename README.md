@@ -1,24 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Portfolio
+
+A modern portfolio website built with Next.js, React, TypeScript, and Three.js.
+
+## Project Structure
+
+The project follows a well-organized structure:
+
+```
+src/
+├── app/                  # Next.js app directory
+│   ├── page.tsx          # Main page component
+│   ├── layout.tsx        # Root layout
+│   └── globals.css       # Global styles
+├── components/           # React components
+│   ├── layout/           # Layout components
+│   │   ├── Navigation.tsx
+│   │   ├── constants.ts
+│   │   └── index.ts
+│   ├── sections/         # Section components
+│   │   ├── AboutSection.tsx
+│   │   ├── ResumeSection.tsx
+│   │   ├── PortfolioSection.tsx
+│   │   ├── ContactSection.tsx
+│   │   ├── types.ts
+│   │   └── index.ts
+│   ├── three/            # Three.js components
+│   │   ├── Scene.tsx
+│   │   ├── Background.tsx
+│   │   ├── Band.tsx
+│   │   ├── LightformerConfig.tsx
+│   │   ├── constants/
+│   │   ├── types/
+│   │   ├── viewport/
+│   │   └── index.ts
+│   └── ui/               # UI components
+│       ├── SectionTitle.tsx
+│       └── card.tsx
+└── lib/                  # Utility functions
+    └── utils.ts
+```
+
+## Technologies Used
+
+- **Next.js**: React framework for server-rendered applications
+- **React**: JavaScript library for building user interfaces
+- **TypeScript**: Typed superset of JavaScript
+- **Three.js**: 3D library for creating 3D graphics in the browser
+- **React Three Fiber**: React renderer for Three.js
+- **Tailwind CSS**: Utility-first CSS framework
+- **Shadcn UI**: UI component library
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Build and Deploy
+
+To build the project for production:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To start the production server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Code Organization
+
+- **Named Exports**: Components use named exports for consistency
+- **Type Definitions**: Types are organized in dedicated type files
+- **Constants**: Constants are extracted to dedicated files
+- **Reusable Components**: UI components are designed to be reusable
+- **Responsive Design**: The site is fully responsive for all device sizes
 
 ## Learn More
 

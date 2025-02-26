@@ -13,24 +13,15 @@ import {
 } from "@react-three/rapier";
 import { useTexture, useGLTF, Line } from "@react-three/drei";
 import { CatmullRomCurve3, Vector3 } from 'three';
+import { BandProps, ExtendedRigidBody } from "./types";
 
 useGLTF.preload('/cardtest.glb')
 
-interface BandProps {
-  position?: [number, number, number];
-  maxSpeed?: number;
-  minSpeed?: number;
-}
-
-interface ExtendedRigidBody extends RapierRigidBody {
-  lerped?: THREE.Vector3;
-}
-
-export default function Band({
+export const Band = ({
   position = [0, 0, 0],
   maxSpeed = 50,
   minSpeed = 10,
-}: BandProps = {}) {
+}: BandProps = {}) => {
   // References for the band and the joints
   const fixed = useRef<RapierRigidBody>(null);
   const j1 = useRef<ExtendedRigidBody | null>(null);
@@ -183,5 +174,7 @@ export default function Band({
     </>
   );
 }
+
+export default Band;
 
 
