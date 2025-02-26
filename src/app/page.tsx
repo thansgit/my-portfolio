@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Navigation } from "@/components/layout";
 import { AboutSection, ResumeSection, PortfolioSection, ContactSection } from "@/components/sections";
 import { Scene } from '@/components/three';
+import { SplashScreen } from '@/components/ui/SplashScreen';
+import { LoadingProvider } from '@/components/three/context/LoadingContext';
 
 const sections = {
   about: AboutSection,
@@ -19,9 +21,12 @@ export default function Page() {
 
   return (
     <div className="min-h-screen text-white">
-      <div className="fixed inset-0 pointer-events-none">
-        <Scene />
-      </div>
+      <LoadingProvider>
+        <SplashScreen />
+        <div className="fixed inset-0 pointer-events-none">
+          <Scene />
+        </div>
+      </LoadingProvider>
       
       {/* Main Content */}
       <div className="relative z-10 md:ml-[35%] p-8 pb-24 md:pb-8 mt-[60vh] md:mt-0">

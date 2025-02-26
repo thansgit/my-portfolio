@@ -14,7 +14,8 @@ import {
 import { useGLTF, Line } from "@react-three/drei";
 import { BandProps, ExtendedRigidBody } from "./types";
 
-useGLTF.preload('/cardtest.glb')
+// Preload the 3D model to improve loading performance
+useGLTF.preload('/cardtest.glb', true);
 
 export const Band = ({
   position = [0, 0, 0],
