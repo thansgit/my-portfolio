@@ -21,13 +21,18 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
     <>
       {/* Highlight box that moves */}
       <div 
-        className="absolute inset-1.5 transition-all duration-300 ease-in-out"
+        className="absolute transition-all duration-300 ease-in-out"
         style={{
           left: highlightPosition,
           width: "25%",
+          top: "0.375rem", // 1.5 tailwind units
+          bottom: "0.375rem", // 1.5 tailwind units
+          right: "auto",
+          paddingLeft: "0.5rem", // Add padding to center the highlight box
+          paddingRight: "0.5rem"
         }}
       >
-        <div className="w-full h-full rounded-full bg-zinc-800" />
+        <div className="w-full h-full rounded-full bg-zinc-700" />
       </div>
 
       {navigationItems.map((item) => (
