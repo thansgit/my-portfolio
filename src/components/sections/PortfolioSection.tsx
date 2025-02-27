@@ -53,6 +53,7 @@ export function PortfolioSection() {
                   src={item.imageUrl}
                   alt={item.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-contain transition-transform duration-300 group-hover:scale-110"
                 />
               </div>

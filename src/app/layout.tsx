@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full bg-black">
+    <html lang="en" className="w-full bg-black" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased w-full m-0 p-0 bg-black min-h-screen`}>
         <div className="absolute inset-0 w-full z-0 m-0 p-0">
         </div>
