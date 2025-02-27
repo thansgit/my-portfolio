@@ -45,6 +45,7 @@ export const ResumeSection = () => {
         "Wrote and maintained Cypress tests to ensure code quality and reliability.",
         "Conducted feature demos for stakeholders to showcase new functionalities.",
         "Managed tasks and workflows using Jira for project tracking.",
+        "Took part in integrating a new design system into the product.",
       ]
     }
   ];
