@@ -41,7 +41,7 @@ export function AboutSection() {
         <p>
         My time as a consultant taught me to solve problems flexibly for different clients, while working in a larger product company gave me hands-on experience with CI/CD pipelines,
         automated testing, and building maintainable systems at scale.
-        I aim to write code that's straightforward to use today and easy to improve tomorrow, whether it's a quick fix or a long-term solution.
+        I aim to write code that's straightforward to use today and easy to improve tomorrow.
         </p>
         <p>
         If you're looking for a developer who can adapt to your needs and deliver results, let's talk!
