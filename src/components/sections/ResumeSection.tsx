@@ -1,5 +1,5 @@
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, BriefcaseIcon, GraduationCapIcon } from "lucide-react";
 import { EducationItem, ExperienceItem } from "./types";
 
 export const ResumeSection = () => {
@@ -65,7 +65,12 @@ export const ResumeSection = () => {
       
       {/* Experience Section */}
       <div className="mb-12">
-        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">Experience</SectionTitle>
+        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">
+          <div className="flex items-center gap-2">
+            <BriefcaseIcon size={20} className="text-yellow-500" />
+            <span>Experience</span>
+          </div>
+        </SectionTitle>
         <div className="space-y-8">
           {experience.map((exp, index) => (
             <div key={index} className="relative pl-6 border-l border-zinc-700">
@@ -85,7 +90,12 @@ export const ResumeSection = () => {
 
       {/* Education Section */}
       <div>
-        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">Education</SectionTitle>
+        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">
+          <div className="flex items-center gap-2">
+            <GraduationCapIcon size={20} className="text-yellow-500" />
+            <span>Education</span>
+          </div>
+        </SectionTitle>
         <div className="space-y-6">
           {education.map((edu, index) => (
             <div key={index} className="relative pl-6 border-l border-zinc-700">

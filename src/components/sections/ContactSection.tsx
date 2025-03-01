@@ -3,6 +3,13 @@
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { useState } from "react";
 import { ContactFormData, SubmitStatus } from "./types";
+import { 
+  MailIcon,
+  UserIcon, 
+  MessageSquareIcon, 
+  SendIcon, 
+  MapPinIcon 
+} from "lucide-react";
 
 export function ContactSection() {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -69,7 +76,11 @@ export function ContactSection() {
       <SectionTitle>Contact</SectionTitle>
       
       {/* Map Section */}
-      <div className="mb-12 w-full h-[400px] rounded-lg overflow-hidden">
+      <div className="mb-12 w-full h-[400px] rounded-lg overflow-hidden relative">
+        <div className="absolute top-4 left-4 z-10 bg-zinc-900/80 p-2 rounded-lg flex items-center gap-2">
+          <MapPinIcon size={16} className="text-yellow-500" />
+          <span className="text-sm text-white">Hervanta, Tampere, Finland</span>
+        </div>
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15349.387950054843!2d23.837399584287164!3d61.450409040860716!2m3!1f0!2f0!3f0!3m2!1i1024!1i768!4f13.1!3m3!1m2!1s0x468edfb1098a7c41%3A0x5bc20ec2638a0d0!2sHervanta%2C%20Tampere%2C%20Finland!5e0!3m2!1sen!2sfi!4v1710271923154!5m2!1sen!2sfi"
           width="100%"
@@ -84,7 +95,7 @@ export function ContactSection() {
       </div>
 
       {/* Contact Form */}
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+      <form onSubmit={handleSubmit} className="w-full">
         {submitStatus.message && (
           <div className={`mb-6 p-4 rounded-lg ${submitStatus.success ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'}`}>
             {submitStatus.message}
@@ -92,40 +103,49 @@ export function ContactSection() {
         )}
         
         <div className="grid grid-cols-1 gap-6">
-          <div>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+              <UserIcon size={18} />
+            </div>
             <input
               type="text"
               name="fullName"
               value={formData.fullName}
               onChange={handleInputChange}
               placeholder="Full name"
-              className="w-full px-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
               required
               aria-label="Full name"
               disabled={isSubmitting}
             />
           </div>
-          <div>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+              <MailIcon size={18} />
+            </div>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Email address"
-              className="w-full px-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
               required
               aria-label="Email address"
               disabled={isSubmitting}
             />
           </div>
-          <div>
+          <div className="relative">
+            <div className="absolute left-3 top-3 text-zinc-400">
+              <MessageSquareIcon size={18} />
+            </div>
             <textarea
               name="message"
               value={formData.message}
               onChange={handleInputChange}
               placeholder="Your Message"
               rows={6}
-              className="w-full px-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all resize-none"
+              className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all resize-none"
               required
               aria-label="Your message"
               disabled={isSubmitting}
@@ -139,22 +159,7 @@ export function ContactSection() {
               disabled={isSubmitting}
             >
               <span>{isSubmitting ? "Sending..." : "Send Message"}</span>
-              {!isSubmitting && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-              )}
+              {!isSubmitting && <SendIcon size={18} />}
             </button>
           </div>
         </div>
