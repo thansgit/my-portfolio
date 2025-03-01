@@ -58,7 +58,7 @@ export const ResumeSection = () => {
             onKeyDown={handleKeyDown}
           >
             <DownloadIcon size={16} />
-            <span className="font-medium">Resume PDF</span>
+            <span className="font-medium">PDF</span>
           </a>
         </div>
       </div>
