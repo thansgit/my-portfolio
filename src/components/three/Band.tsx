@@ -24,7 +24,6 @@ export const Band = ({
 }: BandProps = {}) => {
   // References for the band and the joints
   const fixed = useRef<RapierRigidBody>(null);
-  const j1 = useRef<ExtendedRigidBody | null>(null);
   const j2 = useRef<ExtendedRigidBody | null>(null);
   const j3 = useRef<RapierRigidBody | null>(null);
 
@@ -51,8 +50,7 @@ export const Band = ({
 
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
-    new THREE.Vector3(position[0] + 0.5, position[1], position[2]),
-    new THREE.Vector3(position[0] + 1, position[1], position[2]),
+    new THREE.Vector3(position[0] + 0.75, position[1], position[2]),
     new THREE.Vector3(position[0] + 1.5, position[1], position[2]),
   ]);
 
@@ -81,8 +79,20 @@ export const Band = ({
             y: 0,
             z: -touchVelocity.current.y * flickStrength
           }, true);
+        } else {
+          // Always ensure the card becomes dynamic even if it's not a flick
+          card.current.setBodyType(2, true);
         }
+      } else if (card.current) {
+        // Always ensure the card becomes dynamic when released, even without velocity
+        card.current.setBodyType(2, true);
+        
+        // Apply a tiny impulse to ensure physics takes over
+        card.current.applyImpulse({ x: 0, y: 0.01, z: 0 }, true);
       }
+      
+      // Ensure all bodies are awake to respond to physics
+      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
       
       // Reset tracking
       touchVelocity.current.set(0, 0);
@@ -141,7 +151,7 @@ export const Band = ({
             dir.copy(vec).sub(three.camera.position).normalize();
             vec.add(dir.multiplyScalar(three.camera.position.length()));
             
-            [card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+            [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
             card.current!.setNextKinematicTranslation({
               x: vec.x - (dragged as THREE.Vector3).x,
               y: vec.y - (dragged as THREE.Vector3).y,
@@ -188,9 +198,8 @@ export const Band = ({
     }
   }, [hovered, dragged])
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 0.5]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 0.5]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useRopeJoint(fixed, j2, [[0, 0, 0], [0, 0, 0], 0.75]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 0.75]);
   useSphericalJoint(j3, card, [[0, 0, 0], [0, 1.45, 0]]);
 
   const segmentProps = {
@@ -206,7 +215,7 @@ export const Band = ({
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
-      [card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
       card.current!.setNextKinematicTranslation({
         x: vec.x - (dragged as THREE.Vector3).x,
         y: vec.y - (dragged as THREE.Vector3).y,
@@ -216,7 +225,7 @@ export const Band = ({
 
     if (fixed.current) {
       // Fix most of the jitter when over pulling the card
-      [j1, j2].forEach((ref) => {
+      [j2].forEach((ref) => {
         const current = ref.current!;
         if (!current.lerped) {
           current.lerped = new THREE.Vector3().copy(current.translation());
@@ -228,7 +237,6 @@ export const Band = ({
       // Update points from physics
       const newPoints = [
         new THREE.Vector3().copy(fixed.current.translation()),
-        new THREE.Vector3().copy(j1.current!.lerped!),
         new THREE.Vector3().copy(j2.current!.lerped!),
         new THREE.Vector3().copy(j3.current!.translation()),
       ];
@@ -242,6 +250,24 @@ export const Band = ({
         y: ang.y - rot.y * 0.25,
         z: ang.z
       }, true);
+      
+      // Anti-stuck mechanism: If the card is not being dragged and appears stuck at the top
+      if (!dragged && card.current && !card.current.isSleeping()) {
+        // Check if card is higher up than the fixed point (suggesting it might be stuck)
+        const cardPos = card.current.translation();
+        const fixedPos = fixed.current.translation();
+        const cardVel = card.current.linvel();
+        
+        // If card is higher than fixed point and moving very slowly (almost stuck)
+        const isHigherThanBase = cardPos.y > fixedPos.y + 0.5;
+        const isAlmostStill = Math.abs(cardVel.x) < 0.1 && Math.abs(cardVel.y) < 0.1 && Math.abs(cardVel.z) < 0.1;
+        
+        if (isHigherThanBase && isAlmostStill) {
+          // Apply a small downward force to overcome any physics anomaly
+          card.current.applyImpulse({ x: 0, y: -0.05, z: 0 }, true);
+          card.current.wakeUp();
+        }
+      }
     }
   });
 
@@ -306,7 +332,7 @@ export const Band = ({
       dir.copy(vec).sub(three.camera.position).normalize();
       vec.add(dir.multiplyScalar(three.camera.position.length()));
       
-      [card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
       card.current!.setNextKinematicTranslation({
         x: vec.x - (dragged as THREE.Vector3).x,
         y: vec.y - (dragged as THREE.Vector3).y,
@@ -389,6 +415,8 @@ export const Band = ({
       // Original desktop behavior
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current!.translation())));
+      // Ensure the card is kinematic during desktop drag
+      card.current!.setBodyType(1, true); // 1 = kinematicPosition
     }
   };
 
@@ -433,14 +461,7 @@ export const Band = ({
     <>
       <RigidBody ref={fixed} position={position} {...segmentProps} type="fixed" />
       <RigidBody
-        position={[position[0] + 0.5, position[1], position[2]]}
-        ref={j1}
-        {...segmentProps}
-      >
-        <BallCollider args={[0.1]} />
-      </RigidBody>
-      <RigidBody
-        position={[position[0] + 1, position[1], position[2]]}
+        position={[position[0] + 0.75, position[1], position[2]]}
         ref={j2}
         {...segmentProps}
       >
@@ -480,6 +501,8 @@ export const Band = ({
             } else {
               (e.target as HTMLElement).setPointerCapture(e.pointerId);
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current!.translation())));
+              // Ensure the card is kinematic during desktop drag
+              card.current!.setBodyType(1, true); // 1 = kinematicPosition
             }
           }}
           onPointerUp={(e) => {
