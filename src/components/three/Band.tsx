@@ -26,6 +26,10 @@ export const Band = ({
   const fixed = useRef<RapierRigidBody>(null);
   const j2 = useRef<ExtendedRigidBody | null>(null);
   const j3 = useRef<RapierRigidBody | null>(null);
+  const j4 = useRef<RapierRigidBody | null>(null);
+
+  // Configuration constants
+  const ROPE_SEGMENT_LENGTH = 0.15;
 
   const card = useRef<RapierRigidBody>(null);
   const vec = new THREE.Vector3();
@@ -50,8 +54,9 @@ export const Band = ({
 
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
-    new THREE.Vector3(position[0] + 0.75, position[1], position[2]),
-    new THREE.Vector3(position[0] + 1.5, position[1], position[2]),
+    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]),
+    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]),
+    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]),
   ]);
 
   // Handle safe release of card
@@ -92,7 +97,7 @@ export const Band = ({
       }
       
       // Ensure all bodies are awake to respond to physics
-      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+      [card, j2, j3, j4, fixed].forEach((ref) => ref.current?.wakeUp());
       
       // Reset tracking
       touchVelocity.current.set(0, 0);
@@ -151,7 +156,7 @@ export const Band = ({
             dir.copy(vec).sub(three.camera.position).normalize();
             vec.add(dir.multiplyScalar(three.camera.position.length()));
             
-            [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+            [card, j2, j3, j4, fixed].forEach((ref) => ref.current?.wakeUp());
             card.current!.setNextKinematicTranslation({
               x: vec.x - (dragged as THREE.Vector3).x,
               y: vec.y - (dragged as THREE.Vector3).y,
@@ -198,9 +203,10 @@ export const Band = ({
     }
   }, [hovered, dragged])
 
-  useRopeJoint(fixed, j2, [[0, 0, 0], [0, 0, 0], 0.75]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 0.75]);
-  useSphericalJoint(j3, card, [[0, 0, 0], [0, 1.45, 0]]);
+  useRopeJoint(fixed, j2, [[0, 0, 0], [0, 0, 0], ROPE_SEGMENT_LENGTH]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], ROPE_SEGMENT_LENGTH]);
+  useRopeJoint(j3, j4, [[0, 0, 0], [0, 0, 0], ROPE_SEGMENT_LENGTH]);
+  useSphericalJoint(j4, card, [[0, 0, 0], [0, 1.45, 0]]);
 
   const segmentProps = {
     type: "dynamic" as const,
@@ -215,7 +221,7 @@ export const Band = ({
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
-      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+      [card, j2, j3, j4, fixed].forEach((ref) => ref.current?.wakeUp());
       card.current!.setNextKinematicTranslation({
         x: vec.x - (dragged as THREE.Vector3).x,
         y: vec.y - (dragged as THREE.Vector3).y,
@@ -239,6 +245,7 @@ export const Band = ({
         new THREE.Vector3().copy(fixed.current.translation()),
         new THREE.Vector3().copy(j2.current!.lerped!),
         new THREE.Vector3().copy(j3.current!.translation()),
+        new THREE.Vector3().copy(j4.current!.translation()),
       ];
       setPoints(newPoints);
 
@@ -332,7 +339,7 @@ export const Band = ({
       dir.copy(vec).sub(three.camera.position).normalize();
       vec.add(dir.multiplyScalar(three.camera.position.length()));
       
-      [card, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+      [card, j2, j3, j4, fixed].forEach((ref) => ref.current?.wakeUp());
       card.current!.setNextKinematicTranslation({
         x: vec.x - (dragged as THREE.Vector3).x,
         y: vec.y - (dragged as THREE.Vector3).y,
@@ -410,6 +417,7 @@ export const Band = ({
       vec.add(dir.multiplyScalar(three.camera.position.length()));
       
       drag(new THREE.Vector3().copy(vec).sub(vec.copy(card.current!.translation())));
+      // Ensure the card is kinematic during mobile drag
       card.current!.setBodyType(1, true); // 1 = kinematicPosition
     } else {
       // Original desktop behavior
@@ -461,15 +469,22 @@ export const Band = ({
     <>
       <RigidBody ref={fixed} position={position} {...segmentProps} type="fixed" />
       <RigidBody
-        position={[position[0] + 0.75, position[1], position[2]]}
+        position={[position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]]}
         ref={j2}
         {...segmentProps}
       >
         <BallCollider args={[0.1]} />
       </RigidBody>
       <RigidBody
-        position={[position[0] + 1.5, position[1], position[2]]}
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]]}
         ref={j3}
+        {...segmentProps}
+      >
+        <BallCollider args={[0.05]} />
+      </RigidBody>
+      <RigidBody
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]]}
+        ref={j4}
         {...segmentProps}
       >
         <BallCollider args={[0.05]} />
@@ -486,12 +501,11 @@ export const Band = ({
         ref={card}
         {...segmentProps}
         type={dragged ? "kinematicPosition" : "dynamic"}
-        position={[position[0] + 2, position[1], position[2]]}
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 4, position[1], position[2]]}
       >
-        <CuboidCollider args={[0.8, 1.125, 0.01]} />
         <group
           scale={2}
-          position={[0, 0.1, -0.05]}
+          position={[0, 0.1, -0.03]}
           rotation={[Math.PI * 0.5, 0, 0]}
           onPointerOver={() => hover(true)}
           onPointerOut={() => hover(false)}
