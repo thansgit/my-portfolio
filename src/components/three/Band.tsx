@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import {
   BallCollider,
@@ -10,11 +10,42 @@ import {
   useSphericalJoint,
   RapierRigidBody,
 } from "@react-three/rapier";
-import { useGLTF, Line } from "@react-three/drei";
+import { useGLTF, Line, CatmullRomLine } from "@react-three/drei";
 import { BandProps, ExtendedRigidBody } from "./types";
 
 // Preload the 3D model to improve loading performance
 useGLTF.preload('/cardtest.glb', true);
+
+// Define the RopeMesh component props interface
+interface RopeMeshProps {
+  points: THREE.Vector3[];
+  radius?: number;
+  color?: string;
+}
+
+// RopeMesh component to create a tubular mesh around the rope points
+const RopeMesh = ({ points, radius = 0.05, color = "black" }: RopeMeshProps) => {
+  const curve = useMemo(() => {
+    // Create a smooth curve through the points
+    const curvePoints = [...points];
+    return new THREE.CatmullRomCurve3(curvePoints);
+  }, [points]);
+
+  // Create a tubular geometry along the curve
+  const tubeGeometry = useMemo(() => {
+    return new THREE.TubeGeometry(curve, 64, radius, 8, false);
+  }, [curve, radius]);
+
+  return (
+    <mesh>
+      <primitive object={tubeGeometry} attach="geometry" />
+      <meshStandardMaterial 
+        color={color} 
+        roughness={0.7} 
+      />
+    </mesh>
+  );
+};
 
 export const Band = ({
   position = [0, 0, 0],
@@ -144,14 +175,10 @@ export const Band = ({
       >
         <BallCollider args={[0.05]} />
       </RigidBody>
-      <Line
-        points={points}
-        color="white"
-        lineWidth={6}
-        transparent={false}
-        opacity={1}
-        depthTest={true}
-      />
+      
+      {/* Replace the Line with our RopeMesh component */}
+      <RopeMesh points={points} />
+      
       <RigidBody
         ref={card}
         {...segmentProps}
