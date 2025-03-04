@@ -2,7 +2,7 @@
 
 import * as THREE from "three";
 import { useEffect, useRef, useState, useMemo } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import {
   BallCollider,
   RigidBody,
@@ -12,6 +12,7 @@ import {
 } from "@react-three/rapier";
 import { useGLTF, Line, CatmullRomLine } from "@react-three/drei";
 import { BandProps, ExtendedRigidBody } from "./types";
+import {Pinhead} from "./Pinhead";
 
 // Preload the 3D model to improve loading performance
 useGLTF.preload('/cardtest.glb', true);
@@ -77,6 +78,11 @@ export const Band = ({
   
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
+  const [j2Position, setJ2Position] = useState<[number, number, number]>([
+    position[0] + ROPE_SEGMENT_LENGTH, 
+    position[1], 
+    position[2]
+  ]);
   const { nodes } = useGLTF('/cardtest.glb');
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
@@ -104,7 +110,26 @@ export const Band = ({
   useRopeJoint(j3, j4, [[0, 0, 0], [0, 0, 0], ROPE_SEGMENT_LENGTH]);
   useSphericalJoint(j4, card, [[0, 0, 0], [0, 1.45, 0]]);
 
+  // Add this useEffect to set initial position and update on window resize
+  useEffect(() => {
+    // Function to update j2Position
+    const updatePosition = () => {
+      setJ2Position([
+        position[0] + ROPE_SEGMENT_LENGTH -0.14, 
+        position[1]+0.1, 
+        position[2]+0.2
+      ]);
+    };
+    
 
+      updatePosition();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', updatePosition);
+    
+    // Clean up event listener
+    return () => window.removeEventListener('resize', updatePosition);
+  }, [position]); // Dependency on position ensures correct values are used
 
   useFrame((state, delta) => {
     if (dragged) {
@@ -139,7 +164,7 @@ export const Band = ({
         new THREE.Vector3().copy(j4.current!.translation()),
       ];
       setPoints(newPoints);
-
+      
       // Tilt correction to make card face the camera
       ang.copy(card.current!.angvel());
       rot.copy(card.current!.rotation());
@@ -203,7 +228,9 @@ export const Band = ({
         >
           <primitive object={nodes.Scene} />
         </group>
+
       </RigidBody>
+      <Pinhead position={j2Position} color="red" size={0.1} />
     </>
   );
 }
