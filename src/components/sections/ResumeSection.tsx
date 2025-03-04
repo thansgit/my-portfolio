@@ -1,8 +1,31 @@
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { DownloadIcon, BriefcaseIcon, GraduationCapIcon } from "lucide-react";
+import { DownloadIcon, BriefcaseIcon, GraduationCapIcon, ChevronDownIcon, CheckIcon } from "lucide-react";
 import { EducationItem, ExperienceItem } from "./types";
+import { useState, useRef, useEffect } from "react";
 
 export const ResumeSection = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'fi'>('en');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const resumeFiles = {
+    en: "/resume-eng.pdf",
+    fi: "/resume-fin.pdf"
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const education: EducationItem[] = [
     {
       school: "Tampereen yliopisto",
@@ -44,22 +67,83 @@ export const ResumeSection = () => {
     }
   };
 
+  const handleDropdownKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      setIsDropdownOpen(!isDropdownOpen);
+    } else if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedLanguage(selectedLanguage === 'en' ? 'fi' : 'en');
+    }
+  };
+
+  const handleLanguageSelect = (language: 'en' | 'fi') => {
+    setSelectedLanguage(language);
+    setIsDropdownOpen(false);
+  };
+
+  const handleLanguageKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, language: 'en' | 'fi') => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleLanguageSelect(language);
+    }
+  };
+
   return (
     <section>
       <div className="mb-6">
         <SectionTitle>Resume</SectionTitle>
-        <div className="mt-4">
-          <a 
-            href="/resume.pdf" 
-            download
-            className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-zinc-900 rounded-md hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
-            aria-label="Download resume as PDF"
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-          >
-            <DownloadIcon size={16} />
-            <span className="font-medium">PDF</span>
-          </a>
+        <div className="mt-4 relative" ref={dropdownRef}>
+          <div className="flex items-center">
+            <div
+              className="inline-flex items-center px-4 py-2 bg-yellow-500 text-zinc-900 rounded-l-md hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900 cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onKeyDown={handleDropdownKeyDown}
+              tabIndex={0}
+              aria-haspopup="true"
+              aria-expanded={isDropdownOpen}
+              aria-label="Select resume language"
+            >
+              <span className="font-medium mr-1 w-9 inline-block text-center">{selectedLanguage === 'en' ? 'Eng' : 'Fin'}</span>
+              <ChevronDownIcon size={16} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </div>
+            <a 
+              href={resumeFiles[selectedLanguage]} 
+              download
+              className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-zinc-900 rounded-r-md border-l border-yellow-600 hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+              aria-label={`Download ${selectedLanguage === 'en' ? 'English' : 'Finnish'} resume as PDF`}
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+            >
+              <DownloadIcon size={16} />
+              <span className="font-medium">PDF</span>
+            </a>
+          </div>
+          
+          {isDropdownOpen && (
+            <div className="absolute mt-1 w-32 bg-zinc-800 rounded-md shadow-lg z-10 border border-zinc-700 overflow-hidden">
+              <div 
+                className={`px-4 py-2 flex items-center justify-between ${selectedLanguage === 'en' ? 'bg-zinc-700 text-white' : 'text-zinc-300 hover:bg-zinc-700'} cursor-pointer`}
+                onClick={() => handleLanguageSelect('en')}
+                onKeyDown={(e) => handleLanguageKeyDown(e, 'en')}
+                tabIndex={0}
+                aria-label="Select English resume"
+              >
+                <span>English</span>
+                {selectedLanguage === 'en' && <CheckIcon size={16} />}
+              </div>
+              <div 
+                className={`px-4 py-2 flex items-center justify-between ${selectedLanguage === 'fi' ? 'bg-zinc-700 text-white' : 'text-zinc-300 hover:bg-zinc-700'} cursor-pointer`}
+                onClick={() => handleLanguageSelect('fi')}
+                onKeyDown={(e) => handleLanguageKeyDown(e, 'fi')}
+                tabIndex={0}
+                aria-label="Select Finnish resume"
+              >
+                <span>Finnish</span>
+                {selectedLanguage === 'fi' && <CheckIcon size={16} />}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
