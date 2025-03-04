@@ -49,15 +49,17 @@ const useViewport = () => {
   return state;
 };
 
-// Components
+// Wrapper component for the Band element that manages its position based on screen size
 const BandWrapper = () => {
   const { viewport } = useThree();
   const { isMobile } = useContext(ViewportContext);
 
+  // Select x-axis offset based on device type
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET;
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
 
-  return <Band position={[xPosition, 4, 0]} />;
+  return <Band position={[xPosition, 2.5
+    , 0]} />;
 };
 
 const SceneContent = () => {
