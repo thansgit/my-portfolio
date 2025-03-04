@@ -8,7 +8,7 @@ export const DESKTOP_OFFSET = 0.25;
 
 // ===== PHYSICS CONSTANTS =====
 // TetheredCard physics constants
-export const ROPE_SEGMENT_LENGTH = 0.15;
+export const ROPE_SEGMENT_LENGTH = 0.13;
 
 export const SEGMENT_PROPS = {
   type: "dynamic" as const,

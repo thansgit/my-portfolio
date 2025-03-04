@@ -16,7 +16,7 @@ interface RopeMeshProps {
 }
 
 // RopeMesh component to create a tubular mesh around the rope points
-export const RopeMesh = ({ points, radius = 0.05, color = "black" }: RopeMeshProps) => {
+export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshProps) => {
   const curve = useMemo(() => {
     // Create a smooth curve through the points
     const curvePoints = [...points];
@@ -25,17 +25,42 @@ export const RopeMesh = ({ points, radius = 0.05, color = "black" }: RopeMeshPro
 
   // Create a tubular geometry along the curve
   const tubeGeometry = useMemo(() => {
-    return new THREE.TubeGeometry(curve, 64, radius, 8, false);
+    return new THREE.TubeGeometry(curve, 32, radius, 8, false);
   }, [curve, radius]);
 
+  // Get the start and end points for cap spheres
+  const startPoint = useMemo(() => points[0], [points]);
+  const endPoint = useMemo(() => points[points.length - 1], [points]);
+
   return (
-    <mesh>
-      <primitive object={tubeGeometry} attach="geometry" />
-      <meshStandardMaterial 
-        color={color} 
-        roughness={0.7} 
-      />
-    </mesh>
+    <group>
+      {/* Main tube */}
+      <mesh>
+        <primitive object={tubeGeometry} attach="geometry" />
+        <meshStandardMaterial 
+          color={color} 
+          roughness={0.7} 
+        />
+      </mesh>
+      
+      {/* Cap at the start point */}
+      <mesh position={startPoint}>
+        <sphereGeometry args={[radius, 4 , 4]} />
+        <meshStandardMaterial 
+          color={color} 
+          roughness={0.7} 
+        />
+      </mesh>
+      
+      {/* Cap at the end point */}
+      <mesh position={endPoint}>
+        <sphereGeometry args={[radius, 4, 4]} />
+        <meshStandardMaterial 
+          color={color} 
+          roughness={0.7} 
+        />
+      </mesh>
+    </group>
   );
 };
 
@@ -54,7 +79,7 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
   return (
     <group
       scale={2}
-      position={[0, 0.1, -0.03]}
+      position={[0, 0.08, -0.03]}
       rotation={[Math.PI * 0.5, 0, 0]}
       onPointerOver={() => onHover(true)}
       onPointerOut={() => onHover(false)}

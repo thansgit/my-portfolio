@@ -51,8 +51,8 @@ export const TetheredCard = ({
     const updatePosition = () => {
       setJ2Position([
         position[0] + ROPE_SEGMENT_LENGTH -0.14, 
-        position[1]+0.1, 
-        position[2]+0.2
+        position[1]+0.12, 
+        position[2]+0.17
       ]);
     };
     
