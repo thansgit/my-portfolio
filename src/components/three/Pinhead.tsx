@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Sphere, MeshDistortMaterial } from '@react-three/drei';
+import { Sphere } from '@react-three/drei';
 import { Vector3, Mesh, MeshStandardMaterial } from 'three';
 
 interface PinheadProps {

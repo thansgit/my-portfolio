@@ -7,8 +7,8 @@ export interface ViewportState {
   isVisible: boolean;
 }
 
-// Band types
-export interface BandProps {
+// TetheredCard types
+export interface TetheredCardProps {
   position?: [number, number, number];
   maxSpeed?: number;
   minSpeed?: number;

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useContext, createContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
 import { ViewportState } from '../types';
-import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../constants/viewport';
-import { Band } from '../Band';
+import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../constants';
+import { TetheredCard } from '../TetheredCard';
 import { Background } from '../Background';
 
-// Context
+// Create context with default values
 const ViewportContext = createContext<ViewportState>({
   isMobile: false,
   isVisible: true
@@ -26,7 +26,7 @@ const useViewport = () => {
     let timeoutId: NodeJS.Timeout;
 
     const updateViewport = () => {
-      // Hide content immediately on any dimension change
+      // Hide content immediately
       setState(prev => ({ ...prev, isVisible: false }));
 
       // Show content and update mobile state after delay
@@ -41,16 +41,14 @@ const useViewport = () => {
 
     updateViewport();
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [size.width, size.height]); // Watch both dimensions
+    return () => clearTimeout(timeoutId);
+  }, [size.width]);
 
   return state;
 };
 
-// Wrapper component for the Band element that manages its position based on screen size
-const BandWrapper = () => {
+// Wrapper component for the TetheredCard element that manages its position based on screen size
+const TetheredCardWrapper = () => {
   const { viewport } = useThree();
   const { isMobile } = useContext(ViewportContext);
 
@@ -58,8 +56,7 @@ const BandWrapper = () => {
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET;
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
 
-  return <Band position={[xPosition, 2.5
-    , 0]} />;
+  return <TetheredCard position={[xPosition, 2.5, 0]} />;
 };
 
 const SceneContent = () => {
@@ -69,7 +66,7 @@ const SceneContent = () => {
 
   return (
     <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-      <BandWrapper />
+      <TetheredCardWrapper />
     </Physics>
   );
 };
