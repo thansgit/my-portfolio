@@ -8,6 +8,7 @@ import { Pinhead } from "./Pinhead";
 import { RopeMesh, CardModel } from "@/components/three/TetheredCardVisuals";
 import { setupJoints, usePhysicsUpdate } from "@/components/three/TetheredCardPhysics";
 import { useTouchHandling } from "@/components/three/TetheredCardInteractions";
+import { useRotationTracker } from "@/components/three/TetheredCardRotationTracker";
 import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/constants";
 
 export const TetheredCard = ({
@@ -26,11 +27,17 @@ export const TetheredCard = ({
   
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
-  const [j2Position, setJ2Position] = useState<[number, number, number]>([
-    position[0] + ROPE_SEGMENT_LENGTH, 
-    position[1], 
-    position[2]
-  ]);
+  
+  // State to track glowing effect
+  const [isGlowing, setIsGlowing] = useState(false);
+  const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Track last rotation values separately
+  const lastClockwiseRef = useRef(0);
+  const lastCounterClockwiseRef = useRef(0);
+  
+  // Add rotation counter for particle effects
+  const [rotationCounter, setRotationCounter] = useState(0);
   
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
@@ -42,31 +49,56 @@ export const TetheredCard = ({
   const [ropeColor, setRopeColor] = useState("#000000");
   const [ropeRadius, setRopeRadius] = useState(ROPE_INITIAL_RADIUS);
 
+  // Use the rotation tracker with rotation detection callback
+  const { clockwiseRotations, counterClockwiseRotations } = useRotationTracker({
+    card,
+    fixed,
+    isDragging: dragged !== false,
+  });
+  
+  // Watch for changes in rotations and trigger the glow effect
+  useEffect(() => {
+    // Detect if any new rotation has occurred
+    const hasNewRotation = 
+      clockwiseRotations > lastClockwiseRef.current || 
+      counterClockwiseRotations > lastCounterClockwiseRef.current;
+    
+    // Update our references
+    lastClockwiseRef.current = clockwiseRotations;
+    lastCounterClockwiseRef.current = counterClockwiseRotations;
+    
+    // If a new rotation has occurred
+    if (hasNewRotation) {
+      // Always set to true on new rotation, regardless of current state
+      setIsGlowing(true);
+      
+      // Increment rotation counter to trigger new particles
+      setRotationCounter(prev => prev + 1);
+      
+      // Clear any existing timeout to restart the timer
+      if (glowTimeoutRef.current) {
+        clearTimeout(glowTimeoutRef.current);
+      }
+      
+      // Set a new timeout
+      glowTimeoutRef.current = setTimeout(() => {
+        setIsGlowing(false);
+      }, 1500);
+    }
+    
+    // Clean up on unmount
+    return () => {
+      if (glowTimeoutRef.current) {
+        clearTimeout(glowTimeoutRef.current);
+      }
+    };
+  }, [clockwiseRotations, counterClockwiseRotations]);
+
   // Setup joints between rigid bodies
   setupJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
 
   // Handle touch events
   useTouchHandling(dragged, hovered);
-
-  // Add this useEffect to set initial position and update on window resize
-  useEffect(() => {
-    // Function to update j2Position, this is the position of the pinhead
-    const updatePosition = () => {
-      setJ2Position([
-        position[0] + ROPE_SEGMENT_LENGTH -0.14, 
-        position[1]+0.12, 
-        position[2]+0.17
-      ]);
-    };
-    
-    updatePosition();
-    
-    // Add event listener for window resize
-    window.addEventListener('resize', updatePosition);
-    
-    // Clean up event listener
-    return () => window.removeEventListener('resize', updatePosition);
-  }, [position]); // Dependency on position ensures correct values are used
 
   const calculateRopeLength = (pts: THREE.Vector3[]): number => {
     let totalLength = 0;
@@ -129,13 +161,22 @@ export const TetheredCard = ({
     cardChildren: cardModelElement,
   });
 
+  // Pin position offset relative to fixed position
+  const pinOffset = 0.18;
+
   return (
     <>
       {physicsElements}
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
       
-      <Pinhead position={j2Position} color="red" size={0.1} />
+      <Pinhead 
+        position={[position[0], position[1] + pinOffset, position[2]]} 
+        color="red" 
+        size={0.08} 
+        isGlowing={isGlowing}
+        rotationCount={rotationCounter}
+      />
     </>
   );
-} 
+}; 
