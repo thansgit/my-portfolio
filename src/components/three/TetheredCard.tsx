@@ -27,11 +27,6 @@ export const TetheredCard = ({
   
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
-  const [j2Position, setJ2Position] = useState<[number, number, number]>([
-    position[0] + ROPE_SEGMENT_LENGTH, 
-    position[1], 
-    position[2]
-  ]);
   
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
@@ -55,26 +50,6 @@ export const TetheredCard = ({
 
   // Handle touch events
   useTouchHandling(dragged, hovered);
-
-  // Add this useEffect to set initial position and update on window resize
-  useEffect(() => {
-    // Function to update j2Position, this is the position of the pinhead
-    const updatePosition = () => {
-      setJ2Position([
-        position[0] + ROPE_SEGMENT_LENGTH -0.14, 
-        position[1]+0.12, 
-        position[2]+0.17
-      ]);
-    };
-    
-    updatePosition();
-    
-    // Add event listener for window resize
-    window.addEventListener('resize', updatePosition);
-    
-    // Clean up event listener
-    return () => window.removeEventListener('resize', updatePosition);
-  }, [position]); // Dependency on position ensures correct values are used
 
   const calculateRopeLength = (pts: THREE.Vector3[]): number => {
     let totalLength = 0;
@@ -137,13 +112,20 @@ export const TetheredCard = ({
     cardChildren: cardModelElement,
   });
 
+  // Pin position offset relative to fixed position
+  const pinOffset: [number, number, number] = [0, 0.12, 0];
+
   return (
     <>
       {physicsElements}
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
       
-      <Pinhead position={j2Position} color="red" size={0.1} />
+      <Pinhead 
+        position={[position[0] + pinOffset[0], position[1] + pinOffset[1], position[2] + pinOffset[2]]} 
+        color="red" 
+        size={0.1} 
+      />
     </>
   );
 }; 
