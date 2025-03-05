@@ -28,6 +28,10 @@ export const TetheredCard = ({
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
   
+  // State to track glowing effect
+  const [isGlowing, setIsGlowing] = useState(false);
+  const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
     new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]),
@@ -38,12 +42,39 @@ export const TetheredCard = ({
   const [ropeColor, setRopeColor] = useState("#000000");
   const [ropeRadius, setRopeRadius] = useState(ROPE_INITIAL_RADIUS);
 
-  // Use the rotation tracker - just for console logs
-  useRotationTracker({
+  // Use the rotation tracker with rotation detection callback
+  const { clockwiseRotations, counterClockwiseRotations } = useRotationTracker({
     card,
     fixed,
     isDragging: dragged !== false,
   });
+  
+  // Watch for changes in rotations and trigger the glow effect
+  useEffect(() => {
+    const totalRotations = clockwiseRotations + counterClockwiseRotations;
+    
+    // If any rotation occurs, trigger the glow effect
+    if (totalRotations > 0) {
+      setIsGlowing(true);
+      
+      // Clear any existing timeout
+      if (glowTimeoutRef.current) {
+        clearTimeout(glowTimeoutRef.current);
+      }
+      
+      // Turn off the glow effect after 1.5 seconds
+      glowTimeoutRef.current = setTimeout(() => {
+        setIsGlowing(false);
+      }, 1500);
+    }
+    
+    // Clean up on unmount
+    return () => {
+      if (glowTimeoutRef.current) {
+        clearTimeout(glowTimeoutRef.current);
+      }
+    };
+  }, [clockwiseRotations, counterClockwiseRotations]);
 
   // Setup joints between rigid bodies
   setupJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
@@ -113,7 +144,7 @@ export const TetheredCard = ({
   });
 
   // Pin position offset relative to fixed position
-  const pinOffset: [number, number, number] = [0, 0.12, 0];
+  const pinOffset = 0.18;
 
   return (
     <>
@@ -122,9 +153,10 @@ export const TetheredCard = ({
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
       
       <Pinhead 
-        position={[position[0] + pinOffset[0], position[1] + pinOffset[1], position[2] + pinOffset[2]]} 
+        position={[position[0], position[1] + pinOffset, position[2]]} 
         color="red" 
-        size={0.1} 
+        size={0.08} 
+        isGlowing={isGlowing}
       />
     </>
   );
