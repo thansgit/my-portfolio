@@ -8,6 +8,7 @@ import { Pinhead } from "./Pinhead";
 import { RopeMesh, CardModel } from "@/components/three/TetheredCardVisuals";
 import { setupJoints, usePhysicsUpdate } from "@/components/three/TetheredCardPhysics";
 import { useTouchHandling } from "@/components/three/TetheredCardInteractions";
+import { useRotationTracker } from "@/components/three/TetheredCardRotationTracker";
 import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/constants";
 
 export const TetheredCard = ({
@@ -41,6 +42,13 @@ export const TetheredCard = ({
 
   const [ropeColor, setRopeColor] = useState("#000000");
   const [ropeRadius, setRopeRadius] = useState(ROPE_INITIAL_RADIUS);
+
+  // Use the rotation tracker - just for console logs
+  useRotationTracker({
+    card,
+    fixed,
+    isDragging: dragged !== false,
+  });
 
   // Setup joints between rigid bodies
   setupJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
@@ -138,4 +146,4 @@ export const TetheredCard = ({
       <Pinhead position={j2Position} color="red" size={0.1} />
     </>
   );
-} 
+}; 
