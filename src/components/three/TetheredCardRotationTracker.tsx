@@ -104,7 +104,6 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
     if (clockwisePatterns.some(pattern => checkSequence(last5, pattern))) {
       if (isMoving.current) {
         clockwiseRotations.current++;
-        console.log(`Clockwise rotations: ${clockwiseRotations.current}`);
       }
       lastQuadrants.current = [last5[last5.length - 1]];
       lastRotationTime.current = now;
@@ -113,7 +112,6 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
     else if (counterClockwisePatterns.some(pattern => checkSequence(last5, pattern))) {
       if (isMoving.current) {
         counterClockwiseRotations.current++;
-        console.log(`Counter-clockwise rotations: ${counterClockwiseRotations.current}`);
       }
       lastQuadrants.current = [last5[last5.length - 1]];
       lastRotationTime.current = now;
