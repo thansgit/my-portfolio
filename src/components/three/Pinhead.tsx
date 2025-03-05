@@ -261,7 +261,14 @@ export const Pinhead: React.FC<PinheadProps> = ({
         {/* Pin stem coming out from the bottom of the head */}
         <mesh position={[0, -size * 1.2, 0]}>
           <cylinderGeometry args={[size * 0.15, size * 0.3, size * 2, 16]} />
-          <meshStandardMaterial color="#D3D3D3" metalness={0.9} />
+          <meshStandardMaterial 
+            color="#c0c0c0" 
+            metalness={1.0} 
+            roughness={0.05} 
+            emissive="#111111"
+            emissiveIntensity={0.05}
+            envMapIntensity={1.5}
+          />
         </mesh>
       </Billboard>
       
