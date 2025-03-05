@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { RapierRigidBody } from '@react-three/rapier';
-import { ExtendedRigidBody } from './types';
+
 
 interface RotationTrackerProps {
   // Use the card instead of j4

@@ -32,6 +32,13 @@ export const TetheredCard = ({
   const [isGlowing, setIsGlowing] = useState(false);
   const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
+  // Track last rotation values separately
+  const lastClockwiseRef = useRef(0);
+  const lastCounterClockwiseRef = useRef(0);
+  
+  // Add rotation counter for particle effects
+  const [rotationCounter, setRotationCounter] = useState(0);
+  
   const [points, setPoints] = useState([
     new THREE.Vector3(position[0], position[1], position[2]),
     new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]),
@@ -51,18 +58,29 @@ export const TetheredCard = ({
   
   // Watch for changes in rotations and trigger the glow effect
   useEffect(() => {
-    const totalRotations = clockwiseRotations + counterClockwiseRotations;
+    // Detect if any new rotation has occurred
+    const hasNewRotation = 
+      clockwiseRotations > lastClockwiseRef.current || 
+      counterClockwiseRotations > lastCounterClockwiseRef.current;
     
-    // If any rotation occurs, trigger the glow effect
-    if (totalRotations > 0) {
+    // Update our references
+    lastClockwiseRef.current = clockwiseRotations;
+    lastCounterClockwiseRef.current = counterClockwiseRotations;
+    
+    // If a new rotation has occurred
+    if (hasNewRotation) {
+      // Always set to true on new rotation, regardless of current state
       setIsGlowing(true);
       
-      // Clear any existing timeout
+      // Increment rotation counter to trigger new particles
+      setRotationCounter(prev => prev + 1);
+      
+      // Clear any existing timeout to restart the timer
       if (glowTimeoutRef.current) {
         clearTimeout(glowTimeoutRef.current);
       }
       
-      // Turn off the glow effect after 1.5 seconds
+      // Set a new timeout
       glowTimeoutRef.current = setTimeout(() => {
         setIsGlowing(false);
       }, 1500);
@@ -157,6 +175,7 @@ export const TetheredCard = ({
         color="red" 
         size={0.08} 
         isGlowing={isGlowing}
+        rotationCount={rotationCounter}
       />
     </>
   );
