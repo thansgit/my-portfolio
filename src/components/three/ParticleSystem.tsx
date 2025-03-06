@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { BufferGeometry, BufferAttribute, PointsMaterial, Color, Points, Vector3 } from 'three';
+import { useFrame, useLoader } from '@react-three/fiber';
+import { BufferGeometry, BufferAttribute, PointsMaterial, Color, Points, Vector3, TextureLoader } from 'three';
 
 interface ParticleSystemProps {
   triggerCount: number;  // Increases to trigger new particles
@@ -10,28 +10,35 @@ interface ParticleSystemProps {
   particleSize?: number;
   particleCount?: number;
   color?: string;
+  texture?: string;  // URL to texture image (optional)
+  confetti?: boolean; // Option to make it look like confetti
 }
 
 export const ParticleSystem: React.FC<ParticleSystemProps> = ({
   triggerCount = 0,
   position = [0, 0, 0],
-  particleSize = 0.025, // New independent particle size control (default half the reference size)
+  particleSize = 0.025,
   color = '#c0c0c0',
   particleCount = 80,
+  texture,
+  confetti = false,
 }) => {
   const particlesRef = useRef<Points>(null);
+  
+  // Load texture only if provided and confetti mode is off
+  const useTexture = texture && !confetti;
+  const particleTexture = useTexture ? useLoader(TextureLoader, texture) : null;
   
   // Track previous trigger count to detect changes
   const prevTriggerCountRef = useRef(0);
 
   // Store particle batches - each batch is created when triggerCount increases
-  // Each batch contains position, velocity, color, alpha and size data for particles
   const [particleBatches, setParticleBatches] = useState<Array<{
-    positions: Float32Array; // XYZ positions of each particle
-    velocities: Float32Array; // Movement direction and speed
-    colors: Float32Array; // RGB colors
-    alphas: Float32Array; // Opacity/transparency values
-    sizes: Float32Array; // Size of each particle
+    positions: Float32Array;
+    velocities: Float32Array;
+    colors: Float32Array;
+    alphas: Float32Array;
+    sizes: Float32Array;
   }>>([]);
   
   // Create new particle effects when trigger count changes
@@ -46,7 +53,7 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({
   
   // Create a new particle batch
   const createParticleBatch = () => {
-    const count = particleCount; // Less particles per batch since we'll have multiple batches
+    const count = particleCount;
     
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
@@ -73,14 +80,33 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({
       velocities[i3 + 1] = Math.sin(phi) * Math.sin(theta) * velocity;
       velocities[i3 + 2] = Math.cos(phi) * velocity;
       
-      // Create a brighter color for better visibility
-      const particleColor = new Color(color);
-      particleColor.offsetHSL(0, 0, 0.2); // Brighten
-      colors[i3] = particleColor.r;
-      colors[i3 + 1] = particleColor.g;
-      colors[i3 + 2] = particleColor.b;
+      if (confetti) {
+        // For confetti, use vibrant random colors
+        const confettiColors = [
+          new Color(1, 0.3, 0.3), // Red
+          new Color(0.3, 1, 0.3), // Green
+          new Color(0.3, 0.3, 1), // Blue
+          new Color(1, 1, 0.3),   // Yellow
+          new Color(1, 0.3, 1),   // Pink
+          new Color(0.3, 1, 1)    // Cyan
+        ];
+        
+        // Select a random confetti color
+        const randomColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        
+        colors[i3] = randomColor.r;
+        colors[i3 + 1] = randomColor.g;
+        colors[i3 + 2] = randomColor.b;
+      } else {
+        // Default color behavior
+        const particleColor = new Color(color);
+        particleColor.offsetHSL(0, 0, 0.2); // Brighten
+        colors[i3] = particleColor.r;
+        colors[i3 + 1] = particleColor.g;
+        colors[i3 + 2] = particleColor.b;
+      }
       
-      // Varied particle sizes - now using particleSize instead of referenceSize
+      // Varied particle sizes
       sizes[i] = (0.6 + Math.random()) * particleSize;
       
       // Set initial alpha
@@ -120,17 +146,26 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({
     return geometry;
   }, [particleBatches]);
   
-  // Particle material with size based on particleSize
+  // Particle material setup
   const particleMaterial = useMemo(() => {
-    return new PointsMaterial({
-      size: particleSize, // Now using the dedicated particleSize
+    const material = new PointsMaterial({
+      size: particleSize,
       sizeAttenuation: true,
       vertexColors: true,
       transparent: true,
       opacity: 1,
       depthWrite: false,
     });
-  }, [particleSize]); // Dependency updated to particleSize
+    
+    // Apply texture if available and not in confetti mode
+    if (particleTexture) {
+      material.map = particleTexture;
+      material.alphaTest = 0.1;
+      material.alphaMap = particleTexture;
+    }
+    
+    return material;
+  }, [particleSize, particleTexture]);
   
   // Animation for particles
   useFrame(() => {

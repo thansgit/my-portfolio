@@ -5,7 +5,6 @@ import { Sphere, Billboard } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Vector3, Mesh, MeshStandardMaterial, PointLight } from 'three';
 import { useSpring, animated } from '@react-spring/three';
-import { ParticleSystem } from './ParticleSystem';
 
 interface PinheadProps {
   position?: [number, number, number];
@@ -14,7 +13,6 @@ interface PinheadProps {
   metalness?: number;
   roughness?: number;
   isGlowing?: boolean;
-  rotationCount?: number;
 }
 
 export const Pinhead: React.FC<PinheadProps> = ({
@@ -24,7 +22,6 @@ export const Pinhead: React.FC<PinheadProps> = ({
   metalness = 0.9,
   roughness = 0.1,
   isGlowing = false,
-  rotationCount = 0,
 }) => {
   // References to Three.js objects for direct manipulation in animations
   const pinRef = useRef<Mesh>(null);
@@ -85,16 +82,6 @@ export const Pinhead: React.FC<PinheadProps> = ({
           />
         </mesh>
       </Billboard>
-      
-      {/* Use the separated ParticleSystem component with independent size control */}
-      <ParticleSystem 
-        triggerCount={rotationCount} 
-        position={[0, 0, 0]} 
-        particleSize={0.075} 
-        particleCount={200}
-        color="white"
-      />
-      
     </group>
   );
 }; 
