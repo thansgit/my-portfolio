@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
 import { TetheredCardProps, ExtendedRigidBody } from "./types";
 import { Pinhead } from "./Pinhead";
+import { ParticleSystem } from "./ParticleSystem";
 import { RopeMesh, CardModel } from "@/components/three/TetheredCardVisuals";
 import { setupJoints, usePhysicsUpdate } from "@/components/three/TetheredCardPhysics";
 import { useTouchHandling } from "@/components/three/TetheredCardInteractions";
@@ -175,7 +176,14 @@ export const TetheredCard = ({
         color="red" 
         size={0.08} 
         isGlowing={isGlowing}
-        rotationCount={rotationCounter}
+      />
+      
+      <ParticleSystem 
+        triggerCount={rotationCounter}
+        position={[position[0], position[1] + pinOffset, position[2]]}
+        particleSize={0.075}
+        particleCount={200}
+        confetti={true}
       />
     </>
   );
