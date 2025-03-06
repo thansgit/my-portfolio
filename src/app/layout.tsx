@@ -38,9 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="w-full bg-black" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased w-full m-0 p-0 bg-black min-h-screen`}>
-        <div className="absolute inset-0 w-full z-0 m-0 p-0">
-        </div>
-        <div className="relative z-10">
+        <div className="relative z-10 w-full h-full">
           {children}
         </div>
         <Analytics />
