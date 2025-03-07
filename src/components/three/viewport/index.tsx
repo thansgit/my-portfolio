@@ -73,12 +73,19 @@ const SceneContent = () => {
 
 export const ViewportManager = () => {
   const viewportState = useViewport();
+  const { viewport } = useThree();
+  
+  // Calculate card position the same way as in TetheredCardWrapper
+  const isMobile = viewportState.isMobile;
+  const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET;
+  const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
+  const cardPosition: [number, number, number] = [xPosition, 2.5, 0];
 
   return (
     <ViewportContext.Provider value={viewportState}>
       <Suspense fallback={null}>
         <ambientLight intensity={0.5} />
-        <Background />
+        <Background cardPosition={cardPosition} />
         <SceneContent />
       </Suspense>
     </ViewportContext.Provider>
