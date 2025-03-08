@@ -35,7 +35,7 @@ export default function Page() {
             {/* Metallic border - leveämpi ja näyttävämpi */}
             <div className="absolute inset-0 bg-gradient-to-b from-zinc-600 via-zinc-700 to-zinc-800 rounded-xl border border-zinc-500 shadow-[0_0_25px_rgba(0,0,0,0.6)]">
               {/* Metallic inner border with brushed steel texture */}
-              <div className="absolute inset-[5px] rounded-lg bg-[url('/assets/textures/brushed-steel.webp')] bg-cover overflow-hidden">
+              <div className="absolute inset-[5px] rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-zinc-400/40 via-zinc-600/60 to-zinc-900/80 backdrop-blur-[1px]"></div>
                 
               </div>
@@ -43,7 +43,7 @@ export default function Page() {
             
             {/* Dark leather texture container - korjattu opacity */}
             <div className="relative z-10 bg-zinc-900 m-[8px] rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-[url('/assets/textures/dark-leather.webp')] bg-repeat opacity-10"></div>
+              <div className="absolute inset-0 bg-zinc-800/20 bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:4px_4px] opacity-10"></div>
               
               {/* Content container */}
               <div className="relative z-10 p-6">
