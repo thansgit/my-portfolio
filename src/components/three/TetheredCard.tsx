@@ -16,6 +16,7 @@ export const TetheredCard = ({
   position = [0, 0, 0],
   maxSpeed = 50,
   minSpeed = 10,
+  onPinheadStateChange,
 }: TetheredCardProps = {}) => {
   
   const card = useRef<RapierRigidBody>(null);
@@ -164,6 +165,14 @@ export const TetheredCard = ({
 
   // Pin position offset relative to fixed position
   const pinOffset = 0.18;
+  const pinheadPosition: [number, number, number] = [position[0], position[1] + pinOffset, position[2]];
+
+  // Notify parent component when pinhead state changes
+  useEffect(() => {
+    if (onPinheadStateChange) {
+      onPinheadStateChange(pinheadPosition, isGlowing);
+    }
+  }, [isGlowing, pinheadPosition, onPinheadStateChange]);
 
   return (
     <>
@@ -172,7 +181,7 @@ export const TetheredCard = ({
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
       
       <Pinhead 
-        position={[position[0], position[1] + pinOffset, position[2]]} 
+        position={pinheadPosition} 
         color="red" 
         size={0.08} 
         isGlowing={isGlowing}
@@ -180,7 +189,7 @@ export const TetheredCard = ({
       
       <ParticleSystem 
         triggerCount={rotationCounter}
-        position={[position[0], position[1] + pinOffset, position[2]]}
+        position={pinheadPosition}
         particleSize={0.075}
         particleCount={200}
         confetti={true}

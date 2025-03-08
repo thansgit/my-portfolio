@@ -48,7 +48,7 @@ const useViewport = () => {
 };
 
 // Wrapper component for the TetheredCard element that manages its position based on screen size
-const TetheredCardWrapper = () => {
+const TetheredCardWrapper = ({ onPinheadStateChange }: { onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void }) => {
   const { viewport } = useThree();
   const { isMobile } = useContext(ViewportContext);
 
@@ -56,17 +56,17 @@ const TetheredCardWrapper = () => {
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET;
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
 
-  return <TetheredCard position={[xPosition, 2.5, 0]} />;
+  return <TetheredCard position={[xPosition, 2.5, 0]} onPinheadStateChange={onPinheadStateChange} />;
 };
 
-const SceneContent = () => {
+const SceneContent = ({ onPinheadStateChange }: { onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void }) => {
   const { isVisible } = useContext(ViewportContext);
 
   if (!isVisible) return null;
 
   return (
     <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-      <TetheredCardWrapper />
+      <TetheredCardWrapper onPinheadStateChange={onPinheadStateChange} />
     </Physics>
   );
 };
@@ -81,12 +81,27 @@ export const ViewportManager = () => {
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
   const cardPosition: [number, number, number] = [xPosition, 2.5, 0];
 
+  // State for pinhead position and glowing status
+  const [pinheadPosition, setPinheadPosition] = useState<[number, number, number] | undefined>(undefined);
+  const [isPinheadGlowing, setIsPinheadGlowing] = useState<boolean>(false);
+
+  // Handler for pinhead state changes
+  const handlePinheadStateChange = (position: [number, number, number], isGlowing: boolean) => {
+    setPinheadPosition(position);
+    setIsPinheadGlowing(isGlowing);
+  };
+
   return (
     <ViewportContext.Provider value={viewportState}>
       <Suspense fallback={null}>
         <ambientLight intensity={0.5} />
-        <Background cardPosition={cardPosition} />
-        <SceneContent />
+        <Background 
+          cardPosition={cardPosition} 
+          pinheadPosition={pinheadPosition}
+          isPinheadGlowing={isPinheadGlowing}
+          isMobile={viewportState.isMobile}
+        />
+        <SceneContent onPinheadStateChange={handlePinheadStateChange} />
       </Suspense>
     </ViewportContext.Provider>
   );

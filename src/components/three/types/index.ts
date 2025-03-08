@@ -12,6 +12,7 @@ export interface TetheredCardProps {
   position?: [number, number, number];
   maxSpeed?: number;
   minSpeed?: number;
+  onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void;
 }
 
 export interface ExtendedRigidBody extends RapierRigidBody {

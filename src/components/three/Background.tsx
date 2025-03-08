@@ -2,9 +2,8 @@
 
 import { Environment, Lightformer } from "@react-three/drei";
 import { useScreenCenter } from "../../utils/screenUtils";
-import { Vector3 } from "three";
+import { useThree } from "@react-three/fiber";
 
-// Types
 export interface LightformerConfigProps {
   intensity: number;
   position: [number, number, number];
@@ -13,7 +12,6 @@ export interface LightformerConfigProps {
   color?: string;
 }
 
-// Light configurations
 export const lightformerConfigs: LightformerConfigProps[] = [
   // Left side lightformers
   {
@@ -33,7 +31,6 @@ export const lightformerConfigs: LightformerConfigProps[] = [
   },
 ];
 
-// Individual lightformer component
 export const ConfiguredLightformer = ({ config }: { config: LightformerConfigProps }) => (
   <Lightformer
     intensity={config.intensity}
@@ -44,7 +41,6 @@ export const ConfiguredLightformer = ({ config }: { config: LightformerConfigPro
   />
 );
 
-// Center lightformer component that uses the screen center
 export const CenterLightformer = () => {
   const centerPoint = useScreenCenter();
   
@@ -63,7 +59,6 @@ export const CenterLightformer = () => {
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {
   return (
     <>
-      {/* Top left light with target aimed toward bottom right */}
       <Lightformer
         intensity={2.5}
         position={[cardPosition[0] - 5, cardPosition[1] + 2.5, cardPosition[2] + 2]}
@@ -73,14 +68,13 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
         color="#ffffff"
       />
       
-      {/* Bottom right light with target aimed to enhance the diagonal flow */}
       <Lightformer
         intensity={2.5}
         position={[cardPosition[0] + 4, cardPosition[1] - 2.5, cardPosition[2] + 2]}
         target={[cardPosition[0] - 2, cardPosition[1] + 1, cardPosition[2] - 0.5]}
         form="rect"
         scale={[10, 12, 1]}
-        color="#f0f8ff" /* Slightly blue-tinted light */
+        color="#f0f8ff"
       />
       
     </>
@@ -88,16 +82,64 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
 };
 
 // Main background component
-export const Background = ({ cardPosition }: { cardPosition?: [number, number, number] }) => (
-  <>
-    {/* Environment with black background and no lighting contribution */}
-    <Environment background blur={0.75}>
-      <color attach="background" args={["black"]} />
-    </Environment>
+export const Background = ({ 
+  cardPosition,
+  pinheadPosition,
+  isPinheadGlowing,
+  isMobile = false
+}: { 
+  cardPosition?: [number, number, number];
+  pinheadPosition?: [number, number, number];
+  isPinheadGlowing?: boolean;
+  isMobile?: boolean;
+}) => {
+  const { viewport } = useThree();
+  const centerPoint = useScreenCenter();
+  
+  // Adjust lightformer position based on viewport
+  const getLightformerPosition = (): [number, number, number] => {
+    console.log("pinheadPosition", pinheadPosition);
+    if (!pinheadPosition) return [0, 0, 0];
     
-    {/* Separate lighting environment that doesn't affect the background */}
-    <Environment preset={undefined} resolution={256} background={false}>
-      {cardPosition && <CardLightformer cardPosition={cardPosition} />}
-    </Environment>
-  </>
-);
+    // For desktop view, we need to adjust the position to account for the viewport offset
+    if (!isMobile) {
+      // On desktop, use the screen center utility to position the lightformer
+      // This ensures it's always centered regardless of the card position
+      return [
+        centerPoint.x, // Use the screen center X position
+        pinheadPosition[1], // Keep the Y position from the pinhead
+        pinheadPosition[2] + 0.5 // Keep the Z position from the pinhead with a small offset
+      ];
+    }
+    // For mobile, use the pinhead position directly
+    return [
+      pinheadPosition[0], 
+      pinheadPosition[1], 
+      pinheadPosition[2] + 0.5
+    ];
+  };
+  
+  return (
+    <>
+      {/* Environment with black background */}
+      <Environment background blur={0.75}>
+        <color attach="background" args={["black"]} />
+        
+        {isPinheadGlowing && pinheadPosition && (
+          <Lightformer
+            intensity={5}
+            position={getLightformerPosition()}
+            scale={[3, 3, 1]}
+            color="#ff5555"
+            form="circle"
+          />
+        )}
+      </Environment>
+      
+      {/* Separate lighting environment that doesn't affect the background */}
+      <Environment preset={undefined} resolution={256} background={false}>
+        {cardPosition && <CardLightformer cardPosition={cardPosition} />}
+      </Environment>
+    </>
+  );
+};
