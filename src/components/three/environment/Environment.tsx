@@ -98,7 +98,6 @@ export const Environment = ({
   
   // Adjust lightformer position based on viewport
   const getLightformerPosition = (): [number, number, number] => {
-    console.log("pinheadPosition", pinheadPosition);
     if (!pinheadPosition) return [0, 0, 0];
     
     // For desktop view, we need to adjust the position to account for the viewport offset
