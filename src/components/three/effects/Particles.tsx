@@ -46,7 +46,19 @@ export const Particles: React.FC<ParticlesProps> = ({
     // Only trigger particle creation when trigger count increases
     if (triggerCount > prevTriggerCountRef.current) {
       const newBatch = createParticleBatch();
-      setParticleBatches(prev => [...prev, newBatch]);
+      
+      // Limit the number of active batches to prevent memory issues
+      const MAX_BATCHES = 3; // Adjust this number based on your performance needs
+      
+      setParticleBatches(prev => {
+        // If we already have the maximum number of batches, remove the oldest one
+        if (prev.length >= MAX_BATCHES) {
+          return [...prev.slice(1), newBatch];
+        }
+        // Otherwise, just add the new batch
+        return [...prev, newBatch];
+      });
+      
       prevTriggerCountRef.current = triggerCount;
     }
   }, [triggerCount]);
@@ -146,6 +158,19 @@ export const Particles: React.FC<ParticlesProps> = ({
     return geometry;
   }, [particleBatches]);
   
+  // Cleanup geometry when component unmounts or when geometry changes
+  useEffect(() => {
+    // Store reference to current geometry for cleanup
+    const currentGeometry = combinedGeometry;
+    
+    // Return cleanup function
+    return () => {
+      if (currentGeometry) {
+        currentGeometry.dispose();
+      }
+    };
+  }, [combinedGeometry]);
+  
   // Particle material setup
   const particleMaterial = useMemo(() => {
     const material = new PointsMaterial({
@@ -166,6 +191,19 @@ export const Particles: React.FC<ParticlesProps> = ({
     
     return material;
   }, [particleSize, particleTexture]);
+  
+  // Cleanup material when component unmounts or when material changes
+  useEffect(() => {
+    // Store reference to current material for cleanup
+    const currentMaterial = particleMaterial;
+    
+    // Return cleanup function
+    return () => {
+      if (currentMaterial) {
+        currentMaterial.dispose();
+      }
+    };
+  }, [particleMaterial]);
   
   // Animation for particles
   useFrame(() => {

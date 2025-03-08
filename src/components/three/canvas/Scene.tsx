@@ -2,7 +2,7 @@
 
 import React, { Suspense, lazy } from 'react';
 import { Canvas } from "@react-three/fiber";
-// import { Perf } from 'r3f-perf';
+import { Perf } from 'r3f-perf';
 
 // Lazy load the ViewportManager component
 const ViewportManager = lazy(() => import('./ViewportManager').then(mod => ({ default: mod.ViewportManager })));
@@ -15,7 +15,7 @@ export const Scene = () => (
       resize={{ scroll: false }}
       dpr={[1, 2]} // Limit pixel ratio for better performance
     >
-      {/* {process.env.NODE_ENV === 'development' && <Perf position="top-left" />} */}
+     {process.env.NODE_ENV === 'development' && <Perf position="top-left" />}
       <Suspense fallback={null}>
         <ViewportManager />
       </Suspense>

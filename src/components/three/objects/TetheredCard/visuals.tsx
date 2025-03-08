@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 
@@ -17,6 +17,11 @@ interface RopeMeshProps {
 
 // RopeMesh component to create a tubular mesh around the rope points
 export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshProps) => {
+  // Keep references to geometries for disposal
+  const tubeGeometryRef = useRef<THREE.TubeGeometry | null>(null);
+  const startSphereGeometryRef = useRef<THREE.SphereGeometry | null>(null);
+  const endSphereGeometryRef = useRef<THREE.SphereGeometry | null>(null);
+
   const curve = useMemo(() => {
     // Create a smooth curve through the points
     const curvePoints = [...points];
@@ -25,12 +30,35 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
 
   // Create a tubular geometry along the curve
   const tubeGeometry = useMemo(() => {
-    return new THREE.TubeGeometry(curve, 32, radius, 8, false);
+    // Dispose of the previous geometry if it exists
+    if (tubeGeometryRef.current) {
+      tubeGeometryRef.current.dispose();
+    }
+    
+    // Create new geometry
+    const newGeometry = new THREE.TubeGeometry(curve, 32, radius, 8, false);
+    tubeGeometryRef.current = newGeometry;
+    return newGeometry;
   }, [curve, radius]);
 
   // Get the start and end points for cap spheres
   const startPoint = useMemo(() => points[0], [points]);
   const endPoint = useMemo(() => points[points.length - 1], [points]);
+
+  // Clean up geometries when component unmounts
+  useEffect(() => {
+    return () => {
+      if (tubeGeometryRef.current) {
+        tubeGeometryRef.current.dispose();
+      }
+      if (startSphereGeometryRef.current) {
+        startSphereGeometryRef.current.dispose();
+      }
+      if (endSphereGeometryRef.current) {
+        endSphereGeometryRef.current.dispose();
+      }
+    };
+  }, []);
 
   return (
     <group>
@@ -45,7 +73,16 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
       
       {/* Cap at the start point */}
       <mesh position={startPoint}>
-        <sphereGeometry args={[radius, 4 , 4]} />
+        <sphereGeometry 
+          ref={(geometry) => {
+            // Dispose of previous geometry if it exists
+            if (startSphereGeometryRef.current && geometry !== startSphereGeometryRef.current) {
+              startSphereGeometryRef.current.dispose();
+            }
+            startSphereGeometryRef.current = geometry;
+          }}
+          args={[radius, 4, 4]} 
+        />
         <meshStandardMaterial 
           color={color} 
           roughness={0.7} 
@@ -54,7 +91,16 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
       
       {/* Cap at the end point */}
       <mesh position={endPoint}>
-        <sphereGeometry args={[radius, 4, 4]} />
+        <sphereGeometry 
+          ref={(geometry) => {
+            // Dispose of previous geometry if it exists
+            if (endSphereGeometryRef.current && geometry !== endSphereGeometryRef.current) {
+              endSphereGeometryRef.current.dispose();
+            }
+            endSphereGeometryRef.current = geometry;
+          }}
+          args={[radius, 4, 4]} 
+        />
         <meshStandardMaterial 
           color={color} 
           roughness={0.7} 
