@@ -4,7 +4,7 @@ import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { BufferGeometry, BufferAttribute, PointsMaterial, Color, Points, Vector3, TextureLoader } from 'three';
 
-interface ParticleSystemProps {
+interface ParticlesProps {
   triggerCount: number;  // Increases to trigger new particles
   position?: [number, number, number];
   particleSize?: number;
@@ -14,7 +14,7 @@ interface ParticleSystemProps {
   confetti?: boolean; // Option to make it look like confetti
 }
 
-export const ParticleSystem: React.FC<ParticleSystemProps> = ({
+export const Particles: React.FC<ParticlesProps> = ({
   triggerCount = 0,
   position = [0, 0, 0],
   particleSize = 0.025,

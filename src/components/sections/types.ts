@@ -24,7 +24,7 @@ export interface ExperienceItem {
 // PortfolioSection types
 export interface PortfolioItem {
   title: string;
-  imageUrl: string;
+  videoUrl: string;
   technologies: string[]; // Array of technologies used
   githubUrl?: string; // Optional GitHub URL
   liveUrl?: string; // Optional live demo URL

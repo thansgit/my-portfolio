@@ -10,7 +10,7 @@ import {
   useSphericalJoint,
   RapierRigidBody,
 } from "@react-three/rapier";
-import { ExtendedRigidBody } from "./types";
+import { ExtendedRigidBody } from "@/components/three/utils/types";
 
 interface PhysicsProps {
   position: [number, number, number];
