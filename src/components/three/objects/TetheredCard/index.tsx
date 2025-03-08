@@ -3,14 +3,12 @@
 import * as THREE from "three";
 import { useEffect, useRef, useState } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
-import { TetheredCardProps, ExtendedRigidBody } from "./types";
-import { Pinhead } from "./Pinhead";
-import { ParticleSystem } from "./ParticleSystem";
-import { RopeMesh, CardModel } from "@/components/three/TetheredCardVisuals";
-import { setupJoints, usePhysicsUpdate } from "@/components/three/TetheredCardPhysics";
-import { useTouchHandling } from "@/components/three/TetheredCardInteractions";
-import { useRotationTracker } from "@/components/three/TetheredCardRotationTracker";
-import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/constants";
+import { TetheredCardProps, ExtendedRigidBody } from "@/components/three/utils/types";
+import { Pinhead, Particles } from "@/components/three";
+import { RopeMesh, CardModel } from "./visuals";
+import { setupJoints, usePhysicsUpdate } from "./physics";
+import { useTouchHandling, useRotationTracker } from "./controls";
+import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/utils/constants";
 
 export const TetheredCard = ({
   position = [0, 0, 0],
@@ -187,7 +185,7 @@ export const TetheredCard = ({
         isGlowing={isGlowing}
       />
       
-      <ParticleSystem 
+      <Particles 
         triggerCount={rotationCounter}
         position={pinheadPosition}
         particleSize={0.075}

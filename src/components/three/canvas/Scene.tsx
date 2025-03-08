@@ -5,7 +5,7 @@ import { Canvas } from "@react-three/fiber";
 // import { Perf } from 'r3f-perf';
 
 // Lazy load the ViewportManager component
-const ViewportManager = lazy(() => import('./viewport/index').then(mod => ({ default: mod.ViewportManager })));
+const ViewportManager = lazy(() => import('./ViewportManager').then(mod => ({ default: mod.ViewportManager })));
 
 export const Scene = () => (
   <div className="fixed inset-0 w-screen h-screen overflow-hidden">
@@ -21,4 +21,4 @@ export const Scene = () => (
       </Suspense>
     </Canvas>
   </div>
-);
+); 

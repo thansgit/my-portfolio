@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLoading } from '@/components/three/context/LoadingContext';
+import { useLoading } from '@/components/three';
 
 export const SplashScreen: React.FC = () => {
   const { isLoaded, progress } = useLoading();

@@ -15,14 +15,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Timo Hanski" }],
   creator: "Timo Hanski",
   publisher: "Timo Hanski",
-  // openGraph: {
-  //   type: "website",
-  //   locale: "en_US",
-  //   url: "https://timohanski.com", // Replace with your actual domain when you have it
-  //   title: "Timo Hanski - Software Developer Portfolio",
-  //   description: "Portfolio of Timo Hanski, a Software Developer specializing in React, TypeScript, Three.js and full-stack development",
-  //   siteName: "Timo Hanski Portfolio",
-  // },
   robots: {
     index: true,
     follow: true,

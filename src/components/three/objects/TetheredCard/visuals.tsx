@@ -6,7 +6,7 @@ import { ThreeEvent } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 
 // Preload the 3D model to improve loading performance
-useGLTF.preload('/cardtest.glb', true);
+useGLTF.preload('/assets/models/card.glb', true);
 
 // Define the RopeMesh component props interface
 interface RopeMeshProps {
@@ -73,7 +73,7 @@ interface CardModelProps {
 }
 
 export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
-  const { nodes } = useGLTF('/cardtest.glb');
+  const { nodes } = useGLTF('/assets/models/card.glb');
   const vec = new THREE.Vector3();
 
   return (

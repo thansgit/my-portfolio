@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
@@ -8,26 +7,26 @@ export function PortfolioSection() {
   const portfolioItems: PortfolioItem[] = [
     {
       title: "Blog / Social media",
-      imageUrl: "/blogapp.gif",
+      videoUrl: "/assets/videos/blogapp.mp4",
       technologies: ["React-redux", "Express", "Node", "MongoDB", "tailwindCSS",],
       githubUrl: "https://github.com/thansgit/lol-service",
     },
     {
       title: "Old portfolio site",
-      imageUrl: "/portfolio.gif",
+      videoUrl: "/assets/videos/portfolio.mp4",
       technologies: ["React", "Bootstrap", "CSS"],
       githubUrl: "https://github.com/thansgit/portfolio",
       liveUrl: "https://thansgitportfolio.netlify.app/",
     },
     {
       title: "Mine Sweeper GUI",
-      imageUrl: "/minesweeper.gif",
+      videoUrl: "/assets/videos/minesweeper.mp4",
       technologies: ["C++17", "QT"],
       githubUrl: "https://github.com/thansgit/minesweeper_gui",
     },
     {
       title: "To-Do app",
-      imageUrl: "/todo.gif",
+      videoUrl: "/assets/videos/todo.mp4",
       technologies: ["React", "Express", "Mongoose", "MongoDB"],
       githubUrl: "https://github.com/thansgit/to-do",
     },
@@ -48,12 +47,14 @@ export function PortfolioSection() {
           >
             <CardContent className="p-0 relative">
               <div className="aspect-video relative overflow-hidden bg-black">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-contain transition-transform duration-300 group-hover:scale-110"
+                <video
+                  src={item.videoUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                  aria-label={`${item.title} demo video`}
                 />
               </div>
               <div className="h-px w-full bg-zinc-700"></div>

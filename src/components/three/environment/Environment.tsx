@@ -1,7 +1,7 @@
 "use client";
 
-import { Environment, Lightformer } from "@react-three/drei";
-import { useScreenCenter } from "../../utils/screenUtils";
+import { Environment as DreiEnvironment, Lightformer } from "@react-three/drei";
+import { useScreenCenter } from "../utils/r3fUtils";
 import { useThree } from "@react-three/fiber";
 
 export interface LightformerConfigProps {
@@ -81,8 +81,8 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
   );
 };
 
-// Main background component
-export const Background = ({ 
+// Main environment component (renamed from Background)
+export const Environment = ({ 
   cardPosition,
   pinheadPosition,
   isPinheadGlowing,
@@ -122,7 +122,7 @@ export const Background = ({
   return (
     <>
       {/* Environment with black background */}
-      <Environment background blur={0.75}>
+      <DreiEnvironment background blur={0.75}>
         <color attach="background" args={["black"]} />
         
         {isPinheadGlowing && pinheadPosition && (
@@ -134,12 +134,12 @@ export const Background = ({
             form="circle"
           />
         )}
-      </Environment>
+      </DreiEnvironment>
       
       {/* Separate lighting environment that doesn't affect the background */}
-      <Environment preset={undefined} resolution={256} background={false}>
+      <DreiEnvironment preset={undefined} resolution={256} background={false}>
         {cardPosition && <CardLightformer cardPosition={cardPosition} />}
-      </Environment>
+      </DreiEnvironment>
     </>
   );
-};
+}; 

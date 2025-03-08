@@ -115,16 +115,17 @@ export function AboutSection() {
                 key={service.title} 
                 whileHover={{ translateY: -5 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="h-full"
               >
-                <Card className="bg-[url('/textures/brushed-steel.webp')] bg-cover border-none overflow-hidden relative rounded-xl shadow-[0_10px_20px_rgba(0,0,0,0.5)]">
+                <Card className="bg-[url('/assets/textures/brushed-steel.webp')] bg-cover border-none overflow-hidden relative rounded-xl shadow-[0_10px_20px_rgba(0,0,0,0.5)] h-full min-h-[180px]">
                   <div className="absolute inset-0 bg-zinc-900/70 backdrop-blur-[1px]"></div>
                   <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
                   <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                  <CardContent className="p-6 flex items-start gap-4 relative">
-                    <div className="p-3 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-[0_4px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)]">
+                  <CardContent className="p-6 flex items-start gap-4 relative h-full">
+                    <div className="p-3 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-[0_4px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] flex-shrink-0">
                       {service.icon}
                     </div>
-                    <div>
+                    <div className="flex flex-col flex-1">
                       <h4 className="text-lg font-semibold mb-2 text-white text-shadow-glow">
                         {service.title}
                       </h4>
@@ -147,7 +148,7 @@ export function AboutSection() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Card className="relative bg-[url('/textures/carbon-fiber.webp')] bg-cover border-none overflow-hidden rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.4)]">
+                <Card className="relative bg-[url('/assets/textures/carbon-fiber.webp')] bg-cover border-none overflow-hidden rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.4)]">
                   <div className="absolute inset-0 bg-gradient-to-b from-zinc-800/50 to-zinc-900/80 backdrop-blur-[1px]"></div>
                   <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                   <CardContent className="p-6 flex flex-col items-center justify-center gap-3 relative">

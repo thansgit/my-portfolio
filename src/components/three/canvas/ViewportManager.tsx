@@ -3,10 +3,10 @@
 import React, { useState, useEffect, Suspense, useContext, createContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
-import { ViewportState } from '../types';
-import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../constants';
-import { TetheredCard } from '../TetheredCard';
-import { Background } from '../Background';
+import { ViewportState } from '../utils/types';
+import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants';
+import { TetheredCard } from '../objects/TetheredCard';
+import { Environment } from '../environment/Environment';
 
 // Create context with default values
 const ViewportContext = createContext<ViewportState>({
@@ -95,7 +95,7 @@ export const ViewportManager = () => {
     <ViewportContext.Provider value={viewportState}>
       <Suspense fallback={null}>
         <ambientLight intensity={0.5} />
-        <Background 
+        <Environment 
           cardPosition={cardPosition} 
           pinheadPosition={pinheadPosition}
           isPinheadGlowing={isPinheadGlowing}
