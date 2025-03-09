@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useContext, createContext } from 'react';
+import React, { useState, useEffect, Suspense, useContext, createContext, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
 import { ViewportState } from '../utils/types';
@@ -115,6 +115,13 @@ export const ViewportManager = () => {
     setPinheadPosition(position);
     setIsPinheadGlowing(isGlowing);
   };
+  
+  // Turn off glowing when content becomes invisible
+  useEffect(() => {
+    if (!viewportState.isVisible && isPinheadGlowing) {
+      setIsPinheadGlowing(false);
+    }
+  }, [viewportState.isVisible, isPinheadGlowing]);
 
   return (
     <ViewportContext.Provider value={viewportState}>
