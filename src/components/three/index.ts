@@ -1,6 +1,7 @@
 // Export components from their new locations
 export { Scene } from './canvas/Scene';
-export { LoadingProvider, useLoading } from './canvas/LoadingProvider';
+export { LoadingProvider } from './canvas/LoadingProvider';
+export { useLoading } from './hooks/useLoading';
 export { ViewportManager } from './canvas/ViewportManager';
 export { Environment } from './environment/Environment';
 export { Particles } from './effects/Particles';

@@ -50,7 +50,7 @@ export const Environment = ({
   return (
     <>
     {/* Simple black background */}
-    <mesh position={[0, 0, -1]} renderOrder={-1000}>
+    <mesh position={[0, 0, -5]} renderOrder={-1000}>
       <planeGeometry args={[100, 100]} />
       <meshStandardMaterial color="black" />
     </mesh>

@@ -1,18 +1,19 @@
-"use client";
-
 import * as THREE from "three";
 import { RefObject, ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
-  BallCollider,
-  RigidBody,
+  RapierRigidBody,
   useRopeJoint,
   useSphericalJoint,
-  RapierRigidBody,
+  BallCollider,
+  RigidBody
 } from "@react-three/rapier";
 import { ExtendedRigidBody } from "@/components/three/utils/types";
 
-interface PhysicsProps {
+/**
+ * Props for the usePhysicsUpdate hook
+ */
+export interface PhysicsProps {
   position: [number, number, number];
   ROPE_SEGMENT_LENGTH: number;
   segmentProps: any;
@@ -29,7 +30,10 @@ interface PhysicsProps {
   cardChildren?: ReactNode;
 }
 
-export const setupJoints = (
+/**
+ * Creates joints between rigid bodies with specified constraints
+ */
+export const useJoints = (
   fixed: RefObject<RapierRigidBody>,
   j2: RefObject<ExtendedRigidBody>,
   j3: RefObject<RapierRigidBody>,
@@ -43,6 +47,9 @@ export const setupJoints = (
   useSphericalJoint(j4, card, [[0, 0, 0], [0, 1.45, 0]]);
 };
 
+/**
+ * Handles physics updates and kinematic interactions for tethered objects
+ */
 export const usePhysicsUpdate = ({
   position,
   ROPE_SEGMENT_LENGTH,
@@ -109,38 +116,17 @@ export const usePhysicsUpdate = ({
     }
   });
 
-  return (
-    <>
-      <RigidBody ref={fixed} position={position} {...segmentProps} type="fixed" />
-      <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]]}
-        ref={j2}
-        {...segmentProps}
-      >
-        <BallCollider args={[0.1]} />
-      </RigidBody>
-      <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]]}
-        ref={j3}
-        {...segmentProps}
-      >
-        <BallCollider args={[0.05]} />
-      </RigidBody>
-      <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]]}
-        ref={j4}
-        {...segmentProps}
-      >
-        <BallCollider args={[0.05]} />
-      </RigidBody>
-      <RigidBody
-        ref={card}
-        {...segmentProps}
-        type={dragged ? "kinematicPosition" : "dynamic"}
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 4, position[1], position[2]]}
-      >
-        {cardChildren}
-      </RigidBody>
-    </>
-  );
+  // Return physics information to be used by the component
+  return {
+    fixed,
+    j2,
+    j3,
+    j4,
+    card,
+    position,
+    ROPE_SEGMENT_LENGTH,
+    segmentProps,
+    dragged,
+    cardChildren
+  };
 }; 

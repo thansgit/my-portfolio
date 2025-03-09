@@ -6,9 +6,10 @@ import { RapierRigidBody } from "@react-three/rapier";
 import { TetheredCardProps, ExtendedRigidBody } from "@/components/three/utils/types";
 import { Pinhead, Particles } from "@/components/three";
 import { RopeMesh, CardModel } from "./visuals";
-import { setupJoints, usePhysicsUpdate } from "./physics";
-import { useTouchHandling, useRotationTracker } from "./controls";
+import { useJoints, usePhysicsUpdate } from "@/components/three/hooks";
+import { useTouchHandling, useRotationTracker } from "@/components/three/hooks";
 import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/utils/constants";
+import { RigidBody, BallCollider } from "@react-three/rapier";
 
 export const TetheredCard = ({
   position = [0, 0, 0],
@@ -95,7 +96,7 @@ export const TetheredCard = ({
   }, [clockwiseRotations, counterClockwiseRotations]);
 
   // Setup joints between rigid bodies
-  setupJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
+  useJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
 
   // Handle touch events
   useTouchHandling(dragged, hovered);
@@ -144,7 +145,7 @@ export const TetheredCard = ({
   );
 
   // Physics update and rendering
-  const physicsElements = usePhysicsUpdate({
+  usePhysicsUpdate({
     position,
     ROPE_SEGMENT_LENGTH,
     segmentProps: SEGMENT_PROPS,
@@ -174,7 +175,38 @@ export const TetheredCard = ({
 
   return (
     <>
-      {physicsElements}
+      {/* Physics rigid bodies */}
+      <RigidBody ref={fixed} position={position} {...SEGMENT_PROPS} type="fixed" />
+      <RigidBody
+        position={[position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]]}
+        ref={j2}
+        {...SEGMENT_PROPS}
+      >
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]]}
+        ref={j3}
+        {...SEGMENT_PROPS}
+      >
+        <BallCollider args={[0.05]} />
+      </RigidBody>
+      <RigidBody
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]]}
+        ref={j4}
+        {...SEGMENT_PROPS}
+      >
+        <BallCollider args={[0.05]} />
+      </RigidBody>
+      <RigidBody
+        ref={card}
+        {...SEGMENT_PROPS}
+        type={dragged ? "kinematicPosition" : "dynamic"}
+        position={[position[0] + ROPE_SEGMENT_LENGTH * 4, position[1], position[2]]}
+      >
+        {cardModelElement}
+      </RigidBody>
+      
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
       

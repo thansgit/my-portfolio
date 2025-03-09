@@ -1,76 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useContext, createContext, useRef } from 'react';
+import React, { useState, useEffect, Suspense, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
-import { ViewportState } from '../utils/types';
+import { ViewportContext, useViewport } from '@/components/three/hooks';
 import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants';
 import { TetheredCard } from '../objects/TetheredCard';
 import { Environment } from '../environment/Environment';
-
-const ViewportContext = createContext<ViewportState>({
-  isMobile: false,
-  isVisible: true
-});
-
-const useViewport = () => {
-  const { size } = useThree();
-  const [state, setState] = useState<ViewportState>({
-    isMobile: size.width < MOBILE_BREAKPOINT,
-    isVisible: true
-  });
-
-  // Handle resize events
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const updateViewport = () => {
-      // Hide content immediately
-      setState(prev => ({ ...prev, isVisible: false }));
-
-      // Show content and update mobile state after delay
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setState({
-          isMobile: size.width < MOBILE_BREAKPOINT,
-          isVisible: true
-        });
-      }, RESIZE_DELAY);
-    };
-
-    updateViewport();
-
-    return () => clearTimeout(timeoutId);
-  }, [size.width]);
-
-  useEffect(() => {
-    if (!state.isMobile) return;
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const scrollThreshold = viewportHeight * 0.2; // 50% of viewport height
-
-      
-      setState(prev => {
-        const shouldBeVisible = scrollY < scrollThreshold;
-        if (prev.isVisible !== shouldBeVisible) {
-          return { ...prev, isVisible: shouldBeVisible };
-        }
-        return prev;
-      });
-    };
-    
-    // Initial check
-    handleScroll();
-    
-    // Add scroll event listener
-    window.addEventListener('scroll', handleScroll);
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [state.isMobile]);
-  
-  return state;
-};
 
 // Wrapper component for the TetheredCard element that manages its position based on screen size
 const TetheredCardWrapper = ({ onPinheadStateChange }: { onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void }) => {
