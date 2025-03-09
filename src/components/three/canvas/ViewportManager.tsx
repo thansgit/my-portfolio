@@ -45,33 +45,30 @@ const useViewport = () => {
 
   useEffect(() => {
     if (!state.isMobile) return;
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const scrollThreshold = viewportHeight * 0.2; // 50% of viewport height
+
+      
+      setState(prev => {
+        const shouldBeVisible = scrollY < scrollThreshold;
+        if (prev.isVisible !== shouldBeVisible) {
+          return { ...prev, isVisible: shouldBeVisible };
+        }
+        return prev;
+      });
+    };
     
-    // Find the main content element
-    const mainContentElement = document.querySelector('.relative.z-10');
-    if (!mainContentElement) return;
+    // Initial check
+    handleScroll();
     
-    // Create an observer
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Update visibility based on whether the element is in view
-        setState(prev => {
-          const isVisible = entry.isIntersecting;
-          if (prev.isVisible !== isVisible) {
-            return { ...prev, isVisible: isVisible };
-          }
-          return prev;
-        });
-      },
-      { 
-        threshold: 0,
-        rootMargin: '-200px 0px 0px 0px' // Hide when element is 200px above viewport
-      }
-    );
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
     
-    observer.observe(mainContentElement);
-    
-    return () => observer.disconnect();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [state.isMobile]);
+  
   return state;
 };
 
