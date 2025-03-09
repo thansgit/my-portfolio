@@ -120,10 +120,14 @@ export const Environment = ({
   
   return (
     <>
-      {/* Environment with black background */}
-      <DreiEnvironment background blur={0.75}>
+      <DreiEnvironment 
+        background={false}  // Don't render as a background
+        resolution={256}    // Keep your lowered resolution
+        preset={undefined}  // No preset, to avoid additional textures
+      >
         <color attach="background" args={["black"]} />
         
+        {/* Include your pinhead glow lightformer */}
         {isPinheadGlowing && pinheadPosition && (
           <Lightformer
             intensity={5}
@@ -133,12 +137,16 @@ export const Environment = ({
             form="circle"
           />
         )}
-      </DreiEnvironment>
-      
-      {/* Separate lighting environment that doesn't affect the background */}
-      <DreiEnvironment preset={undefined} resolution={256} background={false}>
+        
+        {/* Include your card lightformer */}
         {cardPosition && <CardLightformer cardPosition={cardPosition} />}
       </DreiEnvironment>
+
+      {/* Add a simple black background separately */}
+      <mesh position={[0, 0, -10]}>
+        <planeGeometry args={[100, 100]} />
+        <meshBasicMaterial color="black" />
+      </mesh>
     </>
   );
 }; 
