@@ -6,7 +6,6 @@ export const SplashScreen: React.FC = () => {
   const [fadeOut, setFadeOut] = useState(false);
   const [removed, setRemoved] = useState(false);
   
-  // When Three.js resources are loaded, start fade-out
   useEffect(() => {
     if (isLoaded) {
       setFadeOut(true);
@@ -14,7 +13,7 @@ export const SplashScreen: React.FC = () => {
       // Remove splash screen completely from DOM after fade-out animation
       const timer = setTimeout(() => {
         setRemoved(true);
-      }, 500); // Slightly longer than transition-duration
+      }, 500);
       
       return () => clearTimeout(timer);
     }
@@ -25,7 +24,7 @@ export const SplashScreen: React.FC = () => {
     const timer = setTimeout(() => {
       setFadeOut(true);
       setTimeout(() => setRemoved(true), 500);
-    }, 8000); // 8 second timeout
+    }, 8000);
     
     return () => clearTimeout(timer);
   }, []);

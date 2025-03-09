@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useProgress } from '@react-three/drei';
-import { LoadingContext, LoadingContextType } from '@/components/three/hooks';
+import { LoadingContext } from '@/components/three/hooks';
 
 export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { progress, loaded, active } = useProgress();

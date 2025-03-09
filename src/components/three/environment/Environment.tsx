@@ -2,13 +2,7 @@
 
 import { Environment as DreiEnvironment, Lightformer } from "@react-three/drei";
 
-
-
-
-
-
-
-// Card-focused lightformer that points at the card
+// Card-focused lightformers that points at the card
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {
   return (
     <>
@@ -34,7 +28,6 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
   );
 };
 
-// Main environment component (renamed from Background)
 export const Environment = ({ 
   cardPosition,
   pinheadPosition,
@@ -49,13 +42,11 @@ export const Environment = ({
   
   return (
     <>
-    {/* Simple black background */}
     <mesh position={[0, 0, -5]} renderOrder={-1000}>
       <planeGeometry args={[100, 100]} />
-      <meshStandardMaterial color="black" />
+      <meshBasicMaterial color="black" />
     </mesh>
     
-    {/* Pinhead lightformer that's visible in the scene */}
     {isPinheadGlowing && pinheadPosition && (
       <pointLight
       position={[

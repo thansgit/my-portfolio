@@ -1,5 +1,3 @@
-// Barrel file for Three.js hooks
-// We'll add exports here as we move hooks into this directory 
 export { useLoading, LoadingContext, type LoadingContextType } from './useLoading';
 export { useViewport, ViewportContext, type ViewportState } from './useViewport';
 export { 

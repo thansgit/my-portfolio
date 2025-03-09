@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense, useContext } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Physics } from "@react-three/rapier";
 import { ViewportContext, useViewport } from '@/components/three/hooks';
-import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants';
+import { MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants';
 import { TetheredCard } from '../objects/TetheredCard';
 import { Environment } from '../environment/Environment';
 
@@ -42,11 +42,9 @@ export const ViewportManager = () => {
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2);
   const cardPosition: [number, number, number] = [xPosition, 2.5, 0];
 
-  // State for pinhead position and glowing status
   const [pinheadPosition, setPinheadPosition] = useState<[number, number, number] | undefined>(undefined);
   const [isPinheadGlowing, setIsPinheadGlowing] = useState<boolean>(false);
 
-  // Handler for pinhead state changes
   const handlePinheadStateChange = (position: [number, number, number], isGlowing: boolean) => {
     setPinheadPosition(position);
     setIsPinheadGlowing(isGlowing);

@@ -19,8 +19,6 @@ export const TetheredCard = ({
 }: TetheredCardProps = {}) => {
   
   const card = useRef<RapierRigidBody>(null);
-  
-  // References for the tethered card and the joints
   const fixed = useRef<RapierRigidBody>(null);
   const j2 = useRef<ExtendedRigidBody | null>(null);
   const j3 = useRef<RapierRigidBody | null>(null);
@@ -28,16 +26,12 @@ export const TetheredCard = ({
   
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
-  
-  // State to track glowing effect
   const [isGlowing, setIsGlowing] = useState(false);
   const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
-  // Track last rotation values separately
   const lastClockwiseRef = useRef(0);
   const lastCounterClockwiseRef = useRef(0);
   
-  // Add rotation counter for particle effects
   const [rotationCounter, setRotationCounter] = useState(0);
   
   const [points, setPoints] = useState([
@@ -59,35 +53,26 @@ export const TetheredCard = ({
   
   // Watch for changes in rotations and trigger the glow effect
   useEffect(() => {
-    // Detect if any new rotation has occurred
     const hasNewRotation = 
       clockwiseRotations > lastClockwiseRef.current || 
       counterClockwiseRotations > lastCounterClockwiseRef.current;
     
-    // Update our references
     lastClockwiseRef.current = clockwiseRotations;
     lastCounterClockwiseRef.current = counterClockwiseRotations;
     
-    // If a new rotation has occurred
     if (hasNewRotation) {
-      // Always set to true on new rotation, regardless of current state
       setIsGlowing(true);
-      
-      // Increment rotation counter to trigger new particles
       setRotationCounter(prev => prev + 1);
       
-      // Clear any existing timeout to restart the timer
       if (glowTimeoutRef.current) {
         clearTimeout(glowTimeoutRef.current);
       }
-      
-      // Set a new timeout
+
       glowTimeoutRef.current = setTimeout(() => {
         setIsGlowing(false);
       }, 1500);
     }
     
-    // Clean up on unmount
     return () => {
       if (glowTimeoutRef.current) {
         clearTimeout(glowTimeoutRef.current);
@@ -95,10 +80,7 @@ export const TetheredCard = ({
     };
   }, [clockwiseRotations, counterClockwiseRotations]);
 
-  // Setup joints between rigid bodies
   useJoints(fixed, j2, j3, j4, card, ROPE_SEGMENT_LENGTH);
-
-  // Handle touch events
   useTouchHandling(dragged, hovered);
 
   const calculateRopeLength = (pts: THREE.Vector3[]): number => {
@@ -116,25 +98,20 @@ export const TetheredCard = ({
     const stretchRatio = Math.max(1, currentLength / restingLength);
     
     if (stretchRatio > 1) {
-      // Speed of color change  
       const colorStretch = Math.min((stretchRatio - 1) / ROPE_COLOR_STRETCH_SPEED, 1);
-      // Speed of radius change
       const radiusStretch = Math.min((stretchRatio - 1) / ROPE_RADIUS_STRETCH_SPEED, 1);
       
-      // Color change
       const grayValue = Math.floor(colorStretch * 180);
       setRopeColor(`rgb(${grayValue}, ${grayValue}, ${grayValue})`);
       
       const newRadius = ROPE_INITIAL_RADIUS - (radiusStretch * (ROPE_INITIAL_RADIUS - ROPE_MIN_RADIUS));
       setRopeRadius(newRadius);
     } else {
-      // Lepotilassa palautetaan alkuarvot
       setRopeColor("#000000");
       setRopeRadius(ROPE_INITIAL_RADIUS);
     }
   }, [points]);
 
-  // Create the card model element
   const cardModelElement = (
     <CardModel 
       nodeRef={card}
@@ -144,7 +121,6 @@ export const TetheredCard = ({
     />
   );
 
-  // Physics update and rendering
   usePhysicsUpdate({
     position,
     ROPE_SEGMENT_LENGTH,
@@ -175,7 +151,6 @@ export const TetheredCard = ({
 
   return (
     <>
-      {/* Physics rigid bodies */}
       <RigidBody ref={fixed} position={position} {...SEGMENT_PROPS} type="fixed" />
       <RigidBody
         position={[position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]]}

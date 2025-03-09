@@ -5,8 +5,6 @@ import {
   RapierRigidBody,
   useRopeJoint,
   useSphericalJoint,
-  BallCollider,
-  RigidBody
 } from "@react-three/rapier";
 import { ExtendedRigidBody } from "@/components/three/utils/types";
 
@@ -60,7 +58,6 @@ export const usePhysicsUpdate = ({
   j4,
   card,
   dragged,
-  points,
   setPoints,
   maxSpeed,
   minSpeed,

@@ -5,10 +5,8 @@ import { useMemo, useRef, useEffect } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 
-// Preload the 3D model to improve loading performance
 useGLTF.preload('/assets/models/card.glb', true);
 
-// Define the RopeMesh component props interface
 interface RopeMeshProps {
   points: THREE.Vector3[];
   radius?: number;
@@ -17,13 +15,11 @@ interface RopeMeshProps {
 
 // RopeMesh component to create a tubular mesh around the rope points
 export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshProps) => {
-  // Keep references to geometries for disposal
+
   const tubeGeometryRef = useRef<THREE.TubeGeometry | null>(null);
-  const startSphereGeometryRef = useRef<THREE.SphereGeometry | null>(null);
   const endSphereGeometryRef = useRef<THREE.SphereGeometry | null>(null);
 
   const curve = useMemo(() => {
-    // Create a smooth curve through the points
     const curvePoints = [...points];
     return new THREE.CatmullRomCurve3(curvePoints);
   }, [points]);
@@ -35,7 +31,6 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
       tubeGeometryRef.current.dispose();
     }
     
-    // Create new geometry
     const newGeometry = new THREE.TubeGeometry(curve, 32, radius, 8, false);
     tubeGeometryRef.current = newGeometry;
     return newGeometry;
@@ -50,9 +45,6 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
     return () => {
       if (tubeGeometryRef.current) {
         tubeGeometryRef.current.dispose();
-      }
-      if (startSphereGeometryRef.current) {
-        startSphereGeometryRef.current.dispose();
       }
       if (endSphereGeometryRef.current) {
         endSphereGeometryRef.current.dispose();
@@ -70,30 +62,10 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
           roughness={0.7} 
         />
       </mesh>
-      
-      {/* Cap at the start point */}
-      <mesh position={startPoint}>
-        <sphereGeometry 
-          ref={(geometry) => {
-            // Dispose of previous geometry if it exists
-            if (startSphereGeometryRef.current && geometry !== startSphereGeometryRef.current) {
-              startSphereGeometryRef.current.dispose();
-            }
-            startSphereGeometryRef.current = geometry;
-          }}
-          args={[radius, 4, 4]} 
-        />
-        <meshStandardMaterial 
-          color={color} 
-          roughness={0.7} 
-        />
-      </mesh>
-      
       {/* Cap at the end point */}
       <mesh position={endPoint}>
         <sphereGeometry 
           ref={(geometry) => {
-            // Dispose of previous geometry if it exists
             if (endSphereGeometryRef.current && geometry !== endSphereGeometryRef.current) {
               endSphereGeometryRef.current.dispose();
             }
@@ -101,16 +73,14 @@ export const RopeMesh = ({ points, radius = 0.04, color = "black" }: RopeMeshPro
           }}
           args={[radius, 4, 4]} 
         />
-        <meshStandardMaterial 
+        <meshBasicMaterial 
           color={color} 
-          roughness={0.7} 
         />
       </mesh>
     </group>
   );
 };
 
-// Card component
 interface CardModelProps {
   nodeRef: React.MutableRefObject<any>;
   dragged: THREE.Vector3 | false;
