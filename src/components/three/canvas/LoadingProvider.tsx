@@ -35,7 +35,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
-    }, 5000); // 5 second timeout
+    }, 5000); 
     
     return () => clearTimeout(timer);
   }, []);

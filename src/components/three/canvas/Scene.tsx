@@ -13,7 +13,13 @@ export const Scene = () => (
       camera={{ position: [0, 0, 13], fov: 25 }}
       className="absolute w-full h-full"
       resize={{ scroll: false }}
-      dpr={[1, 2]} // Limit pixel ratio for better performance
+      dpr={[1, 2]}
+      gl={{
+        powerPreference: "high-performance",
+        stencil: false,
+        depth: true,
+        alpha: true
+      }}
     >
      {process.env.NODE_ENV === 'development' && <Perf position="top-left" />}
       <Suspense fallback={null}>

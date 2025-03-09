@@ -8,13 +8,11 @@ import { MOBILE_BREAKPOINT, RESIZE_DELAY, MOBILE_OFFSET, DESKTOP_OFFSET } from '
 import { TetheredCard } from '../objects/TetheredCard';
 import { Environment } from '../environment/Environment';
 
-// Create context with default values
 const ViewportContext = createContext<ViewportState>({
   isMobile: false,
   isVisible: true
 });
 
-// Hook
 const useViewport = () => {
   const { size } = useThree();
   const [state, setState] = useState<ViewportState>({
@@ -22,6 +20,7 @@ const useViewport = () => {
     isVisible: true
   });
 
+  // Handle resize events
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -44,6 +43,35 @@ const useViewport = () => {
     return () => clearTimeout(timeoutId);
   }, [size.width]);
 
+  useEffect(() => {
+    if (!state.isMobile) return;
+    
+    // Find the main content element
+    const mainContentElement = document.querySelector('.relative.z-10');
+    if (!mainContentElement) return;
+    
+    // Create an observer
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Update visibility based on whether the element is in view
+        setState(prev => {
+          const isVisible = entry.isIntersecting;
+          if (prev.isVisible !== isVisible) {
+            return { ...prev, isVisible: isVisible };
+          }
+          return prev;
+        });
+      },
+      { 
+        threshold: 0,
+        rootMargin: '-200px 0px 0px 0px' // Hide when element is 200px above viewport
+      }
+    );
+    
+    observer.observe(mainContentElement);
+    
+    return () => observer.disconnect();
+  }, [state.isMobile]);
   return state;
 };
 
