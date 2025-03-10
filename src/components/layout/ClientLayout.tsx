@@ -1,10 +1,11 @@
 "use client";
 
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/layout";
 import { LoadingProvider, useLoading } from '@/components/three';
-
+import { theme } from '@/lib/theme';
 
 // Dynamically import the Scene component with no SSR
 const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene), {
@@ -19,11 +20,31 @@ const LoadingIndicator = () => {
   if (isLoaded) return null;
   
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-black backdrop-blur-sm px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 shadow-lg border border-zinc-700/50 text-zinc-200">
+    <div className="fixed bottom-4 right-4 z-50 bg-zinc-800/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 shadow-lg border border-zinc-700/50 text-zinc-200">
       <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
       <span>Loading 3D Experience ({Math.round(progress)}%)</span>
     </div>
   );
+};
+
+// Component to prefetch all major routes
+const RoutePrefetcher = () => {
+  const router = useRouter();
+  const { isLoaded } = useLoading();
+  
+  useEffect(() => {
+    // Only prefetch routes after 3D content is loaded
+    if (isLoaded) {
+      console.log('3D content loaded, prefetching routes...');
+      router.prefetch('/');
+      router.prefetch('/about');
+      router.prefetch('/portfolio');
+      router.prefetch('/resume');
+      router.prefetch('/contact');
+    }
+  }, [router, isLoaded]);
+  
+  return null; // This component doesn't render anything
 };
 
 // 3D Scene container with placeholder
@@ -33,7 +54,7 @@ const SceneContainer = () => {
   return (
     <div className="fixed inset-0 pointer-events-none">
       {/* Always show placeholder gradient until 3D scene is loaded */}
-      <div className={`absolute inset-0 bg-black duration-1000 ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
+      <div className={`absolute inset-0 bg-gradient-to-b from-zinc-900 to-black transition-opacity duration-1000 ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
       
       {/* Load 3D scene in parallel */}
       <Suspense fallback={null}>
@@ -67,6 +88,9 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <div className="min-h-screen text-white">
       <LoadingProvider>
+        {/* Prefetch all routes after 3D content loads */}
+        <RoutePrefetcher />
+        
         {/* Non-blocking loading indicator */}
         <LoadingIndicator />
         

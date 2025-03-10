@@ -40,13 +40,9 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
   }, [activeIndex]);
 
   const handleClick = (section: NavigationItemId, path: string, e: React.MouseEvent) => {
-    e.preventDefault();
+    // Don't prevent default - let Next.js Link handle the navigation
     
-    // Update the route
-    router.push(path);
-    
-    // This will be redundant since the layout will update based on the route,
-    // but keeping it for backward compatibility
+    // Just update section state for backward compatibility
     if (onSectionChange) {
       onSectionChange(section);
     }
@@ -54,18 +50,14 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
 
   // Handle click for mobile navigation - adds scrolling
   const handleMobileClick = (section: NavigationItemId, path: string, e: React.MouseEvent) => {
-    e.preventDefault();
+    // Don't prevent default - let Next.js Link handle the navigation
     
-    // Update the route
-    router.push(path);
-    
-    // This will be redundant since the layout will update based on the route,
-    // but keeping it for backward compatibility
+    // Just update section state for backward compatibility
     if (onSectionChange) {
       onSectionChange(section);
     }
     
-    // Scroll to main content on mobile
+    // Scroll to main content on mobile (only if needed)
     const mainContentElement = document.querySelector('.relative.z-10');
     if (mainContentElement) {
       mainContentElement.scrollIntoView({ behavior: 'smooth' });
@@ -122,6 +114,9 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
           onClick={(e) => handleClick(item.id, `/${item.id === 'about' ? '' : item.id}`, e)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
+          prefetch={true}
+          replace={true}
+          scroll={true}
           className={`
             /* [Nav Link] Navigation link styling with conditional active state */
             ${currentSection === item.id 
@@ -188,6 +183,9 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
           onClick={(e) => handleMobileClick(item.id, `/${item.id === 'about' ? '' : item.id}`, e)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
+          prefetch={true}
+          replace={true}
+          scroll={true}
           className={`
             /* [Nav Link Mobile] Navigation link styling for mobile */
             ${currentSection === item.id 
