@@ -14,20 +14,21 @@ export const ThreeDLoadingIndicators: React.FC = () => {
       {/* Side/Top indicator - circular design */}
       <div 
         className={`
-          fixed z-50 transition-all duration-300 ease-out
-          top-[400px] md:top-[20vh]
+          absolute z-50 transition-all duration-300 ease-out
+          top-[200px] md:top-[20vh]
           left-1/2 md:left-[calc(25%-100px)] -translate-x-1/2 md:translate-x-0
-          bg-zinc-800/90 backdrop-blur-sm rounded-full
-          shadow-lg border border-zinc-700/50 text-zinc-200
+          bg-zinc-800/70 backdrop-blur-md rounded-full
+          shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-zinc-600/30
           flex flex-col items-center justify-center
-          h-20 w-20 aspect-square
+          h-16 w-16 aspect-square
+          hover:scale-105
         `}
       >
         {/* Pulsing dot */}
-        <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse mb-1.5" />
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-400/90 animate-pulse mb-1 shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
         
         {/* 3D text */}
-        <div className="text-xs font-medium text-center">3D</div>
+        <div className="text-xs font-medium text-center text-zinc-100/90">3D</div>
         
         {/* Circular progress indicator */}
         <div className="absolute inset-1.5">
@@ -36,19 +37,20 @@ export const ThreeDLoadingIndicators: React.FC = () => {
             <circle 
               cx="50" cy="50" r="42" 
               fill="none" 
-              stroke="#3f3f46" 
-              strokeWidth="3" 
+              stroke="#3f3f4620" 
+              strokeWidth="2" 
             />
             
             {/* Progress */}
             <circle 
               cx="50" cy="50" r="42" 
               fill="none" 
-              stroke="#eab308" 
-              strokeWidth="3" 
+              stroke="rgba(251,191,36,0.6)" 
+              strokeWidth="2" 
               strokeDasharray="264"
               strokeDashoffset={264 - (264 * progress) / 100}
               strokeLinecap="round"
+              className="filter drop-shadow-[0_0_1px_rgba(251,191,36,0.5)]"
             />
           </svg>
         </div>
