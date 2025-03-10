@@ -1,54 +1,98 @@
-# My Portfolio
+# Timo Hanski - Portfolio
 
-A modern portfolio website built with Next.js, React, TypeScript, and Three.js.
+A modern, optimized portfolio website built with Next.js 14, React, TypeScript, and Three.js featuring a 3D interactive background, responsive design, and server components architecture.
 
 ## Project Structure
 
-The project follows a well-organized structure:
+The project follows a well-organized structure with server/client component separation:
 
 ```
 src/
-├── app/                  # Next.js app directory
-│   ├── page.tsx          # Main page component
-│   ├── layout.tsx        # Root layout
-│   └── globals.css       # Global styles
-├── components/           # React components
-│   ├── layout/           # Layout components
-│   │   ├── Navigation.tsx
-│   │   ├── constants.ts
-│   │   └── index.ts
-│   ├── sections/         # Section components
+├── app/                      # Next.js app directory (App Router)
+│   ├── about/                # About page
+│   ├── contact/              # Contact page  
+│   ├── portfolio/            # Portfolio page
+│   ├── resume/               # Resume page
+│   ├── page.tsx              # Home page (redirects to About)
+│   ├── layout.tsx            # Root layout (server component)
+│   ├── fonts.ts              # Font optimization
+│   ├── metadata.ts           # SEO metadata
+│   └── globals.css           # Global styles and utility classes
+├── components/               # React components
+│   ├── layout/               # Layout components
+│   │   ├── ClientLayout.tsx  # Client-side layout wrapper
+│   │   ├── Navigation.tsx    # Navigation component
+│   │   ├── constants.ts      # Layout-related constants
+│   │   └── index.ts          # Barrel exports
+│   ├── sections/             # Section components
 │   │   ├── AboutSection.tsx
 │   │   ├── ResumeSection.tsx
 │   │   ├── PortfolioSection.tsx
 │   │   ├── ContactSection.tsx
 │   │   ├── types.ts
 │   │   └── index.ts
-│   ├── three/            # Three.js components
-│   │   ├── Scene.tsx
-│   │   ├── Background.tsx
-│   │   ├── Band.tsx
-│   │   ├── LightformerConfig.tsx
-│   │   ├── constants/
-│   │   ├── types/
-│   │   ├── viewport/
+│   ├── three/                # Three.js components
+│   │   ├── canvas/           # Canvas and scene setup
+│   │   │   ├── Scene.tsx
+│   │   │   ├── ViewportManager.tsx
+│   │   │   └── LoadingProvider.tsx
+│   │   ├── hooks/            # Custom React hooks
+│   │   │   ├── useLoading.ts
+│   │   │   └── useViewport.ts
+│   │   ├── objects/          # 3D objects and models
+│   │   ├── environment/      # Lighting and environment
+│   │   ├── effects/          # Post-processing effects
+│   │   ├── utils/            # Utility functions
 │   │   └── index.ts
-│   └── ui/               # UI components
+│   └── ui/                   # UI components
+│       ├── form/             # Form components
+│       │   ├── Button.tsx
+│       │   └── TextField.tsx
+│       ├── Section.tsx
 │       ├── SectionTitle.tsx
-│       └── card.tsx
-└── lib/                  # Utility functions
-    └── utils.ts
+│       ├── card.tsx
+│       ├── Timeline.tsx
+│       ├── IconCard.tsx
+│       ├── VideoPlayer.tsx   # Optimized video player
+│       ├── SplashScreen.tsx
+│       └── index.ts
+└── lib/                      # Utility functions and shared logic
+    ├── theme.ts              # Theme configuration
+    └── utils.ts              # General utilities
 ```
+
+## Architectural Decisions
+
+This portfolio follows modern Next.js development best practices:
+
+### Server/Client Component Separation
+- **Root Layout**: Server component for faster initial load
+- **ClientLayout**: Client component for interactive elements
+- Components are marked with `"use client"` only when needed
+
+### Performance Optimizations
+- **Dynamic Imports**: Heavy components like Three.js scene are lazy-loaded
+- **Optimized Media Loading**: Videos only load when visible using Intersection Observer
+- **Image Optimization**: Next.js Image component for automatic optimization
+- **Server Components**: Static content renders on the server for improved SEO and performance
+- **Tailwind Utility Classes**: Limited set of custom utility classes for common patterns
+
+### UI Component Design
+- **Composable Components**: UI elements designed for reusability
+- **Tailwind + Component Extraction**: Balance between utility classes and component extraction
+- **Accessibility Focus**: Proper ARIA attributes and keyboard navigation
 
 ## Technologies Used
 
-- **Next.js**: React framework for server-rendered applications
-- **React**: JavaScript library for building user interfaces
+- **Next.js 14**: React framework with App Router
+- **React 18**: JavaScript library for building user interfaces
 - **TypeScript**: Typed superset of JavaScript
 - **Three.js**: 3D library for creating 3D graphics in the browser
 - **React Three Fiber**: React renderer for Three.js
+- **React Three Drei**: Useful helpers for React Three Fiber
 - **Tailwind CSS**: Utility-first CSS framework
-- **Shadcn UI**: UI component library
+- **Lucide React**: Lightweight icon library
+- **Vercel Analytics**: Performance monitoring
 
 ## Getting Started
 
@@ -77,25 +121,22 @@ To start the production server:
 npm start
 ```
 
-## Code Organization
+## Key Features
 
-- **Named Exports**: Components use named exports for consistency
-- **Type Definitions**: Types are organized in dedicated type files
-- **Constants**: Constants are extracted to dedicated files
-- **Reusable Components**: UI components are designed to be reusable
-- **Responsive Design**: The site is fully responsive for all device sizes
+- **Interactive 3D Background**: Three.js scene with dynamic elements
+- **Non-blocking Loading**: Content is available immediately, with 3D loading in background
+- **Multi-language Resume**: Download resume in English or Finnish
+- **Responsive Design**: Fully responsive across mobile, tablet, and desktop
+- **Optimized Performance**: Fast page loads and transitions
+- **Contact Form**: Working contact form with feedback
+- **Portfolio Showcase**: Video demos of previous projects
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+The portfolio is optimized for deployment on Vercel, but can be deployed to any Next.js-compatible hosting platform.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then deploy the `out` directory to your hosting provider.

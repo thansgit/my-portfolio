@@ -1,7 +1,10 @@
-import { SectionTitle } from "@/components/ui/SectionTitle";
+"use client";
+
+import { Section, Button, Timeline, TimelineItem } from "@/components/ui";
 import { DownloadIcon, BriefcaseIcon, GraduationCapIcon, ChevronDownIcon, CheckIcon } from "lucide-react";
 import { EducationItem, ExperienceItem } from "./types";
 import { useState, useRef, useEffect } from "react";
+import { theme } from "@/lib/theme";
 
 export const ResumeSection = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -9,8 +12,8 @@ export const ResumeSection = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const resumeFiles = {
-    en: "/resume-eng.pdf",
-    fi: "/resume-fin.pdf"
+    en: "/assets/documents/resume-eng.pdf",
+    fi: "/assets/documents/resume-fin.pdf"
   };
 
   useEffect(() => {
@@ -26,19 +29,11 @@ export const ResumeSection = () => {
     };
   }, []);
 
-  const education: EducationItem[] = [
-    {
-      school: "Tampereen yliopisto",
-      degree: "Bachelor of Science in Computer Engineering",
-      duration: "2019 — 2024"
-    },
-  ];
-
   const experience: ExperienceItem[] = [
     {
       company: "Haltu",
-      position: "Fullstack Developer",
-      duration: "2023 — 2024",
+      position: "Full-Stack Developer",
+      duration: "2023 - 2024",
       responsibilities: [
         "Developed applications using Kotlin, Django, Python, TypeScript, and React.",
         "Performed maintenance tasks and managed deployments in Linux environments.",
@@ -50,7 +45,7 @@ export const ResumeSection = () => {
     {
       company: "Here Technologies",
       position: "Frontend Developer",
-      duration: "2022 — 2023",
+      duration: "2022 - 2023",
       responsibilities: [
         "Developed and maintained frontend features using TypeScript and React.",
         "Collaborated on UI design.",
@@ -61,20 +56,32 @@ export const ResumeSection = () => {
     }
   ];
 
+  const education: EducationItem[] = [
+    {
+      school: "Tampere University of Applied Sciences",
+      degree: "Bachelor of Computer Science",
+      duration: "2019 - 2024"
+    },
+    {
+      school: "Helsinki University",
+      degree: "Fullstack Open",
+      duration: "2022"
+    }
+  ];
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      (e.currentTarget as HTMLAnchorElement).click();
+      e.preventDefault();
+      window.open(resumeFiles[selectedLanguage], '_blank');
     }
   };
 
   const handleDropdownKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
       setIsDropdownOpen(!isDropdownOpen);
     } else if (e.key === 'Escape') {
       setIsDropdownOpen(false);
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedLanguage(selectedLanguage === 'en' ? 'fi' : 'en');
     }
   };
 
@@ -85,62 +92,93 @@ export const ResumeSection = () => {
 
   const handleLanguageKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, language: 'en' | 'fi') => {
     if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
       handleLanguageSelect(language);
     }
   };
 
   return (
-    <section>
-      <div className="mb-6">
-        <SectionTitle>Resume</SectionTitle>
-        <div className="mt-4 relative" ref={dropdownRef}>
-          <div className="flex items-center">
+    <Section title="Resume">
+      {/* Resume Download Button with Language Selector */}
+      <div className="mb-12 flex justify-start">
+        <div className="relative" ref={dropdownRef}>
+          <div className="flex">
+            {/* Resume Download Link */}
+            <a
+              href={resumeFiles[selectedLanguage]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button-primary rounded-r-none"
+              aria-label="Download resume"
+              onKeyDown={handleKeyDown}
+              tabIndex={0}
+            >
+              <div className="flex items-center gap-2">
+                <DownloadIcon size={18} />
+                <span>Download Resume</span>
+              </div>
+            </a>
+            
+            {/* Language Toggle Button */}
             <div
-              className="inline-flex items-center px-4 py-2 bg-yellow-500 text-zinc-900 rounded-l-md hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900 cursor-pointer"
+              className={`
+                /* [Dropdown Toggle] Language selector dropdown button */
+                flex items-center gap-1 px-3 py-2 
+                bg-yellow-500 text-zinc-900 
+                rounded-r-md border-l border-yellow-600 
+                hover:bg-yellow-600 transition-colors cursor-pointer
+              `}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               onKeyDown={handleDropdownKeyDown}
               tabIndex={0}
               aria-haspopup="true"
               aria-expanded={isDropdownOpen}
-              aria-label="Select resume language"
+              role="button"
             >
-              <span className="font-medium mr-1 w-9 inline-block text-center">{selectedLanguage === 'en' ? 'Eng' : 'Fin'}</span>
-              <ChevronDownIcon size={16} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <span className="uppercase">{selectedLanguage}</span>
+              <ChevronDownIcon size={16} />
             </div>
-            <a 
-              href={resumeFiles[selectedLanguage]} 
-              download
-              className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-zinc-900 rounded-r-md border-l border-yellow-600 hover:bg-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
-              aria-label={`Download ${selectedLanguage === 'en' ? 'English' : 'Finnish'} resume as PDF`}
-              tabIndex={0}
-              onKeyDown={handleKeyDown}
-            >
-              <DownloadIcon size={16} />
-              <span className="font-medium">PDF</span>
-            </a>
           </div>
           
+          {/* Language Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute mt-1 w-32 bg-zinc-800 rounded-md shadow-lg z-10 border border-zinc-700 overflow-hidden">
-              <div 
-                className={`px-4 py-2 flex items-center justify-between ${selectedLanguage === 'en' ? 'bg-zinc-700 text-white' : 'text-zinc-300 hover:bg-zinc-700'} cursor-pointer`}
+            <div className="absolute right-0 mt-1 bg-zinc-800 rounded-md shadow-lg z-10 overflow-hidden">
+              {/* English Option */}
+              <div
+                className={`
+                  /* [Dropdown Item] Language option in dropdown */
+                  px-4 py-2 cursor-pointer 
+                  ${selectedLanguage === 'en' ? 'bg-zinc-700 text-yellow-500' : 'text-zinc-300 hover:bg-zinc-700'}
+                `}
                 onClick={() => handleLanguageSelect('en')}
                 onKeyDown={(e) => handleLanguageKeyDown(e, 'en')}
                 tabIndex={0}
-                aria-label="Select English resume"
+                role="option"
+                aria-selected={selectedLanguage === 'en'}
               >
-                <span>English</span>
-                {selectedLanguage === 'en' && <CheckIcon size={16} />}
+                <div className="flex items-center gap-2">
+                  {selectedLanguage === 'en' && <CheckIcon size={16} />}
+                  <span className={selectedLanguage === 'en' ? 'ml-0' : 'ml-6'}>English</span>
+                </div>
               </div>
-              <div 
-                className={`px-4 py-2 flex items-center justify-between ${selectedLanguage === 'fi' ? 'bg-zinc-700 text-white' : 'text-zinc-300 hover:bg-zinc-700'} cursor-pointer`}
+              
+              {/* Finnish Option */}
+              <div
+                className={`
+                  /* [Dropdown Item] Language option in dropdown */
+                  px-4 py-2 cursor-pointer 
+                  ${selectedLanguage === 'fi' ? 'bg-zinc-700 text-yellow-500' : 'text-zinc-300 hover:bg-zinc-700'}
+                `}
                 onClick={() => handleLanguageSelect('fi')}
                 onKeyDown={(e) => handleLanguageKeyDown(e, 'fi')}
                 tabIndex={0}
-                aria-label="Select Finnish resume"
+                role="option"
+                aria-selected={selectedLanguage === 'fi'}
               >
-                <span>Finnish</span>
-                {selectedLanguage === 'fi' && <CheckIcon size={16} />}
+                <div className="flex items-center gap-2">
+                  {selectedLanguage === 'fi' && <CheckIcon size={16} />}
+                  <span className={selectedLanguage === 'fi' ? 'ml-0' : 'ml-6'}>Finnish</span>
+                </div>
               </div>
             </div>
           )}
@@ -149,48 +187,53 @@ export const ResumeSection = () => {
       
       {/* Experience Section */}
       <div className="mb-12">
-        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">
-          <div className="flex items-center gap-2">
-            <BriefcaseIcon size={20} className="text-yellow-500" />
-            <span>Experience</span>
-          </div>
-        </SectionTitle>
-        <div className="space-y-8">
-          {experience.map((exp, index) => (
-            <div key={index} className="relative pl-6 border-l border-zinc-700">
-              <div className="absolute w-3 h-3 bg-yellow-500 rounded-full -left-[6.5px] top-1.5" />
-              <h4 className="font-medium text-lg text-white">{exp.company}</h4>
-              <p className="text-yellow-500 mt-1">{exp.position}</p>
-              <p className="text-sm text-zinc-500 mt-1 mb-3">{exp.duration}</p>
-              <ul className="list-disc pl-4 space-y-1">
-                {exp.responsibilities.map((resp, idx) => (
-                  <li key={idx} className="text-zinc-400 text-sm">{resp}</li>
+        <h2 className="section-title">
+          <span className="section-icon">
+            <BriefcaseIcon size={20} />
+          </span>
+          Work Experience
+        </h2>
+        
+        <Timeline>
+          {experience.map((job) => (
+            <TimelineItem
+              key={job.company}
+              title={job.position}
+              subtitle={job.company}
+              period={job.duration}
+              icon={<BriefcaseIcon size={12} className="text-zinc-900" />}
+            >
+              <ul className="list-disc list-inside text-zinc-300 space-y-1 pl-2">
+                {job.responsibilities.map((responsibility, index) => (
+                  <li key={index} className="text-sm">{responsibility}</li>
                 ))}
               </ul>
-            </div>
+            </TimelineItem>
           ))}
-        </div>
+        </Timeline>
       </div>
-
+      
       {/* Education Section */}
       <div>
-        <SectionTitle as="h3" color="yellow" className="text-xl mb-6">
-          <div className="flex items-center gap-2">
-            <GraduationCapIcon size={20} className="text-yellow-500" />
-            <span>Education</span>
-          </div>
-        </SectionTitle>
-        <div className="space-y-6">
-          {education.map((edu, index) => (
-            <div key={index} className="relative pl-6 border-l border-zinc-700">
-              <div className="absolute w-3 h-3 bg-yellow-500 rounded-full -left-[6.5px] top-1.5" />
-              <h4 className="font-medium text-lg text-white">{edu.school}</h4>
-              <p className="text-zinc-400 mt-1">{edu.degree}</p>
-              <p className="text-sm text-zinc-500 mt-1">{edu.duration}</p>
-            </div>
+        <h2 className="section-title">
+          <span className="section-icon">
+            <GraduationCapIcon size={20} />
+          </span>
+          Education
+        </h2>
+        
+        <Timeline>
+          {education.map((edu) => (
+            <TimelineItem
+              key={edu.school}
+              title={edu.degree}
+              subtitle={edu.school}
+              period={edu.duration}
+              icon={<GraduationCapIcon size={12} className="text-zinc-900" />}
+            />
           ))}
-        </div>
+        </Timeline>
       </div>
-    </section>
+    </Section>
   );
 }; 
