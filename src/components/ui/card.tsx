@@ -9,6 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
+      /* [Card Base] Core card styling with customization through className */
       "rounded-xl border bg-card text-card-foreground shadow",
       className
     )}
@@ -23,7 +24,11 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn(
+      /* [Card Header] Standardized spacing for card headers */
+      "flex flex-col space-y-1.5 p-6", 
+      className
+    )}
     {...props}
   />
 ))
@@ -35,7 +40,11 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
+    className={cn(
+      /* [Card Title] Typography for card titles */
+      "font-semibold leading-none tracking-tight", 
+      className
+    )}
     {...props}
   />
 ))
@@ -47,7 +56,11 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn(
+      /* [Card Description] Subtle text styling for card descriptions */
+      "text-sm text-muted-foreground", 
+      className
+    )}
     {...props}
   />
 ))
@@ -57,7 +70,15 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div 
+    ref={ref} 
+    className={cn(
+      /* [Card Content] Content area with padding */
+      "p-6 pt-0", 
+      className
+    )} 
+    {...props} 
+  />
 ))
 CardContent.displayName = "CardContent"
 
@@ -67,7 +88,11 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn(
+      /* [Card Footer] Footer area with flexbox alignment */
+      "flex items-center p-6 pt-0", 
+      className
+    )}
     {...props}
   />
 ))

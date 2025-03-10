@@ -1,26 +1,8 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { inter, roboto_mono } from './fonts';
 import "./globals.css";
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-export const metadata: Metadata = {
-  title: "Timo Hanski - Software Developer Portfolio",
-  description: "Portfolio of Timo Hanski, a Software Developer specializing in React, TypeScript, Three.js and full-stack development. View my projects, skills, and experience.",
-  keywords: "Timo Hanski, software developer, web developer, full-stack developer, React, TypeScript, Three.js, JavaScript, portfolio, Finland, developer portfolio",
-  authors: [{ name: "Timo Hanski" }],
-  creator: "Timo Hanski",
-  publisher: "Timo Hanski",
-  robots: {
-    index: true,
-    follow: true,
-  },
-  metadataBase: new URL("https://timohanski.com"), // Replace with your actual domain
-};
+import ClientLayout from '@/components/layout/ClientLayout';
 
 export default function RootLayout({
   children,
@@ -28,11 +10,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full bg-black" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased w-full m-0 p-0 bg-black min-h-screen`}>
-        <div className="relative z-10 w-full h-full">
+    <html lang="en" className={`w-full bg-black ${inter.variable} ${roboto_mono.variable}`} suppressHydrationWarning>
+      <body className="antialiased w-full m-0 p-0 bg-black min-h-screen">
+        <ClientLayout>
           {children}
-        </div>
+        </ClientLayout>
         <Analytics />
         <SpeedInsights />
       </body>

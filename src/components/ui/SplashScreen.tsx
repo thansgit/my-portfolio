@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { useLoading } from '@/components/three';
 
@@ -33,9 +35,12 @@ export const SplashScreen: React.FC = () => {
   
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 transition-opacity duration-300 ${
-        fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
-      }`}
+      className={`
+        /* [Splash Container] Full-screen splash overlay with fade-out animation */
+        fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 
+        transition-opacity duration-300
+        ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+      `}
     >
       <div className="text-center">
         <h1 className="text-4xl font-bold text-white mb-4">Timo Hanski</h1>
@@ -44,7 +49,10 @@ export const SplashScreen: React.FC = () => {
         {/* Loading progress bar */}
         <div className="w-48 h-1 bg-zinc-800 rounded-full overflow-hidden mx-auto">
           <div 
-            className="h-full bg-yellow-500 transition-all duration-300 ease-out"
+            className={`
+              /* [Progress Bar] Animated loading progress indicator */
+              h-full bg-yellow-500 transition-all duration-300 ease-out
+            `}
             style={{ width: `${Math.max(5, Math.min(100, progress))}%` }}
           />
         </div>
