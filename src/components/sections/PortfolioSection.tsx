@@ -1,18 +1,22 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { SectionTitle } from "@/components/ui/SectionTitle";
+"use client";
+
+import { Card, CardContent, Section, VideoPlayer } from "@/components/ui";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 import { PortfolioItem } from "./types";
 
 export function PortfolioSection() {
+  // Portfolio items data
   const portfolioItems: PortfolioItem[] = [
     {
       title: "Blog / Social media",
+      description: "A full-stack blog and social media platform with user authentication, post creation, commenting, and social features.",
       videoUrl: "/assets/videos/blogapp.mp4",
-      technologies: ["React-redux", "Express", "Node", "MongoDB", "tailwindCSS",],
+      technologies: ["React-redux", "Express", "Node", "MongoDB", "tailwindCSS"],
       githubUrl: "https://github.com/thansgit/lol-service",
     },
     {
       title: "Old portfolio site",
+      description: "My previous portfolio website showcasing my projects and skills with a clean, responsive design.",
       videoUrl: "/assets/videos/portfolio.mp4",
       technologies: ["React", "Bootstrap", "CSS"],
       githubUrl: "https://github.com/thansgit/portfolio",
@@ -20,12 +24,14 @@ export function PortfolioSection() {
     },
     {
       title: "Mine Sweeper GUI",
+      description: "A desktop implementation of the classic Minesweeper game with customizable difficulty levels and game statistics.",
       videoUrl: "/assets/videos/minesweeper.mp4",
       technologies: ["C++17", "QT"],
       githubUrl: "https://github.com/thansgit/minesweeper_gui",
     },
     {
       title: "To-Do app",
+      description: "A full-stack to-do application with user accounts, task categories, reminders, and drag-and-drop functionality.",
       videoUrl: "/assets/videos/todo.mp4",
       technologies: ["React", "Express", "Mongoose", "MongoDB"],
       githubUrl: "https://github.com/thansgit/to-do",
@@ -33,80 +39,75 @@ export function PortfolioSection() {
   ];
 
   return (
-    <section>
-      <SectionTitle>Portfolio</SectionTitle>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <Section title="Portfolio">
+      <div className="grid grid-cols-1 gap-6">
         {portfolioItems.map((item) => (
           <Card 
-            key={item.title} 
-            className="group bg-zinc-800 border-zinc-700 overflow-hidden"
-            tabIndex={0}
-            role="region"
-            aria-label={`${item.title} project`}
+            key={item.title}
+            className="group card-base"
           >
             <CardContent className="p-0 relative">
-              <div className="aspect-video relative overflow-hidden bg-black">
-                <video
-                  src={item.videoUrl}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                  aria-label={`${item.title} demo video`}
-                />
-              </div>
-              <div className="h-px w-full bg-zinc-700"></div>
-              <div className="p-4 flex flex-col gap-2 bg-zinc-800">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                  
-                  <div className="flex space-x-2">
-                    {item.liveUrl && (
-                      <a 
-                        href={item.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700 cursor-pointer"
-                        aria-label={`View live demo of ${item.title}`}
-                        onClick={(e) => e.stopPropagation()}
-                        tabIndex={0}
-                      >
-                        <FaExternalLinkAlt className="w-4 h-4" />
-                      </a>
-                    )}
-                    {item.githubUrl && (
-                      <a 
-                        href={item.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2 rounded-full hover:bg-zinc-700 cursor-pointer"
-                        aria-label={`View ${item.title} source code on GitHub`}
-                        onClick={(e) => e.stopPropagation()}
-                        tabIndex={0}
-                      >
-                        <FaGithub className="w-5 h-5" />
-                      </a>
-                    )}
-                  </div>
-                </div>
+              {/* Use optimized VideoPlayer component */}
+              <VideoPlayer 
+                videoUrl={item.videoUrl}
+                title={item.title}
+              />
+              
+              {/* Content area */}
+              <div className="p-4">
+                <h3 className="text-xl font-semibold text-yellow-500 mb-2">{item.title}</h3>
+                <p className="text-zinc-300 mb-4">{item.description}</p>
                 
-                <div className="flex flex-wrap gap-1">
-                  {item.technologies.map((tech) => (
+                {/* Technology tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {item.technologies.map(tech => (
                     <span 
-                      key={`${item.title}-${tech}`}
-                      className="px-2 py-1 text-xs rounded bg-zinc-700 text-zinc-300"
+                      key={tech} 
+                      className={`
+                        /* [Tech Tag] Pill-shaped tags for technologies */
+                        px-2 py-1 bg-zinc-700 text-zinc-300 text-xs rounded-full
+                      `}
                     >
                       {tech}
                     </span>
                   ))}
+                </div>
+                
+                {/* Project links */}
+                <div className="flex gap-4">
+                  {item.githubUrl && (
+                    <a 
+                      href={item.githubUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="link-style flex items-center gap-1"
+                      aria-label={`GitHub repository for ${item.title}`}
+                      tabIndex={0}
+                    >
+                      <FaGithub />
+                      <span>GitHub</span>
+                    </a>
+                  )}
+                  
+                  {item.liveUrl && (
+                    <a 
+                      href={item.liveUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="link-style flex items-center gap-1"
+                      aria-label={`Live demo for ${item.title}`}
+                      tabIndex={0}
+                    >
+                      <FaExternalLinkAlt />
+                      <span>Live Demo</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
-    </section>
+    </Section>
   );
 } 

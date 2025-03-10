@@ -14,7 +14,6 @@ const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene),
   loading: () => <div className="fixed inset-0 bg-black" />
 });
 
-
 // Component to prefetch all major routes
 const RoutePrefetcher = () => {
   const router = useRouter();
@@ -43,6 +42,7 @@ const SceneContainer = () => {
     <div className="fixed inset-0 pointer-events-none">
       {/* Always show placeholder gradient until 3D scene is loaded */}
       <div className={`absolute inset-0 bg-black ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
+
       
       {/* Load 3D scene in parallel */}
       <Suspense fallback={null}>
@@ -145,6 +145,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
         {/* Mobile Navigation with Social Links */}
         <div className="md:hidden">
           <Navigation />
+
           <div className="fixed top-4 right-4 flex space-x-4 z-50">
             <a 
               href="https://linkedin.com/in/timo-hanski-731413247" 
