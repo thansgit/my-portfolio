@@ -1,12 +1,13 @@
 "use client";
 
-import { ReactNode, Suspense, useEffect } from 'react';
+import { ReactNode, Suspense, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/layout";
 import { LoadingProvider, useLoading } from '@/components/three';
 import { theme } from '@/lib/theme';
 import { ThreeDLoadingIndicators } from '@/components/ui';
+import { NavigationItemId } from './constants';
 
 // Dynamically import the Scene component with no SSR
 const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene), {
@@ -67,6 +68,7 @@ const SECTION_MAP = {
 type SectionType = keyof typeof SECTION_MAP;
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
+  const [activeSection, setActiveSection] = useState<NavigationItemId>('about');
   
   return (
     <div className="min-h-screen text-white">
@@ -102,7 +104,10 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                   {/* Desktop Navigation with Social Links */}
                   <div className="hidden md:block">
                     <div className="flex justify-between items-center">
-                      <Navigation />
+                      <Navigation 
+                        activeSection={activeSection}
+                        onSectionChange={setActiveSection}
+                      />
                       <div className="flex items-center space-x-4">
                         <a 
                           href="https://linkedin.com/in/timo-hanski-731413247" 
@@ -144,7 +149,10 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
         {/* Mobile Navigation with Social Links */}
         <div className="md:hidden">
-          <Navigation />
+          <Navigation 
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+          />
 
           <div className="fixed top-4 right-4 flex space-x-4 z-50">
             <a 
