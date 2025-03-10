@@ -217,7 +217,7 @@ export const TetheredCard = ({
           dragged={dragged}
           onHover={hover}
           onDrag={drag}
-          size={2} // Larger drag area for better mobile experience
+          size={2.5} // Larger drag area for better mobile experience
           debug={false}
         />
       </group>
