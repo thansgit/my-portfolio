@@ -6,26 +6,13 @@ import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/layout";
 import { LoadingProvider, useLoading } from '@/components/three';
 import { theme } from '@/lib/theme';
+import { ThreeDLoadingIndicators } from '@/components/ui';
 
 // Dynamically import the Scene component with no SSR
 const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene), {
   ssr: false,
   loading: () => <div className="fixed inset-0 bg-black" />
 });
-
-// Loading indicator component that doesn't block interaction
-const LoadingIndicator = () => {
-  const { isLoaded, progress } = useLoading();
-  
-  if (isLoaded) return null;
-  
-  return (
-    <div className="fixed bottom-4 right-4 z-50 bg-zinc-800/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 shadow-lg border border-zinc-700/50 text-zinc-200">
-      <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-      <span>Loading 3D Experience ({Math.round(progress)}%)</span>
-    </div>
-  );
-};
 
 // Component to prefetch all major routes
 const RoutePrefetcher = () => {
@@ -54,7 +41,8 @@ const SceneContainer = () => {
   return (
     <div className="fixed inset-0 pointer-events-none">
       {/* Always show placeholder gradient until 3D scene is loaded */}
-      <div className={`absolute inset-0 bg-gradient-to-b from-zinc-900 to-black transition-opacity duration-1000 ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
+      <div className={`absolute inset-0 bg-black ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
+
       
       {/* Load 3D scene in parallel */}
       <Suspense fallback={null}>
@@ -79,21 +67,16 @@ const SECTION_MAP = {
 type SectionType = keyof typeof SECTION_MAP;
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
-  // The Navigation component now handles active section detection internally
-  const handleSectionChange = () => {
-    // This is a no-op function since we're now using URL-based navigation
-    // Keeping it for backward compatibility with the Navigation component
-  };
-
+  
   return (
     <div className="min-h-screen text-white">
       <LoadingProvider>
         {/* Prefetch all routes after 3D content loads */}
         <RoutePrefetcher />
         
-        {/* Non-blocking loading indicator */}
-        <LoadingIndicator />
-        
+        {/* 3D loading indicators */}
+        <ThreeDLoadingIndicators />
+
         {/* 3D scene with placeholder */}
         <SceneContainer />
       
@@ -119,7 +102,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                   {/* Desktop Navigation with Social Links */}
                   <div className="hidden md:block">
                     <div className="flex justify-between items-center">
-                      <Navigation activeSection="about" onSectionChange={handleSectionChange} />
+                      <Navigation />
                       <div className="flex items-center space-x-4">
                         <a 
                           href="https://linkedin.com/in/timo-hanski-731413247" 
@@ -161,7 +144,8 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
         {/* Mobile Navigation with Social Links */}
         <div className="md:hidden">
-          <Navigation activeSection="about" onSectionChange={handleSectionChange} />
+          <Navigation />
+
           <div className="fixed top-4 right-4 flex space-x-4 z-50">
             <a 
               href="https://linkedin.com/in/timo-hanski-731413247" 

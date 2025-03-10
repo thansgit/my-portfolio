@@ -6,4 +6,7 @@ export * from './card';
 export * from './SplashScreen';
 export * from './form/TextField';
 export * from './form/Button';
-export * from './VideoPlayer'; 
+export * from './VideoPlayer';
+export * from './ThreeDLoadingIndicators'; 
+
+
