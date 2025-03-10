@@ -2,7 +2,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, useEffect } from "react";
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 
 useGLTF.preload('/assets/models/card.glb', true);
@@ -87,6 +87,64 @@ interface CardModelProps {
   onHover: (state: boolean) => void;
   onDrag: (drag: THREE.Vector3 | false) => void;
 }
+
+interface DraggablePlaneProps {
+  nodeRef: React.MutableRefObject<any>;
+  dragged: THREE.Vector3 | false;
+  onHover: (state: boolean) => void;
+  onDrag: (drag: THREE.Vector3 | false) => void;
+  size?: number;
+  debug?: boolean;
+}
+
+export const DraggablePlane = ({ 
+  nodeRef, 
+  dragged, 
+  onHover, 
+  onDrag, 
+  size = 1,
+  debug = false
+}: DraggablePlaneProps) => {
+  const vec = new THREE.Vector3();
+  const billboardRef = useRef<THREE.Group>(null);
+  
+  // Make the draggable plane always face the camera
+  useFrame(({ camera }) => {
+    if (billboardRef.current) {
+      billboardRef.current.quaternion.copy(camera.quaternion);
+    }
+  });
+  
+  return (
+    <group ref={billboardRef}>
+      <mesh
+        scale={[size * 0.7, size, 1]}
+        position={[0, +0.2, -1]}
+        onPointerOver={() => onHover(true)}
+        onPointerOut={() => onHover(false)}
+        onPointerDown={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          (e.target as HTMLElement).setPointerCapture(e.pointerId);
+          onDrag(new THREE.Vector3().copy(e.point).sub(vec.copy(nodeRef.current!.translation())));
+        }}
+        onPointerUp={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+          onDrag(false);
+        }}
+        onPointerCancel={() => {
+          onDrag(false);
+        }}
+      >
+        <planeGeometry />
+        <meshBasicMaterial 
+        visible={debug}
+          side={THREE.DoubleSide} 
+        />
+      </mesh>
+    </group>
+  );
+};
 
 export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
   const { nodes } = useGLTF('/assets/models/card.glb');

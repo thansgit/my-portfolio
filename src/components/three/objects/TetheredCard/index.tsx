@@ -3,9 +3,10 @@
 import * as THREE from "three";
 import { useEffect, useRef, useState } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
+import { useFrame } from "@react-three/fiber";
 import { TetheredCardProps, ExtendedRigidBody } from "@/components/three/utils/types";
 import { Pinhead, Particles } from "@/components/three";
-import { RopeMesh, CardModel } from "./visuals";
+import { RopeMesh, CardModel, DraggablePlane } from "./visuals";
 import { useJoints, usePhysicsUpdate } from "@/components/three/hooks";
 import { useTouchHandling, useRotationTracker } from "@/components/three/hooks";
 import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/utils/constants";
@@ -16,6 +17,7 @@ export const TetheredCard = ({
   maxSpeed = 50,
   minSpeed = 10,
   onPinheadStateChange,
+  debug = false,
 }: TetheredCardProps = {}) => {
   
   const card = useRef<RapierRigidBody>(null);
@@ -43,6 +45,24 @@ export const TetheredCard = ({
 
   const [ropeColor, setRopeColor] = useState("#000000");
   const [ropeRadius, setRopeRadius] = useState(ROPE_INITIAL_RADIUS);
+  
+  const planeGroupRef = useRef<THREE.Group>(null);
+  
+  const planePosition = useRef<THREE.Vector3>(
+    new THREE.Vector3(
+      position[0] + ROPE_SEGMENT_LENGTH * 4, 
+      position[1], 
+      position[2]
+    )
+  );
+  
+  useFrame(() => {
+    if (card.current && planeGroupRef.current) {
+      const cardPos = card.current.translation();
+      planePosition.current.set(cardPos.x, cardPos.y, cardPos.z);
+      planeGroupRef.current.position.copy(planePosition.current);
+    }
+  });
 
   // Use the rotation tracker with rotation detection callback
   const { clockwiseRotations, counterClockwiseRotations } = useRotationTracker({
@@ -181,6 +201,26 @@ export const TetheredCard = ({
       >
         {cardModelElement}
       </RigidBody>
+      
+      {/* 
+        Invisible draggable plane that follows the card's position but doesn't rotate.
+        This provides a larger, consistent touch target even when the card rotates on its z-axis,
+        significantly improving the mobile touch experience and preventing the draggable area from
+        becoming too small during card rotation.
+      */}      <group ref={planeGroupRef} position={[
+        position[0] + ROPE_SEGMENT_LENGTH * 4, 
+        position[1], 
+        position[2]
+      ]}>
+        <DraggablePlane
+          nodeRef={card}
+          dragged={dragged}
+          onHover={hover}
+          onDrag={drag}
+          size={2} // Larger drag area for better mobile experience
+          debug={false}
+        />
+      </group>
       
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
