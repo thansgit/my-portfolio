@@ -1,16 +1,29 @@
 "use client";
 
-import * as THREE from "three";
-import { useEffect, useRef, useState } from "react";
-import { RapierRigidBody } from "@react-three/rapier";
+import { Particles, Pinhead } from "@/components/three";
+import {
+  useJoints,
+  usePhysicsUpdate,
+  useRotationTracker,
+  useTouchHandling,
+} from "@/components/three/hooks";
+import {
+  ROPE_COLOR_STRETCH_SPEED,
+  ROPE_INITIAL_RADIUS,
+  ROPE_MIN_RADIUS,
+  ROPE_RADIUS_STRETCH_SPEED,
+  ROPE_SEGMENT_LENGTH,
+  SEGMENT_PROPS,
+} from "@/components/three/utils/constants";
+import {
+  ExtendedRigidBody,
+  TetheredCardProps,
+} from "@/components/three/utils/types";
 import { useFrame } from "@react-three/fiber";
-import { TetheredCardProps, ExtendedRigidBody } from "@/components/three/utils/types";
-import { Pinhead, Particles } from "@/components/three";
-import { RopeMesh, CardModel, DraggablePlane } from "./visuals";
-import { useJoints, usePhysicsUpdate } from "@/components/three/hooks";
-import { useTouchHandling, useRotationTracker } from "@/components/three/hooks";
-import { ROPE_SEGMENT_LENGTH, ROPE_INITIAL_RADIUS, ROPE_MIN_RADIUS, ROPE_COLOR_STRETCH_SPEED, ROPE_RADIUS_STRETCH_SPEED, SEGMENT_PROPS } from "@/components/three/utils/constants";
-import { RigidBody, BallCollider } from "@react-three/rapier";
+import { BallCollider, RapierRigidBody, RigidBody } from "@react-three/rapier";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { CardModel, DraggablePlane, RopeMesh } from "./visuals";
 
 export const TetheredCard = ({
   position = [0, 0, 0],
@@ -19,43 +32,58 @@ export const TetheredCard = ({
   onPinheadStateChange,
   debug = false,
 }: TetheredCardProps = {}) => {
-  
   const card = useRef<RapierRigidBody>(null);
   const fixed = useRef<RapierRigidBody>(null);
   const j2 = useRef<ExtendedRigidBody | null>(null);
   const j3 = useRef<RapierRigidBody | null>(null);
   const j4 = useRef<RapierRigidBody | null>(null);
-  
+
+  // Calculate resting positions based on physics simulation
+  const restingY = position[1] - 2; // Lower than the fixed point
+
+  // Calculate all joint positions in one go to reduce repetition
+  const jointPositions = [
+    position, // Fixed point - keep original position
+    [position[0] + ROPE_SEGMENT_LENGTH, restingY, position[2]], // j2
+    [position[0] + ROPE_SEGMENT_LENGTH * 2, restingY, position[2]], // j3
+    [position[0] + ROPE_SEGMENT_LENGTH * 3, restingY, position[2]], // j4
+    [position[0] + ROPE_SEGMENT_LENGTH * 4, restingY, position[2]], // card
+  ] as [number, number, number][];
+
+  // For clarity
+  const finalCardPosition = jointPositions[4];
+
   const [dragged, drag] = useState<THREE.Vector3 | false>(false);
   const [hovered, hover] = useState(false);
   const [isGlowing, setIsGlowing] = useState(false);
   const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
   const lastClockwiseRef = useRef(0);
   const lastCounterClockwiseRef = useRef(0);
-  
+
   const [rotationCounter, setRotationCounter] = useState(0);
-  
+
+  // Initialize points with the pre-calculated resting positions
   const [points, setPoints] = useState([
-    new THREE.Vector3(position[0], position[1], position[2]),
-    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]),
-    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]),
-    new THREE.Vector3(position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]),
+    new THREE.Vector3(...jointPositions[0]),
+    new THREE.Vector3(...jointPositions[1]),
+    new THREE.Vector3(...jointPositions[2]),
+    new THREE.Vector3(...jointPositions[3]),
   ]);
 
   const [ropeColor, setRopeColor] = useState("#000000");
   const [ropeRadius, setRopeRadius] = useState(ROPE_INITIAL_RADIUS);
-  
+
   const planeGroupRef = useRef<THREE.Group>(null);
-  
+
   const planePosition = useRef<THREE.Vector3>(
     new THREE.Vector3(
-      position[0] + ROPE_SEGMENT_LENGTH * 4, 
-      position[1], 
-      position[2]
+      finalCardPosition[0],
+      finalCardPosition[1],
+      finalCardPosition[2]
     )
   );
-  
+
   useFrame(() => {
     if (card.current && planeGroupRef.current) {
       const cardPos = card.current.translation();
@@ -70,20 +98,20 @@ export const TetheredCard = ({
     fixed,
     isDragging: dragged !== false,
   });
-  
+
   // Watch for changes in rotations and trigger the glow effect
   useEffect(() => {
-    const hasNewRotation = 
-      clockwiseRotations > lastClockwiseRef.current || 
+    const hasNewRotation =
+      clockwiseRotations > lastClockwiseRef.current ||
       counterClockwiseRotations > lastCounterClockwiseRef.current;
-    
+
     lastClockwiseRef.current = clockwiseRotations;
     lastCounterClockwiseRef.current = counterClockwiseRotations;
-    
+
     if (hasNewRotation) {
       setIsGlowing(true);
-      setRotationCounter(prev => prev + 1);
-      
+      setRotationCounter((prev) => prev + 1);
+
       if (glowTimeoutRef.current) {
         clearTimeout(glowTimeoutRef.current);
       }
@@ -92,7 +120,7 @@ export const TetheredCard = ({
         setIsGlowing(false);
       }, 1500);
     }
-    
+
     return () => {
       if (glowTimeoutRef.current) {
         clearTimeout(glowTimeoutRef.current);
@@ -116,15 +144,23 @@ export const TetheredCard = ({
   useEffect(() => {
     const currentLength = calculateRopeLength(points);
     const stretchRatio = Math.max(1, currentLength / restingLength);
-    
+
     if (stretchRatio > 1) {
-      const colorStretch = Math.min((stretchRatio - 1) / ROPE_COLOR_STRETCH_SPEED, 1);
-      const radiusStretch = Math.min((stretchRatio - 1) / ROPE_RADIUS_STRETCH_SPEED, 1);
-      
+      const colorStretch = Math.min(
+        (stretchRatio - 1) / ROPE_COLOR_STRETCH_SPEED,
+        1
+      );
+      const radiusStretch = Math.min(
+        (stretchRatio - 1) / ROPE_RADIUS_STRETCH_SPEED,
+        1
+      );
+
       const grayValue = Math.floor(colorStretch * 180);
       setRopeColor(`rgb(${grayValue}, ${grayValue}, ${grayValue})`);
-      
-      const newRadius = ROPE_INITIAL_RADIUS - (radiusStretch * (ROPE_INITIAL_RADIUS - ROPE_MIN_RADIUS));
+
+      const newRadius =
+        ROPE_INITIAL_RADIUS -
+        radiusStretch * (ROPE_INITIAL_RADIUS - ROPE_MIN_RADIUS);
       setRopeRadius(newRadius);
     } else {
       setRopeColor("#000000");
@@ -133,12 +169,7 @@ export const TetheredCard = ({
   }, [points]);
 
   const cardModelElement = (
-    <CardModel 
-      nodeRef={card}
-      dragged={dragged}
-      onHover={hover}
-      onDrag={drag}
-    />
+    <CardModel nodeRef={card} dragged={dragged} onHover={hover} onDrag={drag} />
   );
 
   usePhysicsUpdate({
@@ -160,7 +191,11 @@ export const TetheredCard = ({
 
   // Pin position offset relative to fixed position
   const pinOffset = 0.18;
-  const pinheadPosition: [number, number, number] = [position[0], position[1] + pinOffset, position[2]];
+  const pinheadPosition: [number, number, number] = [
+    position[0],
+    position[1] + pinOffset,
+    position[2],
+  ];
 
   // Notify parent component when pinhead state changes
   useEffect(() => {
@@ -171,47 +206,43 @@ export const TetheredCard = ({
 
   return (
     <>
-      <RigidBody ref={fixed} position={position} {...SEGMENT_PROPS} type="fixed" />
       <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH, position[1], position[2]]}
-        ref={j2}
+        ref={fixed}
+        position={jointPositions[0]}
         {...SEGMENT_PROPS}
-      >
+        type="fixed"
+      />
+      <RigidBody position={jointPositions[1]} ref={j2} {...SEGMENT_PROPS}>
         <BallCollider args={[0.1]} />
       </RigidBody>
-      <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 2, position[1], position[2]]}
-        ref={j3}
-        {...SEGMENT_PROPS}
-      >
+      <RigidBody position={jointPositions[2]} ref={j3} {...SEGMENT_PROPS}>
         <BallCollider args={[0.05]} />
       </RigidBody>
-      <RigidBody
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 3, position[1], position[2]]}
-        ref={j4}
-        {...SEGMENT_PROPS}
-      >
+      <RigidBody position={jointPositions[3]} ref={j4} {...SEGMENT_PROPS}>
         <BallCollider args={[0.05]} />
       </RigidBody>
       <RigidBody
         ref={card}
         {...SEGMENT_PROPS}
         type={dragged ? "kinematicPosition" : "dynamic"}
-        position={[position[0] + ROPE_SEGMENT_LENGTH * 4, position[1], position[2]]}
+        position={finalCardPosition}
       >
         {cardModelElement}
       </RigidBody>
-      
       {/* 
         Invisible draggable plane that follows the card's position but doesn't rotate.
         This provides a larger, consistent touch target even when the card rotates on its z-axis,
         significantly improving the mobile touch experience and preventing the draggable area from
         becoming too small during card rotation.
-      */}      <group ref={planeGroupRef} position={[
-        position[0] + ROPE_SEGMENT_LENGTH * 4, 
-        position[1], 
-        position[2]
-      ]}>
+      */}{" "}
+      <group
+        ref={planeGroupRef}
+        position={[
+          finalCardPosition[0],
+          finalCardPosition[1],
+          finalCardPosition[2],
+        ]}
+      >
         <DraggablePlane
           nodeRef={card}
           dragged={dragged}
@@ -221,18 +252,15 @@ export const TetheredCard = ({
           debug={false}
         />
       </group>
-      
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
-      
-      <Pinhead 
-        position={pinheadPosition} 
-        color="red" 
-        size={0.08} 
+      <Pinhead
+        position={pinheadPosition}
+        color="red"
+        size={0.08}
         isGlowing={isGlowing}
       />
-      
-      <Particles 
+      <Particles
         triggerCount={rotationCounter}
         position={pinheadPosition}
         particleSize={0.075}
@@ -241,4 +269,4 @@ export const TetheredCard = ({
       />
     </>
   );
-}; 
+};
