@@ -31,7 +31,7 @@ export function PortfolioSection() {
     },
     {
       title: "To-Do app",
-      description: "A full-stack to-do application with user accounts, task categories, reminders, and drag-and-drop functionality.",
+      description: "A full-stack to-do application.",
       videoUrl: "/assets/videos/todo.mp4",
       technologies: ["React", "Express", "Mongoose", "MongoDB"],
       githubUrl: "https://github.com/thansgit/to-do",

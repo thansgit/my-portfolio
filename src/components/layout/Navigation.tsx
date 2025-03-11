@@ -1,17 +1,19 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { navigationItems, NavigationItemId } from "./constants";
 import { useEffect, useState, useRef, useMemo } from "react";
 
-interface NavigationProps {
-  activeSection: NavigationItemId;
-  onSectionChange: Dispatch<SetStateAction<NavigationItemId>>;
-}
+const navigationItems = [
+  { id: "about", label: "About" },
+  { id: "resume", label: "Resume" },
+  { id: "portfolio", label: "Portfolio" },
+  { id: "contact", label: "Contact" },
+] as const;
 
-export function Navigation({ activeSection, onSectionChange }: NavigationProps) {
+type NavigationItemId = typeof navigationItems[number]["id"];
+
+export function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -40,28 +42,18 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
   }, [activeIndex]);
 
   const handleClick = (section: NavigationItemId, path: string, e: React.MouseEvent) => {
-    // Don't prevent default - let Next.js Link handle the navigation
+    e.preventDefault();
     
-    // Just update section state for backward compatibility
-    if (onSectionChange) {
-      onSectionChange(section);
-    }
+    // Update URL
+    router.push(path);
   };
-
-  // Handle click for mobile navigation - adds scrolling
+  
+  // Mobile menu click handler
   const handleMobileClick = (section: NavigationItemId, path: string, e: React.MouseEvent) => {
-    // Don't prevent default - let Next.js Link handle the navigation
+    e.preventDefault();
     
-    // Just update section state for backward compatibility
-    if (onSectionChange) {
-      onSectionChange(section);
-    }
-    
-    // Scroll to main content on mobile (only if needed)
-    const mainContentElement = document.querySelector('.relative.z-10');
-    if (mainContentElement) {
-      mainContentElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Update URL  
+    router.push(path);
   };
 
   const highlightPosition = `${activeIndex * 25}%`;

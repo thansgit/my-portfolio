@@ -7,7 +7,6 @@ import { Navigation } from "@/components/layout";
 import { LoadingProvider, useLoading } from '@/components/three';
 import { theme } from '@/lib/theme';
 import { ThreeDLoadingIndicators } from '@/components/ui';
-import { NavigationItemId } from './constants';
 
 // Dynamically import the Scene component with no SSR
 const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene), {
@@ -15,13 +14,12 @@ const Scene = dynamic(() => import('@/components/three').then(mod => mod.Scene),
   loading: () => <div className="fixed inset-0 bg-black" />
 });
 
-// Component to prefetch all major routes
 const RoutePrefetcher = () => {
   const router = useRouter();
   const { isLoaded } = useLoading();
   
   useEffect(() => {
-    // Only prefetch routes after 3D content is loaded
+    // Prefetch routes after 3D content is loaded
     if (isLoaded) {
       console.log('3D content loaded, prefetching routes...');
       router.prefetch('/');
@@ -32,10 +30,9 @@ const RoutePrefetcher = () => {
     }
   }, [router, isLoaded]);
   
-  return null; // This component doesn't render anything
+  return null;
 };
 
-// 3D Scene container with placeholder
 const SceneContainer = () => {
   const { isLoaded } = useLoading();
   
@@ -44,7 +41,6 @@ const SceneContainer = () => {
       {/* Always show placeholder gradient until 3D scene is loaded */}
       <div className={`absolute inset-0 bg-black ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
 
-      
       {/* Load 3D scene in parallel */}
       <Suspense fallback={null}>
         <Scene />
@@ -57,39 +53,23 @@ interface ClientLayoutProps {
   children: ReactNode;
 }
 
-const SECTION_MAP = {
-  "/about": "about",
-  "/resume": "resume",
-  "/portfolio": "portfolio",
-  "/contact": "contact",
-  "/": "about" // Default section for home page
-} as const;
-
-type SectionType = keyof typeof SECTION_MAP;
-
 export default function ClientLayout({ children }: ClientLayoutProps) {
-  const [activeSection, setActiveSection] = useState<NavigationItemId>('about');
-  
   return (
     <div className="min-h-screen text-white">
       <LoadingProvider>
-        {/* Prefetch all routes after 3D content loads */}
-        <RoutePrefetcher />
-        
-        {/* 3D loading indicators */}
-        <ThreeDLoadingIndicators />
 
-        {/* 3D scene with placeholder */}
+        <RoutePrefetcher />
+        <ThreeDLoadingIndicators />
         <SceneContainer />
       
         {/* Main Content */}
         <div className="relative z-10 md:ml-[35%] p-8 pb-24 md:pb-8 mt-[60vh] md:mt-0">
           <main className="max-w-4xl">
-            {/* Main container with metallic border and leather texture */}
+            {/* Main container */}
             <div className="relative rounded-xl overflow-hidden">
               {/* Metallic border */}
               <div className="absolute inset-0 bg-gradient-to-b from-zinc-600 via-zinc-700 to-zinc-800 rounded-xl border border-zinc-500 shadow-[0_0_25px_rgba(0,0,0,0.6)]">
-                {/* Metallic inner border with brushed steel texture */}
+                {/* Metallic inner border */}
                 <div className="absolute inset-[5px] rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-zinc-400/40 via-zinc-600/60 to-zinc-900/80 backdrop-blur-[1px]"></div>
                 </div>
@@ -104,10 +84,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                   {/* Desktop Navigation with Social Links */}
                   <div className="hidden md:block">
                     <div className="flex justify-between items-center">
-                      <Navigation 
-                        activeSection={activeSection}
-                        onSectionChange={setActiveSection}
-                      />
+                      <Navigation />
                       <div className="flex items-center space-x-4">
                         <a 
                           href="https://linkedin.com/in/timo-hanski-731413247" 
@@ -149,10 +126,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
         {/* Mobile Navigation with Social Links */}
         <div className="md:hidden">
-          <Navigation 
-            activeSection={activeSection}
-            onSectionChange={setActiveSection}
-          />
+          <Navigation />
 
           <div className="fixed top-4 right-4 flex space-x-4 z-50">
             <a 
