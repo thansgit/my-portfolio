@@ -48,7 +48,7 @@ export function Navigation() {
   // Reference to main content for scrolling
   const mainContentRef = useRef<HTMLDivElement | null>(null);
 
-  // Function to scroll to main content
+  // Simplified scroll function
   const scrollToMainContent = () => {
     // Find the main content element if not already stored
     if (!mainContentRef.current) {
@@ -58,9 +58,15 @@ export function Navigation() {
     }
 
     if (mainContentRef.current) {
-      mainContentRef.current.scrollIntoView({
+      const yOffset = -20; // Small offset from the top
+      const y =
+        mainContentRef.current.getBoundingClientRect().top +
+        window.pageYOffset +
+        yOffset;
+
+      window.scrollTo({
+        top: y,
         behavior: "smooth",
-        block: "start",
       });
     }
   };
@@ -72,29 +78,20 @@ export function Navigation() {
     }
   }, [mounted, currentSection]);
 
-  const handleClick = (
+  // Unified click handler for both desktop and mobile
+  const handleNavClick = (
     section: NavigationItemId,
     path: string,
     e: React.MouseEvent
   ) => {
     e.preventDefault();
 
-    // Update URL
-    router.push(path);
-  };
+    // Only update URL if navigating to a different section
+    if (section !== currentSection) {
+      router.push(path);
+    }
 
-  // Mobile menu click handler with scrolling
-  const handleMobileClick = (
-    section: NavigationItemId,
-    path: string,
-    e: React.MouseEvent
-  ) => {
-    e.preventDefault();
-
-    // Update URL
-    router.push(path);
-
-    // Scroll to main content
+    // Always scroll to content
     scrollToMainContent();
   };
 
@@ -147,12 +144,12 @@ export function Navigation() {
         <Link
           key={item.id}
           href={`/${item.id}`}
-          onClick={(e) => handleClick(item.id, `/${item.id}`, e)}
+          onClick={(e) => handleNavClick(item.id, `/${item.id}`, e)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
           prefetch={true}
           replace={true}
-          scroll={true}
+          scroll={false}
           className={`
             /* [Nav Link] Navigation link styling with conditional active state */
             ${
@@ -171,77 +168,8 @@ export function Navigation() {
     </>
   );
 
-  // Mobile Navigation Links with scroll behavior
-  const MobileNavigationLinks = () => (
-    <>
-      {/* Background highlight box that moves */}
-      <div
-        className={`
-          /* [Active Highlight Mobile] Highlight for active navigation item on mobile */
-          absolute transition-all duration-300 ease-out 
-          ${mounted ? "opacity-100" : "opacity-0"}
-        `}
-        style={{
-          left: highlightPosition,
-          width: "25%",
-          top: "0.25rem",
-          bottom: "0.25rem",
-          right: "auto",
-        }}
-      >
-        <div
-          className={`
-          /* [Active Background Mobile] Gradient background for active item on mobile */
-          w-full h-full bg-gradient-to-r from-zinc-700/80 via-zinc-700 to-zinc-700/80 
-          rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]
-        `}
-        />
-      </div>
-
-      {/* Hover highlight effect */}
-      {hoveredIndex !== null && hoveredIndex !== activeIndex && (
-        <div
-          className="absolute transition-all duration-200 ease-out"
-          style={{
-            left: `${hoveredIndex * 25}%`,
-            width: "25%",
-            top: "0.25rem",
-            bottom: "0.25rem",
-            opacity: 0.5,
-          }}
-        >
-          <div className="w-full h-full bg-zinc-700/60 rounded-full" />
-        </div>
-      )}
-
-      {/* Navigation items */}
-      {navigationItems.map((item, index) => (
-        <Link
-          key={item.id}
-          href={`/${item.id}`}
-          onClick={(e) => handleMobileClick(item.id, `/${item.id}`, e)}
-          onMouseEnter={() => setHoveredIndex(index)}
-          onMouseLeave={() => setHoveredIndex(null)}
-          prefetch={true}
-          replace={true}
-          scroll={true}
-          className={`
-            /* [Nav Link Mobile] Navigation link styling for mobile */
-            ${
-              currentSection === item.id
-                ? "text-yellow-500 font-semibold"
-                : "text-zinc-400 hover:text-zinc-200"
-            } 
-            transition-all duration-200 relative z-10 text-sm text-center py-1.5 px-6 
-            flex items-center justify-center
-          `}
-          aria-current={currentSection === item.id ? "page" : undefined}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </>
-  );
+  // Use the same component for mobile navigation
+  const MobileNavigationLinks = NavigationLinks;
 
   return (
     <>
