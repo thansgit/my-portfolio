@@ -23,22 +23,22 @@ export function AboutSection() {
   const services: ServiceItem[] = [
     {
       title: "Frontend Development",
-      description: "Building and maintaining websites and web applications with a focus on clean code and great user experiences.",
+      description: "Building user interfaces with clean code.",
       icon: <FaLaptopCode className="w-8 h-8 text-yellow-500" />,
     },
     {
       title: "Backend Development",
-      description: "Creating and maintaining backend services that are scalable and performant.",
+      description: "Working on server-side logic and APIs.",
       icon: <FaServer className="w-8 h-8 text-yellow-500" />,
     },
     {
       title: "UI/UX Design",
-      description: "Designing and implementing interfaces that are intuitive, responsive, and visually appealing.",
+      description: "Designing functional and intuitive interfaces.",
       icon: <FaPaintBrush className="w-8 h-8 text-yellow-500" />,
     },
     {
       title: "Mobile Development",
-      description: "Developing Android applications using modern tools and frameworks.",
+      description: "Developing Android apps with modern tools.",
       icon: <FaMobileAlt className="w-8 h-8 text-yellow-500" />,
     },
   ];
@@ -81,18 +81,15 @@ export function AboutSection() {
               </div>
               <div>
                 <p>
-                  Developer with experience in both consultancy work and product companies.
-                  I'm comfortable working across the stack, but I especially enjoy frontend development.
+                I'm a software developer who loves building visual and interactive experiences—especially on the web. Frontend is my strong suit, but I'm also into backend work and experimenting with 3D. I like to do things the smart way, not just the "as long as it works" way.
                 </p>
                 <p className="mt-4">
-                  My time as a consultant taught me to solve problems flexibly for different clients, while working in a larger product company gave me hands-on experience with CI/CD pipelines,
-                  automated testing, and building maintainable systems at scale.
-                  I aim to write code that's straightforward to use today and easy to improve tomorrow, whether it's a quick fix or a long-term solution.
+                Beyond coding, I'm interested in design, gamification, and creative ways to use technology. This portfolio is my space to experiment, so you might find all kinds of unusual projects here.
                 </p>
                 <p className="mt-4">
-                  If you're looking for a developer who can adapt to your needs and deliver results, let's talk!
-                  I'm open to new opportunities and excited to discuss how I could contribute to your team.
+                In my free time, I train, work on personal projects, and occasionally dive deep into whatever new topic happens to catch my interest.
                 </p>
+                <p className="mt-4">Got a cool idea or just want to chat? Hit me up!</p>
               </div>
             </div>
           </div>
