@@ -27,7 +27,7 @@ export function Navigation() {
   // Determine active section from path
   const currentSection = useMemo(() => {
     const path = pathname || "/";
-    if (path === "/") return "about";
+    if (path === "/" || path === "/about") return "about";
     const section = path.slice(1);
     return navigationItems.some((item) => item.id === section)
       ? section
@@ -146,10 +146,8 @@ export function Navigation() {
       {navigationItems.map((item, index) => (
         <Link
           key={item.id}
-          href={`/${item.id === "about" ? "" : item.id}`}
-          onClick={(e) =>
-            handleClick(item.id, `/${item.id === "about" ? "" : item.id}`, e)
-          }
+          href={`/${item.id}`}
+          onClick={(e) => handleClick(item.id, `/${item.id}`, e)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
           prefetch={true}
@@ -220,14 +218,8 @@ export function Navigation() {
       {navigationItems.map((item, index) => (
         <Link
           key={item.id}
-          href={`/${item.id === "about" ? "" : item.id}`}
-          onClick={(e) =>
-            handleMobileClick(
-              item.id,
-              `/${item.id === "about" ? "" : item.id}`,
-              e
-            )
-          }
+          href={`/${item.id}`}
+          onClick={(e) => handleMobileClick(item.id, `/${item.id}`, e)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
           prefetch={true}
