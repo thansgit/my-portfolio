@@ -1,44 +1,44 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 // AboutSection types
 export interface ServiceItem {
-  title: string;
-  description: string;
-  icon?: string | ReactNode;
+  title: string
+  description: string
+  icon?: string | ReactNode
 }
 
 // ResumeSection types
 export interface EducationItem {
-  school: string;
-  degree: string;
-  duration: string;
+  school: string
+  degree: string
+  duration: string
 }
 
 export interface ExperienceItem {
-  company: string;
-  position: string;
-  duration: string;
-  responsibilities: string[];
+  company: string
+  position: string
+  duration: string
+  responsibilities: string[]
 }
 
 // PortfolioSection types
 export interface PortfolioItem {
-  title: string;
-  description: string;
-  videoUrl: string;
-  technologies: string[]; // Array of technologies used
-  githubUrl?: string; // Optional GitHub URL
-  liveUrl?: string; // Optional live demo URL
+  title: string
+  description: string
+  videoUrl: string
+  technologies: string[] // Array of technologies used
+  githubUrl?: string // Optional GitHub URL
+  liveUrl?: string // Optional live demo URL
 }
 
 // ContactSection types
 export interface ContactFormData {
-  fullName: string;
-  email: string;
-  message: string;
+  fullName: string
+  email: string
+  message: string
 }
 
 export interface SubmitStatus {
-  success?: boolean;
-  message?: string;
-} 
+  success?: boolean
+  message?: string
+}

@@ -1,15 +1,15 @@
-import { ReactNode } from 'react';
+import { ReactNode } from 'react'
 
 interface TextFieldProps {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  error?: string;
-  type?: 'text' | 'email' | 'textarea';
-  placeholder?: string;
-  required?: boolean;
-  icon?: ReactNode;
+  id: string
+  label: string
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  error?: string
+  type?: 'text' | 'email' | 'textarea'
+  placeholder?: string
+  required?: boolean
+  icon?: ReactNode
 }
 
 export function TextField({
@@ -21,29 +21,26 @@ export function TextField({
   type = 'text',
   placeholder,
   required = false,
-  icon
+  icon,
 }: TextFieldProps) {
-  const isTextarea = type === 'textarea';
-  const isEmpty = value.trim() === '';
-  
+  const isTextarea = type === 'textarea'
+  const isEmpty = value.trim() === ''
+
   return (
-    <div className="mb-4">
+    <div className='mb-4'>
       {/* Field Label */}
-      <label htmlFor={id} className="block text-sm font-medium text-zinc-300 mb-1">
-        {label} {required && isEmpty && <span className="text-red-500">*</span>}
+      <label htmlFor={id} className='mb-1 block text-sm font-medium text-zinc-300'>
+        {label} {required && isEmpty && <span className='text-red-500'>*</span>}
       </label>
-      
-      <div className="relative">
+
+      <div className='relative'>
         {/* Field Icon (if provided) - positioned differently for textarea vs input */}
         {icon && (
-          <div className={`
-            absolute left-3 text-zinc-400
-            ${isTextarea ? 'top-[14px]' : 'top-1/2 -translate-y-1/2'}
-          `}>
+          <div className={`absolute left-3 text-zinc-400 ${isTextarea ? 'top-[14px]' : 'top-1/2 -translate-y-1/2'} `}>
             {icon}
           </div>
         )}
-        
+
         {/* Textarea Field */}
         {isTextarea ? (
           <textarea
@@ -53,13 +50,7 @@ export function TextField({
             onChange={onChange}
             placeholder={placeholder}
             required={required}
-            className={`
-              /* [Text Area] Styled textarea input field */
-              w-full py-2 ${icon ? 'pl-10' : 'pl-3'} pr-3
-              bg-zinc-800/50 border ${error ? 'border-red-500' : 'border-zinc-700'} 
-              rounded-md text-zinc-200
-              focus:outline-none focus:ring-1 focus:ring-yellow-500
-            `}
+            className={`/* [Text Area] Styled textarea input field */ w-full py-2 ${icon ? 'pl-10' : 'pl-3'} border bg-zinc-800/50 pr-3 ${error ? 'border-red-500' : 'border-zinc-700'} rounded-md text-zinc-200 focus:outline-none focus:ring-1 focus:ring-yellow-500`}
             rows={5}
           />
         ) : (
@@ -72,19 +63,13 @@ export function TextField({
             onChange={onChange}
             placeholder={placeholder}
             required={required}
-            className={`
-              /* [Text Input] Styled text input field */
-              w-full py-2 ${icon ? 'pl-10' : 'pl-3'} pr-3
-              bg-zinc-800/50 border ${error ? 'border-red-500' : 'border-zinc-700'} 
-              rounded-md text-zinc-200
-              focus:outline-none focus:ring-1 focus:ring-yellow-500
-            `}
+            className={`/* [Text Input] Styled text input field */ w-full py-2 ${icon ? 'pl-10' : 'pl-3'} border bg-zinc-800/50 pr-3 ${error ? 'border-red-500' : 'border-zinc-700'} rounded-md text-zinc-200 focus:outline-none focus:ring-1 focus:ring-yellow-500`}
           />
         )}
       </div>
-      
+
       {/* Error Message (if any) */}
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className='mt-1 text-sm text-red-500'>{error}</p>}
     </div>
-  );
-} 
+  )
+}

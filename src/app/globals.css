@@ -11,10 +11,17 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-start-rgb));
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    var(--font-inter),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
-code, pre {
+code,
+pre {
   font-family: var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -22,31 +29,33 @@ code, pre {
 @layer components {
   /* Common card styling used throughout the site */
   .card-base {
-    @apply bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden shadow-lg;
+    @apply overflow-hidden rounded-xl border border-zinc-700 bg-zinc-800 shadow-lg;
   }
-  
+
   /* Section headings with consistent styling */
   .section-title {
-    @apply text-xl font-semibold text-zinc-200 mb-6 flex items-center;
+    @apply mb-6 flex items-center text-xl font-semibold text-zinc-200;
   }
-  
+
   /* Section heading icon styling */
   .section-icon {
-    @apply mr-3 inline-flex p-2 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg text-zinc-900;
+    @apply mr-3 inline-flex rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 p-2 text-zinc-900 shadow-lg;
   }
-  
+
   /* Primary button style */
   .button-primary {
-    @apply px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-zinc-900 font-medium rounded-md transition-colors;
+    @apply rounded-md bg-yellow-500 px-4 py-2 font-medium text-zinc-900 transition-colors hover:bg-yellow-600;
   }
-  
+
   /* Link styling */
   .link-style {
-    @apply text-zinc-400 hover:text-yellow-500 transition-colors;
+    @apply text-zinc-400 transition-colors hover:text-yellow-500;
   }
 }
 
 /* Basic text effects */
 .text-glow {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.3);
 }

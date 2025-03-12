@@ -1,27 +1,18 @@
-import { ReactNode } from 'react';
-import { SectionTitle } from './SectionTitle';
-import { theme } from '@/lib/theme';
+import { ReactNode } from 'react'
+import { SectionTitle } from './SectionTitle'
+import { theme } from '@/lib/theme'
 
 interface SectionProps {
-  title: string;
-  children: ReactNode;
-  className?: string;
+  title: string
+  children: ReactNode
+  className?: string
 }
 
 export function Section({ title, children, className = '' }: SectionProps) {
   return (
-    <section className={`
-      /* Layout */
-      relative 
-      /* Spacing */
-      mb-12
-      /* Custom classes */
-      ${className}
-    `}>
+    <section className={`/* Layout */ /* Spacing */ /* Custom classes */ relative mb-12 ${className} `}>
       <SectionTitle>{title}</SectionTitle>
-      <div className="mt-8">
-        {children}
-      </div>
+      <div className='mt-8'>{children}</div>
     </section>
-  );
-} 
+  )
+}

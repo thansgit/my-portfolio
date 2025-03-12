@@ -1,15 +1,15 @@
-import { RapierRigidBody } from "@react-three/rapier";
-import * as THREE from "three";
+import { RapierRigidBody } from '@react-three/rapier'
+import * as THREE from 'three'
 
 // TetheredCard types
 export interface TetheredCardProps {
-  position?: [number, number, number];
-  maxSpeed?: number;
-  minSpeed?: number;
-  onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void;
-  debug?: boolean;
+  position?: [number, number, number]
+  maxSpeed?: number
+  minSpeed?: number
+  onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void
+  debug?: boolean
 }
 
 export interface ExtendedRigidBody extends RapierRigidBody {
-  lerped?: THREE.Vector3;
-} 
+  lerped?: THREE.Vector3
+}

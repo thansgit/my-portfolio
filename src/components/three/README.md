@@ -38,11 +38,12 @@ src/components/three/
     └── useViewport.ts        # Viewport utilities
 ```
 
-This structure follows React Three Fiber best practices by organizing components based on their role in the 3D scene. The components are separated into logical categories:
+This structure follows React Three Fiber best practices by organizing components based on their role in the 3D scene.
+The components are separated into logical categories:
 
 - Canvas components handle the setup and management of the 3D canvas
 - Environment components manage lighting and scene atmosphere
 - Objects contain interactive 3D elements
 - Effects provide visual enhancements
 - Utils offer helper functions and type definitions
-- Hooks provide reusable functionality across components 
+- Hooks provide reusable functionality across components

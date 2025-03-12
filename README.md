@@ -1,6 +1,7 @@
 # Timo Hanski - Portfolio
 
-A modern, optimized portfolio website built with Next.js 14, React, TypeScript, and Three.js featuring a 3D interactive background, responsive design, and server components architecture.
+A modern, optimized portfolio website built with Next.js 14, React, TypeScript, and Three.js featuring a 3D interactive
+background, responsive design, and server components architecture.
 
 ## Project Structure
 
@@ -10,7 +11,7 @@ The project follows a well-organized structure with server/client component sepa
 src/
 ├── app/                      # Next.js app directory (App Router)
 │   ├── about/                # About page
-│   ├── contact/              # Contact page  
+│   ├── contact/              # Contact page
 │   ├── portfolio/            # Portfolio page
 │   ├── resume/               # Resume page
 │   ├── page.tsx              # Home page (redirects to About)
@@ -66,11 +67,13 @@ src/
 This portfolio follows modern Next.js development best practices:
 
 ### Server/Client Component Separation
+
 - **Root Layout**: Server component for faster initial load
 - **ClientLayout**: Client component for interactive elements
 - Components are marked with `"use client"` only when needed
 
 ### Performance Optimizations
+
 - **Dynamic Imports**: Heavy components like Three.js scene are lazy-loaded
 - **Optimized Media Loading**: Videos only load when visible using Intersection Observer
 - **Image Optimization**: Next.js Image component for automatic optimization
@@ -78,6 +81,7 @@ This portfolio follows modern Next.js development best practices:
 - **Tailwind Utility Classes**: Limited set of custom utility classes for common patterns
 
 ### UI Component Design
+
 - **Composable Components**: UI elements designed for reusability
 - **Tailwind + Component Extraction**: Balance between utility classes and component extraction
 - **Accessibility Focus**: Proper ARIA attributes and keyboard navigation

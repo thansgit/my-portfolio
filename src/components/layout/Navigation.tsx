@@ -1,141 +1,120 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const navigationItems = [
-  { id: "about", label: "About" },
-  { id: "resume", label: "Resume" },
-  { id: "portfolio", label: "Portfolio" },
-  { id: "contact", label: "Contact" },
-] as const;
+  { id: 'about', label: 'About' },
+  { id: 'resume', label: 'Resume' },
+  { id: 'portfolio', label: 'Portfolio' },
+  { id: 'contact', label: 'Contact' },
+] as const
 
-type NavigationItemId = (typeof navigationItems)[number]["id"];
+type NavigationItemId = (typeof navigationItems)[number]['id']
 
 export function Navigation() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const router = useRouter()
+  const pathname = usePathname()
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   // For a smoother initial load
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   // Determine active section from path
   const currentSection = useMemo(() => {
-    const path = pathname || "/";
-    if (path === "/" || path === "/about") return "about";
-    const section = path.slice(1);
-    return navigationItems.some((item) => item.id === section)
-      ? section
-      : "about";
-  }, [pathname]);
+    const path = pathname || '/'
+    if (path === '/' || path === '/about') return 'about'
+    const section = path.slice(1)
+    return navigationItems.some((item) => item.id === section) ? section : 'about'
+  }, [pathname])
 
   // Use a ref for animation frame to prevent memory leaks
-  const prevActiveIndexRef = useRef<number>(0);
-  const activeIndex = navigationItems.findIndex(
-    (item) => item.id === currentSection
-  );
+  const prevActiveIndexRef = useRef<number>(0)
+  const activeIndex = navigationItems.findIndex((item) => item.id === currentSection)
 
   // Update previous active index for animation
   useEffect(() => {
-    prevActiveIndexRef.current = activeIndex;
-  }, [activeIndex]);
+    prevActiveIndexRef.current = activeIndex
+  }, [activeIndex])
 
   // Reference to main content for scrolling
-  const mainContentRef = useRef<HTMLDivElement | null>(null);
+  const mainContentRef = useRef<HTMLDivElement | null>(null)
 
   // Simplified scroll function
   const scrollToMainContent = () => {
     // Find the main content element if not already stored
     if (!mainContentRef.current) {
-      mainContentRef.current = document.querySelector(
-        ".relative.z-10.md\\:ml-\\[35\\%\\]"
-      );
+      mainContentRef.current = document.querySelector('.relative.z-10.md\\:ml-\\[35\\%\\]')
     }
 
     if (mainContentRef.current) {
-      const yOffset = -20; // Small offset from the top
-      const y =
-        mainContentRef.current.getBoundingClientRect().top +
-        window.pageYOffset +
-        yOffset;
+      const yOffset = -20 // Small offset from the top
+      const y = mainContentRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
 
       window.scrollTo({
         top: y,
-        behavior: "smooth",
-      });
+        behavior: 'smooth',
+      })
     }
-  };
+  }
 
   // Scroll to main content on initial load for non-about pages
   useEffect(() => {
-    if (mounted && currentSection !== "about") {
-      scrollToMainContent();
+    if (mounted && currentSection !== 'about') {
+      scrollToMainContent()
     }
-  }, [mounted, currentSection]);
+  }, [mounted, currentSection])
 
   // Unified click handler for both desktop and mobile
-  const handleNavClick = (
-    section: NavigationItemId,
-    path: string,
-    e: React.MouseEvent
-  ) => {
-    e.preventDefault();
+  const handleNavClick = (section: NavigationItemId, path: string, e: React.MouseEvent) => {
+    e.preventDefault()
 
     // Only update URL if navigating to a different section
     if (section !== currentSection) {
-      router.push(path);
+      router.push(path)
     }
 
     // Always scroll to content
-    scrollToMainContent();
-  };
+    scrollToMainContent()
+  }
 
-  const highlightPosition = `${activeIndex * 25}%`;
+  const highlightPosition = `${activeIndex * 25}%`
 
   const NavigationLinks = () => (
     <>
       {/* Background highlight box that moves */}
       <div
-        className={`
-          /* [Active Highlight] Highlight for active navigation item */
-          absolute transition-all duration-300 ease-out 
-          ${mounted ? "opacity-100" : "opacity-0"}
-        `}
+        className={`/* [Active Highlight] Highlight for active navigation item */ absolute transition-all duration-300 ease-out ${mounted ? 'opacity-100' : 'opacity-0'} `}
         style={{
           left: highlightPosition,
-          width: "25%",
-          top: "0.25rem",
-          bottom: "0.25rem",
-          right: "auto",
+          width: '25%',
+          top: '0.25rem',
+          bottom: '0.25rem',
+          right: 'auto',
         }}
       >
         <div
-          className={`
-          /* [Active Background] Gradient background for active item */
-          w-full h-full bg-gradient-to-r from-zinc-700/80 via-zinc-700 to-zinc-700/80 
-          rounded-full shadow-[0_0_10px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]
-        `}
+          className={`/* [Active Background] Gradient background for active item */ h-full w-full rounded-full bg-gradient-to-r from-zinc-700/80 via-zinc-700 to-zinc-700/80 shadow-[0_0_10px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]`}
         />
       </div>
 
       {/* Hover highlight effect */}
       {hoveredIndex !== null && hoveredIndex !== activeIndex && (
         <div
-          className="absolute transition-all duration-200 ease-out"
+          className='absolute transition-all duration-200 ease-out'
           style={{
             left: `${hoveredIndex * 25}%`,
-            width: "25%",
-            top: "0.25rem",
-            bottom: "0.25rem",
+            width: '25%',
+            top: '0.25rem',
+            bottom: '0.25rem',
             opacity: 0.5,
           }}
         >
-          <div className="w-full h-full bg-zinc-700/60 rounded-full" />
+          <div className='h-full w-full rounded-full bg-zinc-700/60' />
         </div>
       )}
 
@@ -150,39 +129,27 @@ export function Navigation() {
           prefetch={true}
           replace={true}
           scroll={false}
-          className={`
-            /* [Nav Link] Navigation link styling with conditional active state */
-            ${
-              currentSection === item.id
-                ? "text-yellow-500 font-semibold"
-                : "text-zinc-400 hover:text-zinc-200"
-            } 
-            transition-all duration-200 relative z-10 text-sm text-center py-1.5 px-6 
-            flex items-center justify-center
-          `}
-          aria-current={currentSection === item.id ? "page" : undefined}
+          className={`/* [Nav Link] Navigation link styling with conditional active state */ ${
+            currentSection === item.id ? 'font-semibold text-yellow-500' : 'text-zinc-400 hover:text-zinc-200'
+          } relative z-10 flex items-center justify-center px-6 py-1.5 text-center text-sm transition-all duration-200`}
+          aria-current={currentSection === item.id ? 'page' : undefined}
         >
           {item.label}
         </Link>
       ))}
     </>
-  );
+  )
 
   // Use the same component for mobile navigation
-  const MobileNavigationLinks = NavigationLinks;
+  const MobileNavigationLinks = NavigationLinks
 
   return (
     <>
       {/* Desktop Navigation */}
-      <div className="hidden md:block">
-        <nav aria-label="Main navigation" className="mb-8">
+      <div className='hidden md:block'>
+        <nav aria-label='Main navigation' className='mb-8'>
           <div
-            className={`
-            /* [Nav Container] Main navigation container */
-            relative grid grid-cols-4 bg-zinc-800/90 p-1.5 backdrop-blur-sm 
-            rounded-full border border-zinc-700/40 w-fit 
-            shadow-[0_4px_12px_rgba(0,0,0,0.15)]
-          `}
+            className={`/* [Nav Container] Main navigation */ container relative grid w-fit grid-cols-4 rounded-full border border-zinc-700/40 bg-zinc-800/90 p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-sm`}
           >
             <NavigationLinks />
           </div>
@@ -190,22 +157,15 @@ export function Navigation() {
       </div>
 
       {/* Mobile Navigation */}
-      <nav
-        aria-label="Mobile navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
-      >
+      <nav aria-label='Mobile navigation' className='fixed bottom-0 left-0 right-0 z-50 md:hidden'>
         <div
-          className={`
-          /* [Mobile Nav Bar] Fixed navigation bar at the bottom of the screen */
-          bg-zinc-900/95 backdrop-blur-md border-t border-zinc-700/40 
-          shadow-[0_-2px_10px_rgba(0,0,0,0.2)]
-        `}
+          className={`/* [Mobile Nav Bar] Fixed navigation bar at the bottom of the screen */ border-t border-zinc-700/40 bg-zinc-900/95 shadow-[0_-2px_10px_rgba(0,0,0,0.2)] backdrop-blur-md`}
         >
-          <div className="relative grid grid-cols-4 p-1.5 max-w-md mx-auto">
+          <div className='relative mx-auto grid max-w-md grid-cols-4 p-1.5'>
             <MobileNavigationLinks />
           </div>
         </div>
       </nav>
     </>
-  );
+  )
 }

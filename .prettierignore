@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Next.js build outputs
+.next
+out
+build
+dist
+
+# Coverage directory
+coverage
+
+# Cache directories
+.npm
+.eslintcache
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts 
