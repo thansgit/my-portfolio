@@ -1,5 +1,6 @@
 'use client'
 
+import { ShaderBackground } from '@/components/three/environment/ShaderBackground'
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei'
 
 // Card-focused lightformers that points at the card
@@ -40,10 +41,7 @@ export const Environment = ({
 }) => {
   return (
     <>
-      <mesh position={[0, 0, -5]} renderOrder={-1000}>
-        <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial color='black' />
-      </mesh>
+      <ShaderBackground />
 
       {isPinheadGlowing && pinheadPosition && (
         <pointLight
