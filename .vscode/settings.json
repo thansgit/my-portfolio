@@ -6,9 +6,11 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false,
+  "prettier.configPath": ".prettierrc.js",
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    "source.fixAll.format": "explicit"
   },
 
   // Tailwind CSS IntelliSense enhancements
@@ -27,7 +29,7 @@
 
   // TypeScript settings
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "typescript.preferences.importModuleSpecifier": "shortest",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
   "javascript.updateImportsOnFileMove.enabled": "always",
 
   // Git settings
