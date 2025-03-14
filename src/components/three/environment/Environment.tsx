@@ -8,21 +8,21 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
   return (
     <>
       <Lightformer
-        intensity={2.5}
+        intensity={3}
         position={[cardPosition[0] - 5, cardPosition[1] + 2.5, cardPosition[2] + 2]}
         target={[cardPosition[0] + 2, cardPosition[1] - 2, cardPosition[2] - 0.5]}
         form='rect'
         scale={[10, 12, 1]}
-        color='#ffffff'
+        color='white'
       />
 
       <Lightformer
-        intensity={2.5}
+        intensity={3}
         position={[cardPosition[0] + 4, cardPosition[1] - 2.5, cardPosition[2] + 2]}
         target={[cardPosition[0] - 2, cardPosition[1] + 1, cardPosition[2] - 0.5]}
         form='rect'
         scale={[10, 12, 1]}
-        color='#f0f8ff'
+        color='white'
       />
     </>
   )

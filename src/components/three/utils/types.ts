@@ -8,6 +8,9 @@ export interface TetheredCardProps {
   minSpeed?: number
   onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void
   debug?: boolean
+  glassColor?: string
+  distortionStrength?: number
+  refractionRatio?: number
 }
 
 export interface ExtendedRigidBody extends RapierRigidBody {

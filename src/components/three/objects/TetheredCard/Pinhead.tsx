@@ -48,7 +48,7 @@ export const Pinhead: React.FC<PinheadProps> = ({
       <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
         <group>
           {/* Spherical pin head with metallic material - scale handled in useFrame */}
-          <Sphere ref={pinRef} args={[size, 32, 32]}>
+          <Sphere ref={pinRef} args={[size, 8, 8]}>
             <animated.meshStandardMaterial
               ref={materialRef}
               color={color}

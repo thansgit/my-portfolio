@@ -1,11 +1,72 @@
 'use client'
 
 import * as THREE from 'three'
-import { useMemo, useRef, useEffect, useState } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import { ThreeEvent, useFrame, useLoader } from '@react-three/fiber'
-import { useGLTF, Environment as DreiEnvironment } from '@react-three/drei'
+import { useGLTF, useCursor } from '@react-three/drei'
+import { GLTF } from 'three-stdlib'
 
-useGLTF.preload('/assets/models/testcard.glb', true)
+// Preload the model for better performance
+useGLTF.preload('/assets/models/testcard1.glb', true)
+
+// Type definitions for the GLTF model
+type GLTFResult = GLTF & {
+  nodes: {
+    Scene: THREE.Group & {
+      traverse: (callback: (object: THREE.Object3D) => void) => void
+    }
+  }
+  materials: Record<string, THREE.Material>
+}
+
+// Custom hook for creating a glass material with proper cleanup
+const useGlassMaterial = () => {
+  const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
+  const colorMap = useLoader(THREE.TextureLoader, '/assets/textures/2.png')
+
+  return useMemo(() => {
+    if (!normalMap || !colorMap) return null
+
+    normalMap.wrapS = THREE.RepeatWrapping
+    normalMap.wrapT = THREE.RepeatWrapping
+    normalMap.repeat.set(1, 1)
+
+    colorMap.wrapS = THREE.ClampToEdgeWrapping
+    colorMap.wrapT = THREE.ClampToEdgeWrapping
+    colorMap.minFilter = THREE.LinearFilter
+    colorMap.magFilter = THREE.LinearFilter
+    colorMap.premultiplyAlpha = false
+
+    // Mirror texture horizontally and flip upside down
+    colorMap.center.set(0.5, 0.5)
+    colorMap.repeat.set(-1, 1)
+    colorMap.rotation = Math.PI
+
+    const material = new THREE.MeshPhysicalMaterial({
+      transparent: true,
+      transmission: 0.9,
+      thickness: 0,
+      roughness: 0.2,
+      envMapIntensity: 1,
+      clearcoat: 1,
+      clearcoatRoughness: 0.6,
+      metalness: 0,
+      ior: 1.5,
+      map: colorMap,
+      normalMap: normalMap,
+      normalScale: new THREE.Vector2(0.5, 0.5),
+      clearcoatNormalMap: normalMap,
+      clearcoatNormalScale: new THREE.Vector2(0.3, 0.3),
+      side: THREE.FrontSide,
+      opacity: 0.9,
+      reflectivity: 0.2,
+      color: new THREE.Color('F0FFFF'),
+      attenuationColor: new THREE.Color('F0FFFF'),
+    })
+
+    return material
+  }, [normalMap, colorMap])
+}
 
 interface RopeMeshProps {
   points: THREE.Vector3[]
@@ -18,25 +79,22 @@ export const RopeMesh = ({ points, radius = 0.04, color = 'black' }: RopeMeshPro
   const tubeGeometryRef = useRef<THREE.TubeGeometry | null>(null)
   const endSphereGeometryRef = useRef<THREE.SphereGeometry | null>(null)
 
+  // Create a curve from points
   const curve = useMemo(() => {
-    const curvePoints = [...points]
-    return new THREE.CatmullRomCurve3(curvePoints)
+    return new THREE.CatmullRomCurve3([...points])
   }, [points])
 
-  // Create a tubular geometry along the curve
+  // Create tube geometry around the curve
   const tubeGeometry = useMemo(() => {
-    // Dispose of the previous geometry if it exists
     if (tubeGeometryRef.current) {
       tubeGeometryRef.current.dispose()
     }
 
-    const newGeometry = new THREE.TubeGeometry(curve, 32, radius, 8, false)
+    const newGeometry = new THREE.TubeGeometry(curve, 16, radius, 8, false)
     tubeGeometryRef.current = newGeometry
     return newGeometry
   }, [curve, radius])
 
-  // Get the start and end points for cap spheres
-  const startPoint = useMemo(() => points[0], [points])
   const endPoint = useMemo(() => points[points.length - 1], [points])
 
   // Clean up geometries when component unmounts
@@ -75,15 +133,8 @@ export const RopeMesh = ({ points, radius = 0.04, color = 'black' }: RopeMeshPro
   )
 }
 
-interface CardModelProps {
-  nodeRef: React.MutableRefObject<any>
-  dragged: THREE.Vector3 | false
-  onHover: (state: boolean) => void
-  onDrag: (drag: THREE.Vector3 | false) => void
-}
-
-interface DraggablePlaneProps {
-  nodeRef: React.MutableRefObject<any>
+interface InteractivePlaneProps {
+  nodeRef: React.RefObject<{ translation(): { x: number; y: number; z: number } }>
   dragged: THREE.Vector3 | false
   onHover: (state: boolean) => void
   onDrag: (drag: THREE.Vector3 | false) => void
@@ -91,37 +142,54 @@ interface DraggablePlaneProps {
   debug?: boolean
 }
 
-export const DraggablePlane = ({ nodeRef, dragged, onHover, onDrag, size = 1, debug = false }: DraggablePlaneProps) => {
+export const DraggablePlane = ({
+  nodeRef,
+  dragged,
+  onHover,
+  onDrag,
+  size = 1,
+  debug = false,
+}: InteractivePlaneProps) => {
   const vec = new THREE.Vector3()
   const billboardRef = useRef<THREE.Group>(null)
 
-  // Make the draggable plane always face the camera
+  // Handle cursor appearance based on hover state
+  useCursor(false)
+
+  // Make plane always face the camera
   useFrame(({ camera }) => {
     if (billboardRef.current) {
       billboardRef.current.quaternion.copy(camera.quaternion)
     }
   })
 
+  // Handle pointer events
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    if (nodeRef.current) {
+      const pos = nodeRef.current.translation()
+      vec.set(pos.x, pos.y, pos.z)
+      onDrag(new THREE.Vector3().copy(e.point).sub(vec))
+    }
+  }
+
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+    onDrag(false)
+  }
+
   return (
     <group ref={billboardRef}>
       <mesh
         scale={[size * 0.7, size, 1]}
-        position={[0, +0.2, -1]}
+        position={[0, 0.2, -1]}
         onPointerOver={() => onHover(true)}
         onPointerOut={() => onHover(false)}
-        onPointerDown={(e: ThreeEvent<PointerEvent>) => {
-          e.stopPropagation()
-          ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-          onDrag(new THREE.Vector3().copy(e.point).sub(vec.copy(nodeRef.current!.translation())))
-        }}
-        onPointerUp={(e: ThreeEvent<PointerEvent>) => {
-          e.stopPropagation()
-          ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
-          onDrag(false)
-        }}
-        onPointerCancel={() => {
-          onDrag(false)
-        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => onDrag(false)}
       >
         <planeGeometry />
         <meshBasicMaterial visible={debug} side={THREE.DoubleSide} />
@@ -130,139 +198,98 @@ export const DraggablePlane = ({ nodeRef, dragged, onHover, onDrag, size = 1, de
   )
 }
 
+interface CardModelProps {
+  nodeRef: React.RefObject<{ translation(): { x: number; y: number; z: number } }>
+  dragged: THREE.Vector3 | false
+  onHover: (state: boolean) => void
+  onDrag: (drag: THREE.Vector3 | false) => void
+  glassColor?: string
+  distortionStrength?: number
+  refractionRatio?: number
+}
+
 export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
-  const { nodes, materials } = useGLTF('/assets/models/testcard.glb')
+  const { nodes } = useGLTF('/assets/models/testcard1.glb') as GLTFResult
   const vec = new THREE.Vector3()
   const groupRef = useRef<THREE.Group>(null)
-  const initialRotation = useRef(Math.random() * Math.PI * 2) // Satunnainen alkurotaatio jokaiselle kortille
-  const sceneRef = useRef<THREE.Object3D | null>(null) // Tallennetaan viite scene-objektiin
+  const initialRotation = useRef(Math.random() * Math.PI * 2)
+  const sceneRef = useRef<THREE.Object3D | null>(null)
 
-  // Lisätään pieni heilunta kun kortti on lepotilassa
+  // Use custom hook for glass material
+  const glassMaterial = useGlassMaterial()
+
+  // Handle cursor appearance based on hover state
+  useCursor(false)
+
+  // Add gentle swinging motion when card is at rest
   useFrame((state) => {
-    if (sceneRef.current && dragged === false) {
-      // Käytetään siniaaltoliikettä pehmeän heilunnan luomiseen
+    if (!sceneRef.current) return
+
+    if (dragged === false) {
       const time = state.clock.getElapsedTime()
-
-      // Vahvemmat heilunnan parametrit
-      const swingAmplitude = 6.28 // Isompi heiluntakulma (radiaaneissa) //6.28 to rotate 360
-      const swingFrequency = 0.4 // Hieman nopeampi heilunta
-
-      // Lasketaan heilunnan kulma
+      const swingAmplitude = 0.4
+      const swingFrequency = 0.4
       const swingAngle = Math.sin(time * swingFrequency + initialRotation.current) * swingAmplitude
-
-      // Tärkeä muutos: käytämme suoraan scene-noden rotaatiota fysiikkamoottorin sijaan
       sceneRef.current.rotation.z = swingAngle
-    } else if (sceneRef.current && dragged !== false) {
-      // Kun korttia raahataan, palautetaan rotaatio nollaan pehmeästi
-      sceneRef.current.rotation.z *= 0.9 // Vaimennetaan rotaatiota
+    } else {
+      // Smoothly dampen rotation when card is dragged
+      sceneRef.current.rotation.z *= 0.9
     }
   })
 
-  // Lataa normaalikartta ja väritekstuuri
-  const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
-  const colorMap = useLoader(THREE.TextureLoader, '/assets/textures/Frontside.png')
+  // Handle pointer events
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    if (nodeRef.current) {
+      const pos = nodeRef.current.translation()
+      vec.set(pos.x, pos.y, pos.z)
+      onDrag(new THREE.Vector3().copy(e.point).sub(vec))
+    }
+  }
 
-  // Luo lasimateriaali
-  const glassMaterial = useMemo(() => {
-    if (!normalMap || !colorMap) return null
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+    onDrag(false)
+  }
 
-    // Aseta tekstuuriasetukset
-    normalMap.wrapS = THREE.RepeatWrapping
-    normalMap.wrapT = THREE.RepeatWrapping
-    normalMap.repeat.set(1, 1)
-
-    // Aseta väritekstuuri ja käännä se 180 astetta
-    colorMap.wrapS = THREE.ClampToEdgeWrapping
-    colorMap.wrapT = THREE.ClampToEdgeWrapping
-    colorMap.minFilter = THREE.LinearFilter
-    colorMap.magFilter = THREE.LinearFilter
-    colorMap.premultiplyAlpha = false
-
-    // Peilataan tekstuuri vaakasuunnassa ja käännetään ylösalaisin
-    colorMap.center.set(0.5, 0.5) // Asetetaan rotaation keskipiste tekstuurin keskelle
-    colorMap.repeat.set(-1, 1) // Negatiivinen x-arvo peilaa tekstuurin vaakasuunnassa
-    colorMap.rotation = Math.PI // 180 astetta (ylösalaisin kääntö)
-
-    // Luo materiaaliobjekti
-    const material = new THREE.MeshPhysicalMaterial({
-      transparent: true,
-      transmission: 1,
-      thickness: 0.5,
-      roughness: 0.02,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.15,
-      metalness: 0.1,
-      ior: 1.5,
-      map: colorMap,
-      normalMap: normalMap,
-      normalScale: new THREE.Vector2(0.5, 0.5),
-      clearcoatNormalMap: normalMap,
-      clearcoatNormalScale: new THREE.Vector2(0.3, 0.3),
-      side: THREE.FrontSide,
-      depthWrite: true,
-      depthTest: true,
-      blending: THREE.CustomBlending,
-      blendEquation: THREE.AddEquation,
-      blendSrc: THREE.SrcAlphaFactor,
-      blendDst: THREE.OneMinusSrcAlphaFactor,
-      alphaTest: 0.01,
-      opacity: 1.0,
-      envMapIntensity: 0.8,
-      reflectivity: 0.5,
-      color: new THREE.Color('#00b5ad'),
-      attenuationColor: new THREE.Color('#00b5ad'),
-      attenuationDistance: 4.0,
-    })
-
-    return material
-  }, [normalMap, colorMap])
-
-  // Sovella lasimateriaali mesheihin
+  // Apply materials to the model meshes
   useEffect(() => {
     if (!glassMaterial || !nodes || !nodes.Scene) return
 
-    // Aseta renderöintijärjestys suhteessa taustaan
     nodes.Scene.renderOrder = 10
-
-    // Tallenna viite Scene-objektiin
     sceneRef.current = nodes.Scene
 
-    // Käsittele kaikki meshit
-    nodes.Scene.traverse((child: any) => {
-      if (child.isMesh) {
-        // Tallenna alkuperäinen materiaali
-        if (!child.userData.originalMaterial) {
-          child.userData.originalMaterial = child.material
-        }
+    nodes.Scene.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return
 
-        const materialName = child.material?.name || ''
+      // Store original material for cleanup
+      if (!child.userData.originalMaterial) {
+        child.userData.originalMaterial = child.material
+      }
 
-        // Piilota backmaterial
-        if (materialName.toLowerCase().includes('back')) {
-          child.visible = false
-          child.position.z += 1000
-          child.renderOrder = -1
-        }
-        // Käytä lasia frontmaterialille
-        else if (materialName.toLowerCase().includes('front')) {
-          child.material = glassMaterial
-          child.renderOrder = 100
-          child.castShadow = true
-          child.receiveShadow = true
-        }
+      const materialName = child.material?.name || ''
+
+      if (materialName.toLowerCase().includes('back')) {
+        // Hide back material
+        child.visible = false
+        child.position.z += 1000
+        child.renderOrder = -1
+      } else if (materialName.toLowerCase().includes('front')) {
+        // Apply glass material to front
+        child.material = glassMaterial
+        child.renderOrder = 100
       }
     })
 
-    // Puhdistus unmountatessa
+    // Cleanup on unmount
     return () => {
       if (glassMaterial) {
         glassMaterial.dispose()
       }
 
-      nodes.Scene.traverse((child: any) => {
-        if (child.isMesh && child.userData.originalMaterial) {
-          child.material = child.userData.originalMaterial
-        }
+      nodes.Scene.traverse((child) => {
+        if (!(child instanceof THREE.Mesh) || !child.userData.originalMaterial) return
+        child.material = child.userData.originalMaterial
       })
     }
   }, [glassMaterial, nodes])
@@ -271,21 +298,13 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
     <group
       ref={groupRef}
       scale={2}
-      position={[0, 0.08, -0.03]}
+      position={[0, 0.3, 0]}
       rotation={[Math.PI * 0.5, 0, 0]}
       onPointerOver={() => onHover(true)}
       onPointerOut={() => onHover(false)}
-      onPointerDown={(e: ThreeEvent<PointerEvent>) => {
-        ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-        onDrag(new THREE.Vector3().copy(e.point).sub(vec.copy(nodeRef.current!.translation())))
-      }}
-      onPointerUp={(e: ThreeEvent<PointerEvent>) => {
-        ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
-        onDrag(false)
-      }}
-      onPointerCancel={() => {
-        onDrag(false)
-      }}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => onDrag(false)}
     >
       <primitive object={nodes.Scene} />
     </group>

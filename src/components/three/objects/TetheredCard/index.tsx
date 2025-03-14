@@ -13,7 +13,7 @@ import {
 import { ExtendedRigidBody, TetheredCardProps } from '@/components/three/utils/types'
 import { useFrame } from '@react-three/fiber'
 import { BallCollider, RapierRigidBody, RigidBody } from '@react-three/rapier'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import { CardModel, DraggablePlane, RopeMesh } from './visuals'
 
@@ -23,6 +23,9 @@ export const TetheredCard = ({
   minSpeed = 10,
   onPinheadStateChange,
   debug = false,
+  glassColor = '#88ccff',
+  distortionStrength = 0.5,
+  refractionRatio = 0.98,
 }: TetheredCardProps = {}) => {
   const card = useRef<RapierRigidBody>(null)
   const fixed = useRef<RapierRigidBody>(null)
@@ -147,7 +150,21 @@ export const TetheredCard = ({
     }
   }, [points])
 
-  const cardModelElement = <CardModel nodeRef={card} dragged={dragged} onHover={hover} onDrag={drag} />
+  // Create the card model element with glass effect
+  const cardModelElement = useMemo(
+    () => (
+      <CardModel
+        nodeRef={card}
+        dragged={dragged}
+        onHover={hover}
+        onDrag={drag}
+        glassColor={glassColor}
+        distortionStrength={distortionStrength}
+        refractionRatio={refractionRatio}
+      />
+    ),
+    [card, dragged, hover, drag, glassColor, distortionStrength, refractionRatio],
+  )
 
   usePhysicsUpdate({
     position,

@@ -7,6 +7,7 @@ import * as THREE from 'three'
 export const ShaderBackground = () => {
   const meshRef = useRef<THREE.Mesh>(null)
   const timeRef = useRef(0)
+  const cameraRef = useRef<THREE.Camera | null>(null)
   const { size } = useThree()
 
   // Luo shader-materiaali Worley-noise shaderilla
@@ -15,6 +16,8 @@ export const ShaderBackground = () => {
       uniforms: {
         iTime: { value: 0 },
         iResolution: { value: new THREE.Vector2(size.width, size.height) },
+        iAspect: { value: size.width / size.height },
+        iScale: { value: 1 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -26,84 +29,156 @@ export const ShaderBackground = () => {
       fragmentShader: `
         uniform float iTime;
         uniform vec2 iResolution;
+        uniform float iAspect;
+        uniform float iScale;
         varying vec2 vUv;
         
-        //Calculate the squared length of a vector
-        float length2(vec2 p){
-            return dot(p,p);
+        /* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
+        vec3 random3(vec3 c) {
+          float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
+          vec3 r;
+          r.z = fract(512.0*j);
+          j *= .125;
+          r.x = fract(512.0*j);
+          j *= .125;
+          r.y = fract(512.0*j);
+          return r-0.5;
         }
         
-        //Generate some noise to scatter points.
-        float noise(vec2 p){
-            return fract(sin(fract(sin(p.x) * (43.13311)) + p.y) * 31.0011);
-        }
+        /* skew constants for 3d simplex functions */
+        const float F3 =  0.3333333;
+        const float G3 =  0.1666667;
         
-        float worley(vec2 p) {
-            //Set our distance to infinity
-            float d = 1e30;
-            //For the 9 surrounding grid points
-            for (int xo = -1; xo <= 1; ++xo) {
-                for (int yo = -1; yo <= 1; ++yo) {
-                    //Floor our vec2 and add an offset to create our point
-                    vec2 tp = floor(p) + vec2(xo, yo);
-                    //Calculate the minimum distance for this grid point
-                    //Mix in the noise value too!
-                    d = min(d, length2(p - tp - noise(tp)));
-                }
-            }
-            return 3.0*exp(-4.0*abs(2.5*d - 1.0));
-        }
-        
-        float fworley(vec2 p) {
-            //Stack noise layers 
-            return sqrt(sqrt(sqrt(
-                worley(p*5.0 + 0.05*iTime) *
-                sqrt(worley(p * 50.0 + 0.12 + -0.1*iTime)) *
-                sqrt(sqrt(worley(p * -10.0 + 0.03*iTime))))));
-        }
-              
-        void main() {
-            // Konvertoi vUv koordinaatit fragCoord-arvoiksi
-            vec2 fragCoord = vUv * iResolution;
+        /* 3d simplex noise */
+        float simplex3d(vec3 p) {
+          /* 1. find current tetrahedron T and it's four vertices */
+          /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
+          /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/  
+          /* calculate s and x */
+          vec3 s = floor(p + dot(p, vec3(F3)));
+          vec3 x = p - s + dot(s, vec3(G3));
+          
+          /* calculate i1 and i2 */
+          vec3 e = step(vec3(0.0), x - x.yzx);
+          vec3 i1 = e*(1.0 - e.zxy);
+          vec3 i2 = 1.0 - e.zxy*(1.0 - e);
             
-            //Calculate an intensity
-            float t = fworley(fragCoord / 1500.0);
-            //Add some gradient
-            t *= exp(-length2(abs(0.7*vUv - 1.0)));	
-            //Make it blue!
-            gl_FragColor = vec4(t * vec3(0.1, 1.1*t, pow(t, 0.5-t)), 1.0);
+          /* x1, x2, x3 */
+          vec3 x1 = x - i1 + G3;
+          vec3 x2 = x - i2 + 2.0*G3;
+          vec3 x3 = x - 1.0 + 3.0*G3;
+          
+          /* 2. find four surflets and store them in d */
+          vec4 w, d;
+          
+          /* calculate surflet weights */
+          w.x = dot(x, x);
+          w.y = dot(x1, x1);
+          w.z = dot(x2, x2);
+          w.w = dot(x3, x3);
+          
+          /* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
+          w = max(0.6 - w, 0.0);
+          
+          /* calculate surflet components */
+          d.x = dot(random3(s), x);
+          d.y = dot(random3(s + i1), x1);
+          d.z = dot(random3(s + i2), x2);
+          d.w = dot(random3(s + 1.0), x3);
+          
+          /* multiply d by w^4 */
+          w *= w;
+          w *= w;
+          d *= w;
+          
+          /* 3. return the sum of the four surflets */
+          return dot(d, vec4(52.0));
+        }
+        
+        void main() {
+          vec2 uv = vUv * iScale;
+          vec2 p = uv * iResolution.xy / iResolution.x;
+          vec3 p3 = vec3(p, iTime*0.015) + vec3(iTime*0.015, 0.0, 0.0);
+          
+          float value = pow(abs(simplex3d(p3*2.0)), 1.5);
+          float red = 0.5 + 0.5*simplex3d(p3*2.0 + 38274.9);
+          float green = abs(0.2+0.5*simplex3d(p3*2.0 + 3824.9));
+          float blue = abs(simplex3d(p3*2.0 + 98274.9));
+          
+          gl_FragColor = vec4(sqrt(value*vec3(red, green, blue)), 1.0);
         }
       `,
-      transparent: false, // Tämä on kriittinen asetus - ei läpinäkyvä tausta
-      depthWrite: false, // Ei kirjoita syvyyspuskuriin
-      depthTest: false, // Ei tee syvyystestausta
-      side: THREE.DoubleSide, // Renderöi molemmilta puolilta
-      blending: THREE.NormalBlending, // Tärkeä läpinäkyvyyden kannalta
+      // transparent: false,
+      depthWrite: false,
+      // depthTest: false,
+      // side: THREE.DoubleSide,
+      // blending: THREE.NormalBlending,
     }),
   )
 
   // Päivitä resoluutio kun ikkunan koko muuttuu
   useEffect(() => {
     material.current.uniforms.iResolution.value.set(size.width, size.height)
+    material.current.uniforms.iAspect.value = size.width / size.height
+
+    // Aseta sopiva skaalaus näytön koon mukaan
+    // material.current.uniforms.iScale.value = 1
+
+    // Päivitä myös meshin koko vastaamaan näyttöä
+    if (meshRef.current) {
+      updateMeshSize()
+    }
   }, [size])
 
   // Päivitä aika-uniform joka framessa
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     timeRef.current += delta
     material.current.uniforms.iTime.value = timeRef.current
+
+    if (!cameraRef.current && state.camera) {
+      cameraRef.current = state.camera
+      updateMeshSize()
+    }
   })
 
-  // Aseta meshin sijainti ja renderöintijärjestys
+  // Laske kameran näkökenttään sopiva meshin koko
+  const updateMeshSize = () => {
+    if (!meshRef.current || !cameraRef.current) return
+
+    const camera = cameraRef.current as any
+
+    // Määritä etäisyys kamerasta
+    const distanceFromCamera = meshRef.current.position.distanceTo(camera.position)
+
+    // Oletuskameran fov on 75 astetta
+    let fov = 75
+
+    // Tarkista onko kamera PerspectiveCamera
+    if (camera && camera.isPerspectiveCamera) {
+      fov = camera.fov
+    }
+
+    const aspect = size.width / size.height
+
+    // Laske tason koko, joka täyttää koko näytön kyseisellä etäisyydellä
+    const vFov = (fov * Math.PI) / 180 // Muunna radiaaneiksi
+    const height = 2 * distanceFromCamera * Math.tan(vFov / 2)
+    const width = height * aspect
+
+    // Päivitä geometria
+    meshRef.current.scale.set(width, height, 1)
+  }
+
+  // Aseta meshin renderöintijärjestys
   useEffect(() => {
     if (meshRef.current) {
-      meshRef.current.position.z = -100
       meshRef.current.renderOrder = -20000 // Erittäin alhainen renderOrder, jotta tausta on aina takimmaisena
     }
   }, [])
 
   return (
-    <mesh ref={meshRef} frustumCulled={false} position={[0, 0, -100]} renderOrder={-20000}>
-      <planeGeometry args={[1000, 1000]} />
+    <mesh ref={meshRef} frustumCulled={false} renderOrder={-20000}>
+      <planeGeometry args={[1, 1]} /> {/* Käytämme scale-arvoa geometrian sijaan */}
       <primitive object={material.current} attach='material' />
     </mesh>
   )
