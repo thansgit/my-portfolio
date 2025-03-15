@@ -31,25 +31,4 @@ export interface EnvironmentContextState {
   cardPosition?: [number, number, number]
 }
 
-// Configuration context state
-export interface ConfigContextState {
-  // Physics settings
-  cardPhysics: {
-    maxSpeed: number
-    minSpeed: number
-  }
-
-  // Visual settings
-  ropeStyling: {
-    initialRadius: number
-    minRadius: number
-    colorStretchSpeed: number
-    radiusStretchSpeed: number
-  }
-
-  // Colors and themes
-  colors: {
-    pinhead: string
-    ropeDefault: string
-  }
-}
+// Removed ConfigContextState interface as it's now defined directly in ConfigContext.tsx

@@ -8,6 +8,10 @@ import {
   PINHEAD_COLOR,
   DRAGGABLE_PLANE_SIZE,
   BALL_COLLIDER_SIZES,
+  ROPE_INITIAL_RADIUS,
+  ROPE_MIN_RADIUS,
+  ROPE_COLOR_STRETCH_SPEED,
+  ROPE_RADIUS_STRETCH_SPEED,
 } from '@/components/three/utils/constants'
 import { ExtendedRigidBody, TetheredCardProps } from '@/components/three/utils/types'
 import { useFrame } from '@react-three/fiber'
@@ -19,12 +23,12 @@ import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } fro
 
 export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
   // Get configuration from context
-  const config = useConfigContext()
+  const { cardPhysics } = useConfigContext()
   const { setCardPosition, updateRopeVisuals, ropeColor, ropeRadius } = useSceneContext()
 
   // Physics settings from config context
-  const maxSpeed = config.cardPhysics.maxSpeed
-  const minSpeed = config.cardPhysics.minSpeed
+  const maxSpeed = cardPhysics.maxSpeed
+  const minSpeed = cardPhysics.minSpeed
 
   // Direct refs for physics bodies - these stay local to the component
   const cardRef = useRef<RapierRigidBody>(null)
@@ -104,24 +108,22 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
     const stretchRatio = Math.max(1, currentLength / restingLength)
 
     if (stretchRatio > 1) {
-      const colorStretch = Math.min((stretchRatio - 1) / config.ropeStyling.colorStretchSpeed, 1)
+      const colorStretch = Math.min((stretchRatio - 1) / ROPE_COLOR_STRETCH_SPEED, 1)
 
-      const radiusStretch = Math.min((stretchRatio - 1) / config.ropeStyling.radiusStretchSpeed, 1)
+      const radiusStretch = Math.min((stretchRatio - 1) / ROPE_RADIUS_STRETCH_SPEED, 1)
 
       const grayValue = Math.floor(colorStretch * 180)
       const newColor = `rgb(${grayValue}, ${grayValue}, ${grayValue})`
 
-      const newRadius =
-        config.ropeStyling.initialRadius -
-        radiusStretch * (config.ropeStyling.initialRadius - config.ropeStyling.minRadius)
+      const newRadius = ROPE_INITIAL_RADIUS - radiusStretch * (ROPE_INITIAL_RADIUS - ROPE_MIN_RADIUS)
 
       // Update shared state through context
       updateRopeVisuals(newColor, newRadius)
     } else {
       // Reset to defaults
-      updateRopeVisuals(config.colors.ropeDefault, config.ropeStyling.initialRadius)
+      updateRopeVisuals('#000000', ROPE_INITIAL_RADIUS)
     }
-  }, [points, config, updateRopeVisuals, restingLength])
+  }, [points, updateRopeVisuals, restingLength])
 
   // Set up physics joints
   useJoints(fixedRef, j2Ref, j3Ref, j4Ref, cardRef, ROPE_SEGMENT_LENGTH)
