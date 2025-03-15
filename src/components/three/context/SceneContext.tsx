@@ -15,9 +15,6 @@ interface SceneProviderProps {
 export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialCardPosition = [0, 0, 0] }) => {
   // Card position and state
   const [cardPosition, setCardPosition] = useState<THREE.Vector3>(new THREE.Vector3(...initialCardPosition))
-  const [pinheadPosition, setPinheadPosition] = useState<THREE.Vector3>(
-    new THREE.Vector3(initialCardPosition[0], initialCardPosition[1] + 0.18, initialCardPosition[2]),
-  )
   const [cardRotationCount, setCardRotationCount] = useState(0)
 
   // Rope visuals
@@ -37,14 +34,12 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
   const contextValue: SceneContextState = {
     // State
     cardPosition,
-    pinheadPosition,
     cardRotationCount,
     ropeColor,
     ropeRadius,
 
     // Handlers
     setCardPosition,
-    setPinheadPosition,
     incrementCardRotation,
     updateRopeVisuals,
   }

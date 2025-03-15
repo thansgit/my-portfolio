@@ -1,24 +1,18 @@
 import { RapierRigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
-import { RefObject } from 'react'
 
-// TetheredCard types
 export interface TetheredCardProps {
   position?: [number, number, number]
   maxSpeed?: number
   minSpeed?: number
-  onPinheadStateChange?: (position: [number, number, number], isGlowing: boolean) => void
 }
 
 export interface ExtendedRigidBody extends RapierRigidBody {
   lerped?: THREE.Vector3
 }
 
-// Scene context state
 export interface SceneContextState {
-  // Visual settings
   cardPosition: THREE.Vector3
-  pinheadPosition: THREE.Vector3
 
   // Card state
   cardRotationCount: number
@@ -27,24 +21,14 @@ export interface SceneContextState {
   ropeColor: string
   ropeRadius: number
 
-  // Action handlers
   setCardPosition: (position: THREE.Vector3) => void
-  setPinheadPosition: (position: THREE.Vector3) => void
   incrementCardRotation: () => void
   updateRopeVisuals: (color: string, radius: number) => void
 }
 
-// Environment context state
 export interface EnvironmentContextState {
-  // Lighting
   ambientLightIntensity: number
-
-  // Positions
   cardPosition?: [number, number, number]
-  pinheadPosition?: [number, number, number]
-
-  // Handlers
-  updatePinheadState: (position: [number, number, number], isGlowing: boolean) => void
 }
 
 // Configuration context state

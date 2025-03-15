@@ -1,5 +1,5 @@
 'use client'
-
+//TODO: selvitä mikä järki tässä on
 import React, { Suspense, useState, useEffect, ReactNode } from 'react'
 import { Html } from '@react-three/drei'
 

@@ -19,12 +19,6 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
 }) => {
   // Environment state
   const [cardPosition, setCardPosition] = useState<[number, number, number] | undefined>(initialCardPosition)
-  const [pinheadPosition, setPinheadPosition] = useState<[number, number, number] | undefined>(undefined)
-
-  // Function to update pinhead state
-  const updatePinheadState = (position: [number, number, number], isGlowing: boolean) => {
-    setPinheadPosition(position)
-  }
 
   const contextValue: EnvironmentContextState = {
     // Lighting
@@ -32,10 +26,6 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
 
     // Positions
     cardPosition,
-    pinheadPosition,
-
-    // Handlers
-    updatePinheadState,
   }
 
   return <EnvironmentContext.Provider value={contextValue}>{children}</EnvironmentContext.Provider>

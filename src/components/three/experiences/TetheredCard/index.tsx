@@ -4,7 +4,6 @@ import { useSceneContext, useConfigContext } from '@/components/three/hooks'
 import {
   ROPE_SEGMENT_LENGTH,
   SEGMENT_PROPS,
-  PINHEAD_OFFSET,
   PINHEAD_SIZE,
   PINHEAD_COLOR,
   DRAGGABLE_PLANE_SIZE,
@@ -18,10 +17,10 @@ import * as THREE from 'three'
 import { CardModel, DraggablePlane, Pinhead, RopeMesh } from './components'
 import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } from './hooks'
 
-export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: TetheredCardProps = {}) => {
+export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
   // Get configuration from context
   const config = useConfigContext()
-  const { setCardPosition, setPinheadPosition, updateRopeVisuals, ropeColor, ropeRadius } = useSceneContext()
+  const { setCardPosition, updateRopeVisuals, ropeColor, ropeRadius } = useSceneContext()
 
   // Physics settings from config context
   const maxSpeed = config.cardPhysics.maxSpeed
@@ -40,14 +39,15 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
 
   // Physics positions calculation
   const restingY = position[1] - 2 // Lower than the fixed point
+  const xOffset = -0.5 // Move to the left on X-axis
 
   // Calculate all joint positions
   const jointPositions = [
     position, // Fixed point - keep original position
-    [position[0] + ROPE_SEGMENT_LENGTH, restingY, position[2]], // j2
-    [position[0] + ROPE_SEGMENT_LENGTH * 2, restingY, position[2]], // j3
-    [position[0] + ROPE_SEGMENT_LENGTH * 3, restingY, position[2]], // j4
-    [position[0] + ROPE_SEGMENT_LENGTH * 4, restingY, position[2]], // card
+    [position[0] + ROPE_SEGMENT_LENGTH + xOffset, restingY, position[2]], // j2
+    [position[0] + ROPE_SEGMENT_LENGTH * 2 + xOffset, restingY, position[2]], // j3
+    [position[0] + ROPE_SEGMENT_LENGTH * 3 + xOffset, restingY, position[2]], // j4
+    [position[0] + ROPE_SEGMENT_LENGTH * 4 + xOffset, restingY, position[2]], // card
   ] as [number, number, number][]
 
   const finalCardPosition = jointPositions[4]
@@ -146,19 +146,6 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
     minSpeed,
   })
 
-  // Pin position offset relative to fixed position
-  const pinheadPosition: [number, number, number] = [position[0], position[1] + PINHEAD_OFFSET, position[2]]
-
-  // Update shared state
-  useEffect(() => {
-    if (onPinheadStateChange) {
-      onPinheadStateChange(pinheadPosition, false)
-    }
-
-    // Update pinhead position in scene context
-    setPinheadPosition(new THREE.Vector3(...pinheadPosition))
-  }, [pinheadPosition, onPinheadStateChange, setPinheadPosition])
-
   return (
     <>
       <RigidBody ref={fixedRef} position={jointPositions[0]} {...SEGMENT_PROPS} type='fixed' />
@@ -197,7 +184,11 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
       </group>
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
-      <Pinhead position={pinheadPosition} color={PINHEAD_COLOR} size={PINHEAD_SIZE} />
+      <Pinhead
+        position={[finalCardPosition[0] - 0.015, finalCardPosition[1] + 2.15, finalCardPosition[2]]}
+        color={PINHEAD_COLOR}
+        size={PINHEAD_SIZE}
+      />
     </>
   )
 }

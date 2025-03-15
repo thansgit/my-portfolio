@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Sphere, Billboard } from '@react-three/drei'
-import { Vector3, Mesh, MeshStandardMaterial } from 'three'
+import { Vector3, Mesh, Group } from 'three'
 
 interface PinheadProps {
   position?: [number, number, number]
@@ -19,17 +19,13 @@ export const Pinhead: React.FC<PinheadProps> = ({
   metalness = 0.9,
   roughness = 0.1,
 }) => {
-  const pinRef = useRef<Mesh>(null)
-  const materialRef = useRef<MeshStandardMaterial>(null)
-
   return (
     <group position={new Vector3(...position)}>
       <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
         <group>
           {/* Spherical pin head with metallic material */}
-          <Sphere ref={pinRef} args={[size, 8, 8]}>
+          <Sphere args={[size, 8, 8]}>
             <meshStandardMaterial
-              ref={materialRef}
               color={color}
               emissive={'#000000'}
               metalness={metalness}
@@ -41,7 +37,7 @@ export const Pinhead: React.FC<PinheadProps> = ({
 
         {/* Pin stem - cylindrical shape attached to the bottom of the spherical head */}
         <mesh position={[0, -size * 1.2, 0]}>
-          <cylinderGeometry args={[size * 0.15, size * 0.3, size * 2, 16]} />
+          <cylinderGeometry args={[size * 0.35, size * 0.3, size * 2, 3]} />
           <meshBasicMaterial color='#c0c0c0' />
         </mesh>
       </Billboard>

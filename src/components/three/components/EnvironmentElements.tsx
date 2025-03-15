@@ -1,11 +1,9 @@
 'use client'
 
-import * as THREE from 'three'
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei'
 import { useSceneContext } from '@/components/three/hooks'
 import { BACKGROUND_MESH_POSITION, BACKGROUND_MESH_SIZE, BACKGROUND_COLOR } from '../utils/constants'
 
-// Card-focused lightformers that points at the card
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {
   return (
     <>
@@ -32,12 +30,7 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
 
 export const Environment = ({ cardPosition }: { cardPosition?: [number, number, number] }) => {
   // Get state from context
-  const { cardRotationCount, pinheadPosition } = useSceneContext()
-
-  // Convert Vector3 to array if needed
-  const pinheadPos = pinheadPosition
-    ? ([pinheadPosition.x, pinheadPosition.y, pinheadPosition.z] as [number, number, number])
-    : ([0, 0, 0] as [number, number, number])
+  const { cardRotationCount } = useSceneContext()
 
   return (
     <>

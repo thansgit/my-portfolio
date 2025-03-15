@@ -33,7 +33,6 @@ export const CARD_SWING_FREQUENCY = 0.4
 export const CARD_ROTATION_DAMPING = 0.9
 
 // ===== PINHEAD CONSTANTS =====
-export const PINHEAD_OFFSET = 0.18
 export const PINHEAD_SIZE = 0.08
 export const PINHEAD_COLOR = 'red'
 export const PINHEAD_GLOW_TIMEOUT = 1500 // ms
