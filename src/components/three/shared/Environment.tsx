@@ -1,7 +1,9 @@
 'use client'
 
-import { ShaderBackground } from '@/components/three/environment/ShaderBackground'
+import * as THREE from 'three'
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei'
+import { useSceneContext } from '@/components/three/hooks'
+import { BACKGROUND_MESH_POSITION, BACKGROUND_MESH_SIZE, BACKGROUND_COLOR } from '../utils/constants'
 
 // Card-focused lightformers that points at the card
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {
@@ -28,28 +30,28 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
   )
 }
 
-export const Environment = ({
-  cardPosition,
-  pinheadPosition,
-  isPinheadGlowing,
-  isMobile = false,
-}: {
-  cardPosition?: [number, number, number]
-  pinheadPosition?: [number, number, number]
-  isPinheadGlowing?: boolean
-  isMobile?: boolean
-}) => {
+export const Environment = ({ cardPosition }: { cardPosition?: [number, number, number] }) => {
+  // Get state from context
+  const { isCardGlowing, cardRotationCount, pinheadPosition } = useSceneContext()
+
+  // Determine glow state - card is glowing if it has rotations
+  const shouldGlow = isCardGlowing || cardRotationCount > 0
+
+  // Convert Vector3 to array if needed
+  const pinheadPos = pinheadPosition
+    ? ([pinheadPosition.x, pinheadPosition.y, pinheadPosition.z] as [number, number, number])
+    : ([0, 0, 0] as [number, number, number])
+
   return (
     <>
-      {/* <ShaderBackground /> */}
-      <mesh position={[0, 0, -20]} renderOrder={-30000}>
-        <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial color='#252730' depthWrite={false} />
+      <mesh position={BACKGROUND_MESH_POSITION} renderOrder={-30000}>
+        <planeGeometry args={BACKGROUND_MESH_SIZE} />
+        <meshBasicMaterial color={BACKGROUND_COLOR} depthWrite={false} />
       </mesh>
 
-      {isPinheadGlowing && pinheadPosition && (
+      {shouldGlow && pinheadPosition && (
         <pointLight
-          position={[pinheadPosition[0], pinheadPosition[1] + 0.2, pinheadPosition[2] + 1]}
+          position={[pinheadPos[0], pinheadPos[1] + 0.2, pinheadPos[2] + 1]}
           intensity={50}
           color='#ff5555'
           distance={50}
