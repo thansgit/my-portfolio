@@ -31,11 +31,8 @@ export const CARD_POSITION_OFFSET = [0, 0.3, 0] as [number, number, number]
 export const CARD_SWING_AMPLITUDE = 0.4
 export const CARD_SWING_FREQUENCY = 0.4
 export const CARD_ROTATION_DAMPING = 0.9
-
-// ===== PINHEAD CONSTANTS =====
-export const PINHEAD_SIZE = 0.08
 export const PINHEAD_COLOR = 'red'
-export const PINHEAD_GLOW_TIMEOUT = 1500 // ms
+export const PINHEAD_SIZE = 0.08
 
 // ===== INTERACTION CONSTANTS =====
 export const DRAGGABLE_PLANE_SIZE = 2.5
@@ -54,9 +51,9 @@ export const BACKGROUND_COLOR = '#252730'
 // ===== MATERIAL CONSTANTS =====
 // Card material constants
 export const CARD_MATERIAL = {
-  roughness: 0.3, // Slightly rougher for better visibility
-  metalness: 0.7, // Slightly less metallic
-  envMapIntensity: 1.5, // More environment reflection
+  roughness: 0.3,
+  metalness: 0.7,
+  envMapIntensity: 1.5,
   reflectivity: 1,
   clearcoat: 1,
   clearcoatRoughness: 0.2,

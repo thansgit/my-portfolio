@@ -15,16 +15,10 @@ export const ViewportContext = createContext<ViewportState>({
   isVisible: true,
 })
 
-/**
- * Hook for accessing viewport state context
- */
 export const useViewport = () => {
   return useContext(ViewportContext)
 }
 
-/**
- * Provider component for viewport state
- */
 export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { size } = useThree()
   const [state, setState] = useState<ViewportState>({

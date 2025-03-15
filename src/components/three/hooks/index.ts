@@ -1,6 +1,3 @@
-// Export camera hooks
-export { useScreenCenter, useScreenToWorld } from './useCamera'
-
 // Export viewport hooks
 export { useViewport, ViewportContext, ViewportProvider, type ViewportState } from './useViewport'
 

@@ -1,24 +1,13 @@
 'use client'
 
-import React, { useEffect, Suspense } from 'react'
+import React, { Suspense } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { ViewportContext, useViewport } from '@/components/three/hooks'
-import { MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants'
 import { TetheredCard } from '@/components/three/experiences/TetheredCard'
 import { Environment } from '@/components/three/components'
+import { calculateCardPosition } from '@/components/three/utils/threeHelpers'
 
-// Helper function to calculate card position based on viewport and device type
-const calculateCardPosition = (
-  viewport: { width: number; height: number },
-  isMobile: boolean,
-): [number, number, number] => {
-  const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
-  const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2)
-  return [xPosition, 2.5, 0]
-}
-
-// Wrapper component for the TetheredCard element
 const TetheredCardWrapper = () => {
   const { viewport } = useThree()
   const { isMobile } = useViewport()

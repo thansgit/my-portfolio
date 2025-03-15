@@ -8,12 +8,10 @@ export const LoadingTracker: React.FC<{ children: React.ReactNode }> = ({ childr
   const { progress, loaded, active } = useProgress()
   const { setLoaded, setProgress } = useLoading()
 
-  // Update progress in real-time
   useEffect(() => {
     setProgress(progress)
   }, [progress, setProgress])
 
-  // Update loaded state when appropriate
   useEffect(() => {
     if (loaded || (progress >= 100 && !active)) {
       // Small delay ensures everything is definitely ready

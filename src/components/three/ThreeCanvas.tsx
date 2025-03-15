@@ -49,14 +49,12 @@ export const Scene = () => {
             powerPreference: 'high-performance',
             stencil: false,
             depth: true,
-            alpha: true,
             antialias: true,
             precision: 'highp',
           }}
           style={{
             pointerEvents: 'auto',
             background: 'transparent',
-            // Hide any rendering artifacts during loading
             opacity: isLoaded ? 1 : 0,
             transition: 'opacity 0.3s ease-in-out',
           }}
