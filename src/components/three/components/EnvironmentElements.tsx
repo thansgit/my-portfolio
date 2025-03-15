@@ -32,10 +32,7 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
 
 export const Environment = ({ cardPosition }: { cardPosition?: [number, number, number] }) => {
   // Get state from context
-  const { isCardGlowing, cardRotationCount, pinheadPosition } = useSceneContext()
-
-  // Determine glow state - card is glowing if it has rotations
-  const shouldGlow = isCardGlowing || cardRotationCount > 0
+  const { cardRotationCount, pinheadPosition } = useSceneContext()
 
   // Convert Vector3 to array if needed
   const pinheadPos = pinheadPosition
@@ -48,16 +45,6 @@ export const Environment = ({ cardPosition }: { cardPosition?: [number, number, 
         <planeGeometry args={BACKGROUND_MESH_SIZE} />
         <meshBasicMaterial color={BACKGROUND_COLOR} depthWrite={false} />
       </mesh>
-
-      {shouldGlow && pinheadPosition && (
-        <pointLight
-          position={[pinheadPos[0], pinheadPos[1] + 0.2, pinheadPos[2] + 1]}
-          intensity={50}
-          color='#ff5555'
-          distance={50}
-          decay={2}
-        />
-      )}
 
       {/* Environment for card reflections only */}
       <DreiEnvironment background={false} resolution={128} preset={undefined}>

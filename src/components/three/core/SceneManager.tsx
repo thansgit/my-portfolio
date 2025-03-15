@@ -15,7 +15,7 @@ const TetheredCardWrapper = () => {
   const { viewport } = useThree()
   const { isMobile } = useViewport()
   const { updatePinheadState } = useEnvironment()
-  const { setCardPosition, setPinheadPosition, setCardGlowing } = useSceneContext()
+  const { setPinheadPosition } = useSceneContext()
 
   // Calculate position based on device type
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
@@ -29,7 +29,6 @@ const TetheredCardWrapper = () => {
 
     // Update scene context (for shared state)
     setPinheadPosition(new THREE.Vector3().fromArray(position))
-    setCardGlowing(isGlowing)
   }
 
   return <TetheredCard position={initialPosition} onPinheadStateChange={handlePinheadStateChange} />
@@ -63,7 +62,7 @@ export const SceneManager: React.FC = () => {
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2)
   const cardPosition: [number, number, number] = [xPosition, 2.5, 0]
 
-  // Turn off glowing when content becomes invisible
+  // Reset pinhead state when content becomes invisible
   useEffect(() => {
     if (!viewportState.isVisible) {
       updatePinheadState([0, 0, 0], false)

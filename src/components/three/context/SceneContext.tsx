@@ -18,7 +18,6 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
   const [pinheadPosition, setPinheadPosition] = useState<THREE.Vector3>(
     new THREE.Vector3(initialCardPosition[0], initialCardPosition[1] + 0.18, initialCardPosition[2]),
   )
-  const [isCardGlowing, setCardGlowing] = useState(false)
   const [cardRotationCount, setCardRotationCount] = useState(0)
 
   // Rope visuals
@@ -39,7 +38,6 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
     // State
     cardPosition,
     pinheadPosition,
-    isCardGlowing,
     cardRotationCount,
     ropeColor,
     ropeRadius,
@@ -47,7 +45,6 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
     // Handlers
     setCardPosition,
     setPinheadPosition,
-    setCardGlowing,
     incrementCardRotation,
     updateRopeVisuals,
   }

@@ -2,9 +2,7 @@
 
 import React, { useRef } from 'react'
 import { Sphere, Billboard } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { Vector3, Mesh, MeshStandardMaterial, PointLight } from 'three'
-import { useSpring, animated } from '@react-spring/three'
+import { Vector3, Mesh, MeshStandardMaterial } from 'three'
 
 interface PinheadProps {
   position?: [number, number, number]
@@ -12,7 +10,6 @@ interface PinheadProps {
   color?: string
   metalness?: number
   roughness?: number
-  isGlowing?: boolean
 }
 
 export const Pinhead: React.FC<PinheadProps> = ({
@@ -21,39 +18,20 @@ export const Pinhead: React.FC<PinheadProps> = ({
   color = '#c0c0c0', // Silver color
   metalness = 0.9,
   roughness = 0.1,
-  isGlowing = false,
 }) => {
   const pinRef = useRef<Mesh>(null)
   const materialRef = useRef<MeshStandardMaterial>(null)
-
-  const { emissive, lightIntensity, baseScale } = useSpring({
-    baseScale: isGlowing ? 1.1 : 1.0,
-    emissive: isGlowing ? '#ff3333' : '#000000',
-    lightIntensity: isGlowing ? 2 : 0,
-    config: { mass: 1, tension: 180, friction: 60 },
-  })
-
-  useFrame(({ clock }) => {
-    if (isGlowing && pinRef.current) {
-      const currentBaseScale = baseScale.get()
-      const pulseFactor = Math.sin(clock.getElapsedTime() * 3) * 0.1 + 1.0
-
-      const finalScale = currentBaseScale * pulseFactor
-      pinRef.current.scale.set(finalScale, finalScale, finalScale)
-    }
-  })
 
   return (
     <group position={new Vector3(...position)}>
       <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
         <group>
-          {/* Spherical pin head with metallic material - scale handled in useFrame */}
+          {/* Spherical pin head with metallic material */}
           <Sphere ref={pinRef} args={[size, 8, 8]}>
-            <animated.meshStandardMaterial
+            <meshStandardMaterial
               ref={materialRef}
               color={color}
-              emissive={emissive} // Controlled by spring animation
-              emissiveIntensity={2}
+              emissive={'#000000'}
               metalness={metalness}
               roughness={roughness}
               depthTest={true}

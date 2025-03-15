@@ -1,6 +1,5 @@
 'use client'
 
-import { Particles } from '@/components/three'
 import { useSceneContext, useConfigContext } from '@/components/three/hooks'
 import {
   ROPE_SEGMENT_LENGTH,
@@ -10,7 +9,6 @@ import {
   PINHEAD_COLOR,
   DRAGGABLE_PLANE_SIZE,
   BALL_COLLIDER_SIZES,
-  PINHEAD_GLOW_TIMEOUT,
 } from '@/components/three/utils/constants'
 import { ExtendedRigidBody, TetheredCardProps } from '@/components/three/utils/types'
 import { useFrame } from '@react-three/fiber'
@@ -23,15 +21,7 @@ import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } fro
 export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: TetheredCardProps = {}) => {
   // Get configuration from context
   const config = useConfigContext()
-  const {
-    setCardPosition,
-    setPinheadPosition,
-    setCardGlowing,
-    incrementCardRotation,
-    updateRopeVisuals,
-    ropeColor,
-    ropeRadius,
-  } = useSceneContext()
+  const { setCardPosition, setPinheadPosition, updateRopeVisuals, ropeColor, ropeRadius } = useSceneContext()
 
   // Physics settings from config context
   const maxSpeed = config.cardPhysics.maxSpeed
@@ -47,7 +37,6 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
   // Local interaction state
   const [dragged, setDragged] = useState<THREE.Vector3 | false>(false)
   const [hovered, setHovered] = useState(false)
-  const [isGlowing, setIsGlowing] = useState(false)
 
   // Physics positions calculation
   const restingY = position[1] - 2 // Lower than the fixed point
@@ -89,44 +78,12 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
     }
   })
 
-  // Track rotation counters for detecting new rotations
-  const lastClockwiseRef = useRef(0)
-  const lastCounterClockwiseRef = useRef(0)
-  const glowTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Use the rotation tracker with rotation detection callback
+  // Use the rotation tracker
   const { clockwiseRotations, counterClockwiseRotations } = useRotationTracker({
     card: cardRef,
     fixed: fixedRef,
     isDragging: dragged !== false,
   })
-
-  // Watch for changes in rotations and trigger the glow effect
-  useEffect(() => {
-    const hasNewRotation =
-      clockwiseRotations > lastClockwiseRef.current || counterClockwiseRotations > lastCounterClockwiseRef.current
-
-    lastClockwiseRef.current = clockwiseRotations
-    lastCounterClockwiseRef.current = counterClockwiseRotations
-
-    if (hasNewRotation) {
-      // Update local state
-      setIsGlowing(true)
-
-      // Update shared state through context
-      setCardGlowing(true)
-      incrementCardRotation()
-
-      if (glowTimeoutRef.current) {
-        clearTimeout(glowTimeoutRef.current)
-      }
-
-      glowTimeoutRef.current = setTimeout(() => {
-        setIsGlowing(false)
-        setCardGlowing(false)
-      }, PINHEAD_GLOW_TIMEOUT)
-    }
-  }, [clockwiseRotations, counterClockwiseRotations, setCardGlowing, incrementCardRotation])
 
   // Calculate rope length for physics
   const restingLength = ROPE_SEGMENT_LENGTH * 5
@@ -192,15 +149,15 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
   // Pin position offset relative to fixed position
   const pinheadPosition: [number, number, number] = [position[0], position[1] + PINHEAD_OFFSET, position[2]]
 
-  // Update shared state and notify parent component when pinhead state changes
+  // Update shared state
   useEffect(() => {
     if (onPinheadStateChange) {
-      onPinheadStateChange(pinheadPosition, isGlowing)
+      onPinheadStateChange(pinheadPosition, false)
     }
 
     // Update pinhead position in scene context
     setPinheadPosition(new THREE.Vector3(...pinheadPosition))
-  }, [isGlowing, pinheadPosition, onPinheadStateChange, setPinheadPosition])
+  }, [pinheadPosition, onPinheadStateChange, setPinheadPosition])
 
   return (
     <>
@@ -240,14 +197,7 @@ export const TetheredCard = ({ position = [0, 0, 0], onPinheadStateChange }: Tet
       </group>
       {/* Add the visual rope mesh */}
       <RopeMesh points={points} color={ropeColor} radius={ropeRadius} />
-      <Pinhead position={pinheadPosition} color={PINHEAD_COLOR} size={PINHEAD_SIZE} isGlowing={isGlowing} />
-      <Particles
-        triggerCount={isGlowing ? 1 : 0}
-        position={pinheadPosition}
-        particleSize={config.particleSettings.size}
-        particleCount={config.particleSettings.count}
-        confetti={true}
-      />
+      <Pinhead position={pinheadPosition} color={PINHEAD_COLOR} size={PINHEAD_SIZE} />
     </>
   )
 }

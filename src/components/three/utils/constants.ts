@@ -46,10 +46,6 @@ export const BALL_COLLIDER_SIZES = {
   JOINT_4: 0.05,
 }
 
-// ===== PARTICLE CONSTANTS =====
-export const PARTICLE_SIZE = 0.075
-export const PARTICLE_COUNT = 200
-
 // ===== RENDERING CONSTANTS =====
 // Background mesh constants
 export const BACKGROUND_MESH_POSITION = [0, 0, -20] as [number, number, number]

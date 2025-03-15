@@ -11,7 +11,7 @@ export { TetheredCard } from './experiences/TetheredCard'
 export { Pinhead } from './experiences/TetheredCard/components'
 
 // Components
-export { Environment, ModelWrapper, Particles, ShaderBackground } from './components'
+export { Environment, ModelWrapper, ShaderBackground } from './components'
 
 // Context providers and hooks
 export {

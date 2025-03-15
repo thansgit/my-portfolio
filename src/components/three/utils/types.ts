@@ -21,7 +21,6 @@ export interface SceneContextState {
   pinheadPosition: THREE.Vector3
 
   // Card state
-  isCardGlowing: boolean
   cardRotationCount: number
 
   // Theme settings
@@ -31,7 +30,6 @@ export interface SceneContextState {
   // Action handlers
   setCardPosition: (position: THREE.Vector3) => void
   setPinheadPosition: (position: THREE.Vector3) => void
-  setCardGlowing: (isGlowing: boolean) => void
   incrementCardRotation: () => void
   updateRopeVisuals: (color: string, radius: number) => void
 }
@@ -44,9 +42,6 @@ export interface EnvironmentContextState {
   // Positions
   cardPosition?: [number, number, number]
   pinheadPosition?: [number, number, number]
-
-  // States
-  isPinheadGlowing: boolean
 
   // Handlers
   updatePinheadState: (position: [number, number, number], isGlowing: boolean) => void
@@ -66,12 +61,6 @@ export interface ConfigContextState {
     minRadius: number
     colorStretchSpeed: number
     radiusStretchSpeed: number
-  }
-
-  // Particle settings
-  particleSettings: {
-    size: number
-    count: number
   }
 
   // Colors and themes

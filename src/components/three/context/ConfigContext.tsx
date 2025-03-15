@@ -2,17 +2,35 @@
 
 import React, { createContext, useContext, ReactNode } from 'react'
 import {
-  ROPE_INITIAL_RADIUS,
-  PINHEAD_COLOR,
   CARD_DEFAULT_MAX_SPEED,
   CARD_DEFAULT_MIN_SPEED,
-  PARTICLE_SIZE,
-  PARTICLE_COUNT,
+  ROPE_INITIAL_RADIUS,
+  ROPE_MIN_RADIUS,
   ROPE_COLOR_STRETCH_SPEED,
   ROPE_RADIUS_STRETCH_SPEED,
-  ROPE_MIN_RADIUS,
+  PINHEAD_COLOR,
 } from '../utils/constants'
 import { ConfigContextState } from '../utils/types'
+
+// Default configuration values
+export const defaultConfig: ConfigContextState = {
+  cardPhysics: {
+    maxSpeed: CARD_DEFAULT_MAX_SPEED,
+    minSpeed: CARD_DEFAULT_MIN_SPEED,
+  },
+
+  ropeStyling: {
+    initialRadius: ROPE_INITIAL_RADIUS,
+    minRadius: ROPE_MIN_RADIUS,
+    colorStretchSpeed: ROPE_COLOR_STRETCH_SPEED,
+    radiusStretchSpeed: ROPE_RADIUS_STRETCH_SPEED,
+  },
+
+  colors: {
+    pinhead: PINHEAD_COLOR,
+    ropeDefault: '#000000',
+  },
+}
 
 // Create the context with default values from constants
 export const ConfigContext = createContext<ConfigContextState>({
@@ -26,11 +44,6 @@ export const ConfigContext = createContext<ConfigContextState>({
     minRadius: ROPE_MIN_RADIUS,
     colorStretchSpeed: ROPE_COLOR_STRETCH_SPEED,
     radiusStretchSpeed: ROPE_RADIUS_STRETCH_SPEED,
-  },
-
-  particleSettings: {
-    size: PARTICLE_SIZE,
-    count: PARTICLE_COUNT,
   },
 
   colors: {
@@ -57,11 +70,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children, custom
       minRadius: ROPE_MIN_RADIUS,
       colorStretchSpeed: ROPE_COLOR_STRETCH_SPEED,
       radiusStretchSpeed: ROPE_RADIUS_STRETCH_SPEED,
-    },
-
-    particleSettings: {
-      size: PARTICLE_SIZE,
-      count: PARTICLE_COUNT,
     },
 
     colors: {
