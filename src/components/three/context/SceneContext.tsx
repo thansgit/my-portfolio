@@ -21,11 +21,6 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
   const [ropeColor, setRopeColor] = useState('#000000')
   const [ropeRadius, setRopeRadius] = useState(0.04) // Default from constants
 
-  // Update handlers
-  const incrementCardRotation = () => {
-    setCardRotationCount((prev) => prev + 1)
-  }
-
   const updateRopeVisuals = (color: string, radius: number) => {
     setRopeColor(color)
     setRopeRadius(radius)
@@ -40,7 +35,7 @@ export const SceneProvider: React.FC<SceneProviderProps> = ({ children, initialC
 
     // Handlers
     setCardPosition,
-    incrementCardRotation,
+    setCardRotationCount,
     updateRopeVisuals,
   }
 

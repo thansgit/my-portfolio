@@ -24,7 +24,7 @@ import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } fro
 export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
   // Get configuration from context
   const { cardPhysics } = useConfigContext()
-  const { setCardPosition, updateRopeVisuals, ropeColor, ropeRadius } = useSceneContext()
+  const { setCardPosition, updateRopeVisuals, ropeColor, ropeRadius, setCardRotationCount } = useSceneContext()
 
   // Physics settings from config context
   const maxSpeed = cardPhysics.maxSpeed
@@ -83,11 +83,17 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
   })
 
   // Use the rotation tracker
-  const { clockwiseRotations, counterClockwiseRotations } = useRotationTracker({
+  const { rotations } = useRotationTracker({
     card: cardRef,
     fixed: fixedRef,
-    isDragging: dragged !== false,
+    isDragging: Boolean(dragged),
   })
+
+  // Update rotation count in scene context
+  useEffect(() => {
+    console.log(`Setting rotation count in SceneContext: ${rotations}`)
+    setCardRotationCount(rotations)
+  }, [rotations, setCardRotationCount])
 
   // Calculate rope length for physics
   const restingLength = ROPE_SEGMENT_LENGTH * 5

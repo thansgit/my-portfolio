@@ -22,7 +22,7 @@ export interface SceneContextState {
   ropeRadius: number
 
   setCardPosition: (position: THREE.Vector3) => void
-  incrementCardRotation: () => void
+  setCardRotationCount: (count: number) => void
   updateRopeVisuals: (color: string, radius: number) => void
 }
 

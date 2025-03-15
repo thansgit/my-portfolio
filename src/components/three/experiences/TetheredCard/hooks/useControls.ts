@@ -22,17 +22,18 @@ export interface RotationTrackerProps {
 }
 
 /**
- * Tracks clockwise and counter-clockwise rotations of a tethered object
- * by monitoring its movement through quadrants
+ * Tracks rotations of a tethered object by monitoring its movement through quadrants
  */
 export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerProps) => {
   // Current quadrant and history
   const currentQuadrant = useRef<Quadrant | null>(null)
   const lastQuadrants = useRef<Quadrant[]>([])
 
-  // Rotation counts
-  const clockwiseRotations = useRef<number>(0)
-  const counterClockwiseRotations = useRef<number>(0)
+  // Total rotation count
+  const totalRotations = useRef<number>(0)
+
+  // Track previous dragging state to detect changes
+  const wasDragging = useRef<boolean>(false)
 
   // Animation frame reference
   const frameId = useRef<number | null>(null)
@@ -51,6 +52,20 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   const MIN_ROTATION_INTERVAL = 250 // Minimum time between detected rotations (ms)
   const MIN_DISTANCE_FROM_CENTER = 0.05 // Minimum distance to consider quadrant changes valid
   const MIN_MOVEMENT_THRESHOLD = 0.001 // Minimum movement to consider the card moving
+
+  // Reset rotation count when a new drag starts
+  useEffect(() => {
+    // If we weren't dragging before but now we are, reset the count
+    if (isDragging && !wasDragging.current) {
+      console.log('New drag detected - resetting rotation count')
+      totalRotations.current = 0
+      lastQuadrants.current = []
+      currentQuadrant.current = null
+    }
+
+    // Update previous dragging state
+    wasDragging.current = isDragging
+  }, [isDragging])
 
   /**
    * Get the current quadrant from XY position
@@ -96,34 +111,25 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
 
     const last5 = history.slice(-5)
 
-    // Clockwise patterns (Q1→Q2→Q3→Q4→Q1, etc.)
-    const clockwisePatterns = [
+    // Rotation patterns (both clockwise and counter-clockwise)
+    const rotationPatterns = [
+      // Clockwise patterns
       [Quadrant.Q1, Quadrant.Q2, Quadrant.Q3, Quadrant.Q4, Quadrant.Q1],
       [Quadrant.Q2, Quadrant.Q3, Quadrant.Q4, Quadrant.Q1, Quadrant.Q2],
       [Quadrant.Q3, Quadrant.Q4, Quadrant.Q1, Quadrant.Q2, Quadrant.Q3],
       [Quadrant.Q4, Quadrant.Q1, Quadrant.Q2, Quadrant.Q3, Quadrant.Q4],
-    ]
-
-    // Counter-clockwise patterns (Q1→Q4→Q3→Q2→Q1, etc.)
-    const counterClockwisePatterns = [
+      // Counter-clockwise patterns
       [Quadrant.Q1, Quadrant.Q4, Quadrant.Q3, Quadrant.Q2, Quadrant.Q1],
       [Quadrant.Q2, Quadrant.Q1, Quadrant.Q4, Quadrant.Q3, Quadrant.Q2],
       [Quadrant.Q3, Quadrant.Q2, Quadrant.Q1, Quadrant.Q4, Quadrant.Q3],
       [Quadrant.Q4, Quadrant.Q3, Quadrant.Q2, Quadrant.Q1, Quadrant.Q4],
     ]
 
-    // Check for clockwise rotation
-    if (clockwisePatterns.some((pattern) => checkSequence(last5, pattern))) {
+    // Check for any rotation
+    if (rotationPatterns.some((pattern) => checkSequence(last5, pattern))) {
       if (isMoving.current) {
-        clockwiseRotations.current++
-      }
-      lastQuadrants.current = [last5[last5.length - 1]]
-      lastRotationTime.current = now
-    }
-    // Check for counter-clockwise rotation
-    else if (counterClockwisePatterns.some((pattern) => checkSequence(last5, pattern))) {
-      if (isMoving.current) {
-        counterClockwiseRotations.current++
+        totalRotations.current++
+        console.log(`Rotation detected! New total: ${totalRotations.current}, Quadrant sequence: ${last5.join(' → ')}`)
       }
       lastQuadrants.current = [last5[last5.length - 1]]
       lastRotationTime.current = now
@@ -221,8 +227,7 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   }, [])
 
   return {
-    clockwiseRotations: clockwiseRotations.current,
-    counterClockwiseRotations: counterClockwiseRotations.current,
+    rotations: totalRotations.current,
   }
 }
 
@@ -230,52 +235,41 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
  * Manages browser touch events and cursor styles for interactive 3D objects
  */
 export const useTouchHandling = (dragged: THREE.Vector3 | false, hovered: boolean) => {
-  // Prevent default touch behavior when dragging
-  useEffect(() => {
-    const preventTouchDefault = (e: TouchEvent) => {
-      // Only prevent default if we're actually dragging the object
-      if (dragged && e.cancelable) {
-        e.preventDefault()
-      }
-    }
-
-    // Only add the event listener when dragging
-    if (dragged) {
-      document.addEventListener('touchmove', preventTouchDefault, { passive: false })
-      return () => document.removeEventListener('touchmove', preventTouchDefault)
-    }
-
-    return undefined
-  }, [dragged])
-
-  // Add a separate effect to handle touch events on the canvas
   useEffect(() => {
     // Find the canvas element
     const canvas = document.querySelector('canvas')
 
-    if (!canvas) return
-
-    // Function to handle touchstart on the canvas
-    const handleCanvasTouchStart = (e: TouchEvent) => {
-      // Don't prevent default here to allow scrolling when not interacting with the 3D object
-    }
-
-    // Function to handle touchmove on the canvas
-    const handleCanvasTouchMove = (e: TouchEvent) => {
+    // Function to handle touchmove events
+    const handleTouchMove = (e: TouchEvent) => {
       // Only prevent default if we're dragging the object
       if (dragged && e.cancelable) {
         e.preventDefault()
       }
     }
 
-    // Add event listeners to the canvas only
-    canvas.addEventListener('touchstart', handleCanvasTouchStart)
-    canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false })
+    // Function for touchstart (empty but kept for potential future use)
+    const handleTouchStart = (e: TouchEvent) => {
+      // Don't prevent default here to allow scrolling when not interacting
+    }
+
+    // Add event listeners
+    if (canvas) {
+      canvas.addEventListener('touchstart', handleTouchStart)
+      canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    }
+
+    // Add document-level listener only when dragging
+    if (dragged) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+    }
 
     // Clean up
     return () => {
-      canvas.removeEventListener('touchstart', handleCanvasTouchStart)
-      canvas.removeEventListener('touchmove', handleCanvasTouchMove)
+      if (canvas) {
+        canvas.removeEventListener('touchstart', handleTouchStart)
+        canvas.removeEventListener('touchmove', handleTouchMove)
+      }
+      document.removeEventListener('touchmove', handleTouchMove)
     }
   }, [dragged])
 
