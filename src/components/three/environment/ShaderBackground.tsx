@@ -18,6 +18,7 @@ export const ShaderBackground = () => {
         iResolution: { value: new THREE.Vector2(size.width, size.height) },
         iAspect: { value: size.width / size.height },
         iScale: { value: 1 },
+        iScreenScale: { value: 1.0 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -31,6 +32,7 @@ export const ShaderBackground = () => {
         uniform vec2 iResolution;
         uniform float iAspect;
         uniform float iScale;
+        uniform float iScreenScale;
         varying vec2 vUv;
         
         /* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
@@ -96,16 +98,28 @@ export const ShaderBackground = () => {
         }
         
         void main() {
+          // Define colors from the button gradient
+          vec3 neonBlue = vec3(0.0, 0.5, 1.0);     // Bright blue from the top border
+          vec3 neonViolet = vec3(0.8, 0.0, 1.0);   // Violet/purple from the bottom border
+          
           vec2 uv = vUv * iScale;
           vec2 p = uv * iResolution.xy / iResolution.x;
-          vec3 p3 = vec3(p, iTime*0.015) + vec3(iTime*0.015, 0.0, 0.0);
           
-          float value = pow(abs(simplex3d(p3*2.0)), 1.5);
-          float red = 0.5 + 0.5*simplex3d(p3*2.0 + 38274.9);
-          float green = abs(0.2+0.5*simplex3d(p3*2.0 + 3824.9));
-          float blue = abs(simplex3d(p3*2.0 + 98274.9));
+          // Apply screen-dependent scaling to make pattern size consistent
+          vec3 p3 = vec3(p * iScreenScale, iTime*0.015) + vec3(iTime*0.015, 0.0, 0.0);
           
-          gl_FragColor = vec4(sqrt(value*vec3(red, green, blue)), 1.0);
+          // Calculate noise value for color mixing
+          float noiseValue = simplex3d(p3*2.0);
+          float intensity = pow(abs(noiseValue), 1.5);
+          
+          // Mix between blue and violet based on noise
+          float mixFactor = 0.5 + 0.5 * sin(noiseValue * 3.0 + iTime * 0.5);
+          vec3 color = mix(neonViolet, neonBlue, mixFactor);
+          
+          // Apply intensity for glow effect
+          color *= 1.2 * intensity;
+          
+          gl_FragColor = vec4(color, 1.0);
         }
       `,
       // transparent: false,
@@ -120,6 +134,14 @@ export const ShaderBackground = () => {
   useEffect(() => {
     material.current.uniforms.iResolution.value.set(size.width, size.height)
     material.current.uniforms.iAspect.value = size.width / size.height
+
+    // Calculate a scaling factor based on screen width
+    // This ensures the pattern stays consistent in size across devices
+    const baseWidth = 375 // Reference width (mobile)
+    const scaleFactor = Math.max(1.0, size.width / baseWidth)
+    // Reducing the base value and multiplier to make pattern larger
+    const responsiveScale = 1.5 + scaleFactor * 0.1 // Reduced from 3.0 + (scaleFactor * 0.8)
+    material.current.uniforms.iScreenScale.value = responsiveScale
 
     // Aseta sopiva skaalaus näytön koon mukaan
     // material.current.uniforms.iScale.value = 1

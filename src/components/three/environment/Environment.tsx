@@ -41,7 +41,11 @@ export const Environment = ({
 }) => {
   return (
     <>
-      <ShaderBackground />
+      {/* <ShaderBackground /> */}
+      <mesh position={[0, 0, -20]} renderOrder={-30000}>
+        <planeGeometry args={[100, 100]} />
+        <meshBasicMaterial color='#252730' depthWrite={false} />
+      </mesh>
 
       {isPinheadGlowing && pinheadPosition && (
         <pointLight

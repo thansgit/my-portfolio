@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 const navigationItems = [
   { id: 'about', label: 'About' },
@@ -82,61 +83,49 @@ export function Navigation() {
     scrollToMainContent()
   }
 
-  const highlightPosition = `${activeIndex * 25}%`
-
   const NavigationLinks = () => (
     <>
-      {/* Background highlight box that moves */}
-      <div
-        className={`/* [Active Highlight] Highlight for active navigation item */ absolute transition-all duration-300 ease-out ${mounted ? 'opacity-100' : 'opacity-0'} `}
-        style={{
-          left: highlightPosition,
-          width: '25%',
-          top: '0.25rem',
-          bottom: '0.25rem',
-          right: 'auto',
-        }}
-      >
-        <div
-          className={`/* [Active Background] Gradient background for active item */ h-full w-full rounded-full bg-gradient-to-r from-zinc-700/80 via-zinc-700 to-zinc-700/80 shadow-[0_0_10px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)]`}
-        />
-      </div>
-
-      {/* Hover highlight effect */}
-      {hoveredIndex !== null && hoveredIndex !== activeIndex && (
-        <div
-          className='absolute transition-all duration-200 ease-out'
-          style={{
-            left: `${hoveredIndex * 25}%`,
-            width: '25%',
-            top: '0.25rem',
-            bottom: '0.25rem',
-            opacity: 0.5,
-          }}
-        >
-          <div className='h-full w-full rounded-full bg-zinc-700/60' />
-        </div>
-      )}
-
       {/* Navigation items */}
-      {navigationItems.map((item, index) => (
-        <Link
-          key={item.id}
-          href={`/${item.id}`}
-          onClick={(e) => handleNavClick(item.id, `/${item.id}`, e)}
-          onMouseEnter={() => setHoveredIndex(index)}
-          onMouseLeave={() => setHoveredIndex(null)}
-          prefetch={true}
-          replace={true}
-          scroll={false}
-          className={`/* [Nav Link] Navigation link styling with conditional active state */ ${
-            currentSection === item.id ? 'font-semibold text-yellow-500' : 'text-zinc-400 hover:text-zinc-200'
-          } relative z-10 flex items-center justify-center px-6 py-1.5 text-center text-sm transition-all duration-200`}
-          aria-current={currentSection === item.id ? 'page' : undefined}
-        >
-          {item.label}
-        </Link>
-      ))}
+      {navigationItems.map((item, index) => {
+        const isActive = currentSection === item.id
+        const isHovered = hoveredIndex === index && !isActive
+
+        return (
+          <Link
+            key={item.id}
+            href={`/${item.id}`}
+            onClick={(e) => handleNavClick(item.id, `/${item.id}`, e)}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            prefetch={true}
+            replace={true}
+            scroll={false}
+            className={cn(
+              // Base neumorphic styling
+              'relative z-10 flex items-center justify-center rounded-full px-6 py-2 text-center text-sm transition-all duration-300',
+
+              // Active state
+              isActive && 'neu-container-pressed text-neu-accent translate-y-[1px] transform font-semibold',
+
+              // Inactive state
+              !isActive && 'text-neu-textSecondary hover:text-neu-text',
+
+              // Hover effect when not active
+              isHovered && 'bg-neu-bgLight',
+            )}
+            aria-current={isActive ? 'page' : undefined}
+            tabIndex={0}
+            aria-label={`Navigate to ${item.label} section`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNavClick(item.id, `/${item.id}`, e as unknown as React.MouseEvent)
+              }
+            }}
+          >
+            {item.label}
+          </Link>
+        )
+      })}
     </>
   )
 
@@ -147,9 +136,15 @@ export function Navigation() {
     <>
       {/* Desktop Navigation */}
       <div className='hidden md:block'>
-        <nav aria-label='Main navigation' className='mb-8'>
+        <nav aria-label='Main navigation'>
           <div
-            className={`/* [Nav Container] Main navigation */ container relative grid w-fit grid-cols-4 rounded-full border border-zinc-700/40 bg-zinc-800/90 p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-sm`}
+            className={cn(
+              // Neumorphic container for navigation
+              'neu-container relative grid w-fit grid-cols-4 rounded-full p-1.5',
+              // Fade in effect
+              mounted ? 'opacity-100' : 'opacity-0',
+              'transition-opacity duration-300',
+            )}
           >
             <NavigationLinks />
           </div>
@@ -158,9 +153,7 @@ export function Navigation() {
 
       {/* Mobile Navigation */}
       <nav aria-label='Mobile navigation' className='fixed bottom-0 left-0 right-0 z-50 md:hidden'>
-        <div
-          className={`/* [Mobile Nav Bar] Fixed navigation bar at the bottom of the screen */ border-t border-zinc-700/40 bg-zinc-900/95 shadow-[0_-2px_10px_rgba(0,0,0,0.2)] backdrop-blur-md`}
-        >
+        <div className='border-neu-bgLight bg-neu-bg/95 border-t backdrop-blur-md'>
           <div className='relative mx-auto grid max-w-md grid-cols-4 p-1.5'>
             <MobileNavigationLinks />
           </div>

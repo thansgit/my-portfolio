@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme'
+import { neuColors, neuRadius, createNeuShadow } from './src/lib/neumorphic'
 
 const config = {
   darkMode: ['class'],
@@ -15,51 +16,75 @@ const config = {
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+        // Neumorphic color palette
+        neu: {
+          // Base colors
+          bg: neuColors.base.bg,
+          bgLight: neuColors.base.bgLight,
+          bgDark: neuColors.base.bgDark,
+          surface: neuColors.base.surface,
+
+          // Secondary colors
+          secondary: neuColors.secondary.main,
+          secondaryLight: neuColors.secondary.light,
+          secondaryDark: neuColors.secondary.dark,
+
+          // Accent colors
+          accent: neuColors.accent.main,
+          accentLight: neuColors.accent.light,
+          accentDark: neuColors.accent.dark,
+
+          // Text colors
+          text: neuColors.text.primary,
+          textSecondary: neuColors.text.secondary,
+          textMuted: neuColors.text.muted,
+
+          // Add text color variants for base colors (for clarity)
+          textOnAccent: neuColors.base.bgDark, // Text on accent color (dark bg color)
+          textOnLight: neuColors.base.bgDark, // Text on light surfaces
+          textOnDark: neuColors.text.primary, // Text on dark surfaces
         },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-        chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))',
-        },
+
+        // State colors
+        success: neuColors.state.success,
+        error: neuColors.state.error,
+        warning: neuColors.state.warning,
+        info: neuColors.state.info,
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        // Neumorphic border radius values
+        'neu-xs': neuRadius.xs,
+        'neu-sm': neuRadius.sm,
+        'neu-md': neuRadius.md,
+        'neu-lg': neuRadius.lg,
+        'neu-xl': neuRadius.xl,
+        'neu-2xl': neuRadius['2xl'],
+      },
+      boxShadow: {
+        // Neumorphic shadows
+        'neu-flat-xs': createNeuShadow('flat', 'xs'),
+        'neu-flat-sm': createNeuShadow('flat', 'sm'),
+        'neu-flat': createNeuShadow('flat', 'md'),
+        'neu-flat-lg': createNeuShadow('flat', 'lg'),
+        'neu-flat-xl': createNeuShadow('flat', 'xl'),
+
+        'neu-pressed-xs': createNeuShadow('pressed', 'xs'),
+        'neu-pressed-sm': createNeuShadow('pressed', 'sm'),
+        'neu-pressed': createNeuShadow('pressed', 'md'),
+        'neu-pressed-lg': createNeuShadow('pressed', 'lg'),
+        'neu-pressed-xl': createNeuShadow('pressed', 'xl'),
+
+        'neu-concave-xs': createNeuShadow('concave', 'xs'),
+        'neu-concave-sm': createNeuShadow('concave', 'sm'),
+        'neu-concave': createNeuShadow('concave', 'md'),
+        'neu-concave-lg': createNeuShadow('concave', 'lg'),
+        'neu-concave-xl': createNeuShadow('concave', 'xl'),
+
+        'neu-convex-xs': createNeuShadow('convex', 'xs'),
+        'neu-convex-sm': createNeuShadow('convex', 'sm'),
+        'neu-convex': createNeuShadow('convex', 'md'),
+        'neu-convex-lg': createNeuShadow('convex', 'lg'),
+        'neu-convex-xl': createNeuShadow('convex', 'xl'),
       },
       fontFamily: {
         sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],

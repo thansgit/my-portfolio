@@ -1,10 +1,10 @@
 'use client'
 
-import { Section, Button, Timeline, TimelineItem } from '@/components/ui'
+import { NeuSection, NeuButton, NeuTimeline, NeuTimelineItem, NeuContainer, NeuSectionTitle } from '@/components/ui'
 import { DownloadIcon, BriefcaseIcon, GraduationCapIcon, ChevronDownIcon, CheckIcon } from 'lucide-react'
 import { EducationItem, ExperienceItem } from './types'
 import { useState, useRef, useEffect } from 'react'
-import { theme } from '@/lib/theme'
+import { cn } from '@/lib/utils'
 
 export const ResumeSection = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -98,30 +98,35 @@ export const ResumeSection = () => {
   }
 
   return (
-    <Section title='Resume'>
+    <NeuSection title='Resume'>
       {/* Resume Download Button with Language Selector */}
       <div className='mb-12 flex justify-start'>
         <div className='relative' ref={dropdownRef}>
           <div className='flex'>
             {/* Resume Download Link */}
-            <a
-              href={resumeFiles[selectedLanguage]}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='button-primary rounded-r-none'
+            <NeuButton
+              variant='accent'
+              className='rounded-r-none'
+              onClick={() => window.open(resumeFiles[selectedLanguage], '_blank')}
               aria-label='Download resume'
-              onKeyDown={handleKeyDown}
-              tabIndex={0}
             >
               <div className='flex items-center gap-2'>
                 <DownloadIcon size={18} />
-                <span>Download Resume</span>
+                <span>PDF</span>
               </div>
-            </a>
+            </NeuButton>
 
             {/* Language Toggle Button */}
             <div
-              className={`/* [Dropdown Toggle] Language selector dropdown button */ flex cursor-pointer items-center gap-1 rounded-r-md border-l border-yellow-600 bg-yellow-500 px-3 py-2 text-zinc-900 transition-colors hover:bg-yellow-600`}
+              className={cn(
+                'flex cursor-pointer items-center gap-1 rounded-l-none rounded-r-md',
+                'bg-neu-accent text-neu-textOnAccent px-3 py-2',
+                'border-neu-accentDark border-l',
+                'neu-button neu-button-accent',
+                'transform transition-all duration-300',
+                isDropdownOpen && 'translate-y-1',
+                'hover:translate-y-[2px]',
+              )}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               onKeyDown={handleDropdownKeyDown}
               tabIndex={0}
@@ -136,10 +141,15 @@ export const ResumeSection = () => {
 
           {/* Language Dropdown Menu */}
           {isDropdownOpen && (
-            <div className='absolute right-0 z-10 mt-1 overflow-hidden rounded-md bg-zinc-800 shadow-lg'>
+            <NeuContainer className='shadow-neu-flat-md absolute right-0 z-10 mt-1 overflow-hidden'>
               {/* English Option */}
               <div
-                className={`/* [Dropdown Item] Language option in dropdown */ cursor-pointer px-4 py-2 ${selectedLanguage === 'en' ? 'bg-zinc-700 text-yellow-500' : 'text-zinc-300 hover:bg-zinc-700'} `}
+                className={cn(
+                  'cursor-pointer px-4 py-2 transition-all duration-200',
+                  selectedLanguage === 'en'
+                    ? 'bg-neu-bgLight text-neu-accent'
+                    : 'text-neu-textSecondary hover:bg-neu-bgLight hover:text-neu-accent',
+                )}
                 onClick={() => handleLanguageSelect('en')}
                 onKeyDown={(e) => handleLanguageKeyDown(e, 'en')}
                 tabIndex={0}
@@ -154,7 +164,12 @@ export const ResumeSection = () => {
 
               {/* Finnish Option */}
               <div
-                className={`/* [Dropdown Item] Language option in dropdown */ cursor-pointer px-4 py-2 ${selectedLanguage === 'fi' ? 'bg-zinc-700 text-yellow-500' : 'text-zinc-300 hover:bg-zinc-700'} `}
+                className={cn(
+                  'cursor-pointer px-4 py-2 transition-all duration-200',
+                  selectedLanguage === 'fi'
+                    ? 'bg-neu-bgLight text-neu-accent'
+                    : 'text-neu-textSecondary hover:bg-neu-bgLight hover:text-neu-accent',
+                )}
                 onClick={() => handleLanguageSelect('fi')}
                 onKeyDown={(e) => handleLanguageKeyDown(e, 'fi')}
                 tabIndex={0}
@@ -166,62 +181,56 @@ export const ResumeSection = () => {
                   <span className={selectedLanguage === 'fi' ? 'ml-0' : 'ml-6'}>Finnish</span>
                 </div>
               </div>
-            </div>
+            </NeuContainer>
           )}
         </div>
       </div>
 
       {/* Experience Section */}
       <div className='mb-12'>
-        <h2 className='section-title'>
-          <span className='section-icon'>
-            <BriefcaseIcon size={20} />
-          </span>
+        <NeuSectionTitle withIcon icon={<BriefcaseIcon size={20} />}>
           Work Experience
-        </h2>
+        </NeuSectionTitle>
 
-        <Timeline>
+        <NeuTimeline>
           {experience.map((job) => (
-            <TimelineItem
+            <NeuTimelineItem
               key={job.company}
               title={job.position}
               subtitle={job.company}
               period={job.duration}
-              icon={<BriefcaseIcon size={12} className='text-zinc-900' />}
+              icon={<BriefcaseIcon size={12} />}
             >
-              <ul className='list-inside list-disc space-y-1 pl-2 text-zinc-300'>
+              <ul className='text-neu-textSecondary list-inside list-disc space-y-1 pl-2'>
                 {job.responsibilities.map((responsibility, index) => (
                   <li key={index} className='text-sm'>
                     {responsibility}
                   </li>
                 ))}
               </ul>
-            </TimelineItem>
+            </NeuTimelineItem>
           ))}
-        </Timeline>
+        </NeuTimeline>
       </div>
 
       {/* Education Section */}
       <div>
-        <h2 className='section-title'>
-          <span className='section-icon'>
-            <GraduationCapIcon size={20} />
-          </span>
+        <NeuSectionTitle withIcon icon={<GraduationCapIcon size={20} />}>
           Education
-        </h2>
+        </NeuSectionTitle>
 
-        <Timeline>
+        <NeuTimeline>
           {education.map((edu) => (
-            <TimelineItem
+            <NeuTimelineItem
               key={edu.school}
               title={edu.degree}
               subtitle={edu.school}
               period={edu.duration}
-              icon={<GraduationCapIcon size={12} className='text-zinc-900' />}
+              icon={<GraduationCapIcon size={12} />}
             />
           ))}
-        </Timeline>
+        </NeuTimeline>
       </div>
-    </Section>
+    </NeuSection>
   )
 }
