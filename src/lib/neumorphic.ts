@@ -23,9 +23,9 @@ export const neuColors = {
 
   // Accent/highlight color
   accent: {
-    main: '#E7BE45', // Yellow accent
-    light: '#F0CB5F',
-    dark: '#D1AA3D',
+    main: '#D35400', // Burnt orange
+    light: '#E67E22', // Lighter burnt orange
+    dark: '#A04000', // Darker burnt orange
   },
 
   // Text colors
@@ -282,4 +282,34 @@ export const neuTheme = {
     createShadow: createNeuShadow,
     createTextShadow: createNeuTextShadow,
   },
+}
+
+// Function to convert hex to RGB values for CSS variables
+const hexToRgb = (hex: string): string => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!result) return ''
+  return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+}
+
+// Initialize CSS variables from theme colors
+export const initThemeColors = (): void => {
+  if (typeof document === 'undefined') return // Skip during SSR
+
+  // Create color variables
+  document.documentElement.style.setProperty('--neu-bg', hexToRgb(neuColors.base.bg))
+  document.documentElement.style.setProperty('--neu-bg-light', hexToRgb(neuColors.base.bgLight))
+  document.documentElement.style.setProperty('--neu-bg-dark', hexToRgb(neuColors.base.bgDark))
+  document.documentElement.style.setProperty('--neu-surface', hexToRgb(neuColors.base.surface))
+
+  document.documentElement.style.setProperty('--neu-secondary', hexToRgb(neuColors.secondary.main))
+  document.documentElement.style.setProperty('--neu-secondary-light', hexToRgb(neuColors.secondary.light))
+  document.documentElement.style.setProperty('--neu-secondary-dark', hexToRgb(neuColors.secondary.dark))
+
+  document.documentElement.style.setProperty('--neu-accent', hexToRgb(neuColors.accent.main))
+  document.documentElement.style.setProperty('--neu-accent-light', hexToRgb(neuColors.accent.light))
+  document.documentElement.style.setProperty('--neu-accent-dark', hexToRgb(neuColors.accent.dark))
+
+  document.documentElement.style.setProperty('--neu-text', hexToRgb(neuColors.text.primary))
+  document.documentElement.style.setProperty('--neu-text-secondary', hexToRgb(neuColors.text.secondary))
+  document.documentElement.style.setProperty('--neu-text-muted', hexToRgb(neuColors.text.muted))
 }

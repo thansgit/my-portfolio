@@ -3,23 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Theme variables */
-  --neu-bg: 37, 39, 48; /* #252730 */
-  --neu-bg-light: 46, 48, 57; /* #2e3039 */
-  --neu-bg-dark: 28, 30, 36; /* #1c1e24 */
-  --neu-surface: 42, 44, 54; /* #2a2c36 */
-
-  --neu-secondary: 44, 62, 80; /* #2c3e50 */
-  --neu-secondary-light: 52, 73, 94; /* #34495e */
-  --neu-secondary-dark: 26, 37, 47; /* #1a252f */
-
-  --neu-accent: 231, 190, 69; /* #E7BE45 */
-  --neu-accent-light: 240, 203, 95; /* #F0CB5F */
-  --neu-accent-dark: 209, 170, 61; /* #D1AA3D */
-
-  --neu-text: 230, 230, 230; /* #E6E6E6 */
-  --neu-text-secondary: 184, 184, 184; /* #B8B8B8 */
-  --neu-text-muted: 143, 143, 143; /* #8F8F8F */
+  /* Theme variables will be set dynamically from neumorphic.ts */
 
   /* Shadow variables */
   --neu-shadow-dark: 0, 0, 0;

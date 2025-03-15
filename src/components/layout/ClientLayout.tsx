@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/layout'
 import { LoadingProvider, useLoading } from '@/components/three'
 import { NeuContainer, NeuIconButton, ThreeDLoadingIndicators } from '@/components/ui'
+import { initThemeColors } from '@/lib/neumorphic'
 
 // Dynamically import the Scene component with no SSR
 const Scene = dynamic(() => import('@/components/three').then((mod) => mod.Scene), {
@@ -53,6 +54,10 @@ interface ClientLayoutProps {
 }
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
+  useEffect(() => {
+    initThemeColors()
+  }, [])
+
   return (
     <div className='bg-neu-bg text-neu-text min-h-screen'>
       <LoadingProvider>
