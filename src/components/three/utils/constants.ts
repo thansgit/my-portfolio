@@ -57,7 +57,7 @@ export const BACKGROUND_MESH_SIZE = [100, 100] as [number, number]
 export const BACKGROUND_COLOR = '#252730'
 
 // ===== MATERIAL CONSTANTS =====
-// Card material constants (non-glass)
+// Card material constants
 export const CARD_MATERIAL = {
   roughness: 0.3, // Slightly rougher for better visibility
   metalness: 0.7, // Slightly less metallic

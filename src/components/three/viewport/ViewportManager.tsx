@@ -4,10 +4,11 @@ import React, { useEffect, Suspense } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import * as THREE from 'three'
-import { ViewportContext, useViewport, useEnvironment, useSceneContext } from '@/components/three/hooks'
+import { ViewportContext, useViewport } from '@/components/three/hooks'
+import { useEnvironment, useSceneContext } from '@/components/three/context'
 import { MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants'
 import { TetheredCard } from '@/components/three/experiences/TetheredCard'
-import { Environment } from '@/components/three/shared'
+import { Environment } from '@/components/three/components'
 
 // Wrapper component for the TetheredCard element
 const TetheredCardWrapper = () => {

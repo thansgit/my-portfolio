@@ -1,18 +1,34 @@
-// Canvas components
-export { Scene } from './canvas/Scene'
-export { ViewportManager } from './canvas/ViewportManager'
-export { LoadingProvider } from './canvas/LoadingProvider'
+'use client'
+
+// Main component
+export { Scene } from './ThreeCanvas'
+
+// Core components
+export { SceneManager, CameraManager } from './core'
 
 // Experiences
 export { TetheredCard } from './experiences/TetheredCard'
 export { Pinhead } from './experiences/TetheredCard/components'
 
-// Effects
-export { Particles } from './effects/Particles'
+// Components
+export { Environment, ModelWrapper, Particles, ShaderBackground } from './components'
 
-// Shared components
-export { Environment, CardLightformer, ModelWrapper } from './shared'
+// Context providers and hooks
+export {
+  SceneProvider,
+  ConfigProvider,
+  EnvironmentProvider,
+  LoadingProvider,
+  useLoading,
+  useSceneContext,
+  useConfigContext,
+  useEnvironment,
+  type LoadingContextType,
+} from './context'
 
-// Context providers
-export { SceneProvider, ConfigProvider, EnvironmentProvider } from './hooks'
-export { useLoading } from './hooks/useLoading'
+// Viewport components
+export { LoadingTracker } from './viewport/ThreeLoadingTracker'
+export { ViewportManager } from './viewport/ViewportManager'
+
+// Hooks
+export * from './hooks'

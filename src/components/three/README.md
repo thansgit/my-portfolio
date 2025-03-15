@@ -7,74 +7,115 @@ This directory contains all Three.js related components organized in a logical s
 ```
 src/components/three/
 ├── index.ts                  # Main exports
+├── ThreeCanvas.tsx           # Main canvas component with all providers
 │
-├── canvas/                   # Core canvas setup
-│   ├── Scene.tsx             # Main Canvas component with context providers
-│   └── ViewportManager.tsx   # Viewport and responsive layout management
+├── core/                     # Core rendering components
+│   ├── CanvasProvider.tsx    # Canvas setup and context
+│   ├── Renderer.tsx          # WebGL renderer configuration
+│   ├── CameraManager.tsx     # Camera setup and management
+│   ├── SceneManager.tsx      # Scene content orchestration
+│   └── index.ts              # Core component exports
+│
+├── context/                  # Context providers
+│   ├── ConfigContext.tsx     # Application configuration
+│   ├── SceneContext.tsx      # Scene state management
+│   ├── EnvironmentContext.tsx # Environment settings
+│   ├── LoadingContext.tsx    # Loading state management
+│   └── index.ts              # Context exports
+│
+├── viewport/                 # Viewport management
+│   ├── ViewportManager.tsx   # Viewport and responsive layout
+│   └── ThreeLoadingTracker.tsx # Loading state tracker
+│
+├── components/               # Shared components
+│   ├── Environment.tsx       # Lighting and environment
+│   ├── ModelWrapper.tsx      # Model loading wrapper
+│   ├── Particles.tsx         # Particle system
+│   ├── ShaderBackground.tsx  # Background effects
+│   └── index.ts              # Component exports
 │
 ├── experiences/              # Self-contained experiences
 │   └── TetheredCard/         # Tethered Card experience
 │       ├── index.tsx         # Main component
 │       ├── components/       # Experience-specific components
-│       │   ├── CardModel.tsx # Card model with materials
-│       │   ├── DraggablePlane.tsx # Touch interaction surface
-│       │   ├── Pinhead.tsx   # Pinhead visual component
-│       │   └── RopeMesh.tsx  # Rope visualization
 │       ├── hooks/            # Experience-specific hooks
-│       │   ├── useControls.ts # Input and rotation tracking
-│       │   └── usePhysics.ts # Physics simulation logic
 │       └── utils/            # Experience-specific utilities
-│           └── materials.ts  # Card material creation
 │
-├── shared/                   # Shared components across experiences
-│   ├── Environment.tsx       # Lighting, background, and atmosphere
-│   └── ModelWrapper.tsx      # Loading/error wrapper for models
+├── hooks/                    # Shared global hooks
+│   ├── index.ts              # Hook exports
+│   ├── useViewport.tsx       # Viewport utilities
+│   ├── useCamera.tsx         # Camera management
+│   └── README.md             # Documentation for hooks
 │
-├── effects/                  # Visual effects
-│   └── Particles.tsx         # Particle system
-│
-├── utils/                    # Utilities and helpers
-│   ├── types.ts              # TypeScript definitions
-│   ├── constants.ts          # Constant values
-│   ├── index.ts              # Utility exports
-│   └── README.md             # Documentation for utilities
-│
-└── hooks/                    # Shared global hooks
-    ├── index.ts              # Hook exports
-    ├── useCamera.ts          # Camera management hook
-    ├── useSceneContext.tsx   # Shared visual state context
-    ├── useConfigContext.tsx  # Configuration context
-    ├── useEnvironmentContext.tsx # Environment state context
-    ├── useViewport.ts        # Viewport utilities
-    ├── useLoading.ts         # Loading state tracking
-    └── README.md             # Documentation for hooks
+└── utils/                    # Utilities and helpers
+    ├── types.ts              # TypeScript definitions
+    ├── constants.ts          # Constant values
+    ├── threeHelpers.ts       # Three.js utility functions
+    ├── index.ts              # Utility exports
+    └── README.md             # Documentation for utilities
 ```
 
 ## Architecture Overview
 
-The Three.js experience is built with a context-based architecture:
+The Three.js experience is built with a provider pattern architecture:
 
-1. **Context Hierarchy**:
+1. **Provider Hierarchy**:
 
-   - `ConfigContext`: Application-wide configuration and theming
-   - `EnvironmentContext`: Environment-specific state
-   - `SceneContext`: Shared visual state across components
+   ```tsx
+   <ThreeLoadingTracker>
+     {' '}
+     // Tracks loading state
+     <Canvas>
+       {' '}
+       // R3F Canvas component
+       <RendererSettings /> // Renderer configuration
+       <ConfigProvider>
+         {' '}
+         // Global configuration
+         <EnvironmentProvider>
+           {' '}
+           // Lighting and environment
+           <SceneProvider>
+             {' '}
+             // Scene state management
+             <ViewportProvider>
+               {' '}
+               // Viewport management
+               <CameraManager>
+                 {' '}
+                 // Camera control
+                 <SceneManager /> // Content orchestration
+               </CameraManager>
+             </ViewportProvider>
+           </SceneProvider>
+         </EnvironmentProvider>
+       </ConfigProvider>
+     </Canvas>
+   </ThreeLoadingTracker>
+   ```
 
 2. **Component Organization**:
 
-   - **Experiences**: Self-contained 3D experiences with their own components, hooks, and utilities
-   - **Shared**: Reusable components shared across experiences
-   - **Effects**: Visual enhancements like particles
+   - **Core**: Fundamental rendering components
+   - **Context**: State management providers
+   - **Viewport**: Viewport and loading management
+   - **Components**: Shared visual components
+   - **Experiences**: Self-contained 3D experiences
+   - **Hooks**: Reusable behavior and state management
+   - **Utils**: Helper functions and constants
 
-3. **Resource Management**:
+3. **State Management**:
+   - Context-based state sharing
    - Centralized loading state
-   - Consistent loading UI across the application
-   - Clear component hierarchy
+   - Viewport-responsive layout
 
 ## Best Practices
 
 1. **Memory Management**: Always clean up Three.js resources (geometries, materials, textures)
-2. **Performance**: Use instancing for repeated elements, and optimize render loops
+2. **Performance**:
+   - Use instancing for repeated elements
+   - Optimize render loops
+   - Hide elements during loading
 3. **Modularity**: Keep components focused on a single responsibility
 4. **Context Usage**: Use contexts for shared state, but keep physics references local
 5. **Loading States**: Track and manage loading states for all resources

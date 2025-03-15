@@ -12,7 +12,7 @@ import { CARD_MATERIAL } from '@/components/three/utils/constants'
 export const useReflectiveMaterial = () => {
   const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
   const colorMap = useLoader(THREE.TextureLoader, '/assets/textures/2.png')
-  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null)
+  const materialRef = useRef<THREE.MeshPhysicalMaterial | null>(null)
 
   // Create the material
   const material = useMemo(() => {
@@ -41,7 +41,7 @@ export const useReflectiveMaterial = () => {
     colorMap.rotation = Math.PI
 
     // Create the material - making it more visible with stronger base color
-    const newMaterial = new THREE.MeshStandardMaterial({
+    const newMaterial = new THREE.MeshPhysicalMaterial({
       map: colorMap,
       normalMap: normalMap,
       normalScale: new THREE.Vector2(0.5, 0.5),

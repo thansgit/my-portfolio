@@ -1,5 +1,8 @@
+'use client'
+
+import React from 'react'
 import { useThree } from '@react-three/fiber'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '../utils/constants'
 
 export interface ViewportState {
@@ -13,10 +16,16 @@ export const ViewportContext = createContext<ViewportState>({
 })
 
 /**
- * Hook for managing viewport state based on screen size and scroll position
- * @returns ViewportState with isMobile and isVisible flags
+ * Hook for accessing viewport state context
  */
 export const useViewport = () => {
+  return useContext(ViewportContext)
+}
+
+/**
+ * Provider component for viewport state
+ */
+export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { size } = useThree()
   const [state, setState] = useState<ViewportState>({
     isMobile: size.width < MOBILE_BREAKPOINT,
@@ -53,7 +62,7 @@ export const useViewport = () => {
     const handleScroll = () => {
       const scrollY = window.scrollY
       const viewportHeight = window.innerHeight
-      const scrollThreshold = viewportHeight * 0.5 // 20% of viewport height
+      const scrollThreshold = viewportHeight * 0.5 // 50% of viewport height
 
       setState((prev) => {
         const shouldBeVisible = scrollY < scrollThreshold
@@ -73,5 +82,5 @@ export const useViewport = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [state.isMobile])
 
-  return state
+  return <ViewportContext.Provider value={state}>{children}</ViewportContext.Provider>
 }

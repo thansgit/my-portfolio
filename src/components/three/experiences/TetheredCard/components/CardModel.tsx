@@ -13,7 +13,7 @@ import {
   CARD_SWING_FREQUENCY,
   CARD_ROTATION_DAMPING,
 } from '@/components/three/utils/constants'
-import { ModelWrapper } from '@/components/three/shared'
+import { ModelWrapper } from '@/components/three/components'
 
 // Model path
 const MODEL_PATH = '/assets/models/testcard1.glb'

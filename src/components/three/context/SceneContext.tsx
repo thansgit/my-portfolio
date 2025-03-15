@@ -2,31 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import * as THREE from 'three'
-
-/**
- * SceneContextState interface - shared visual state and configuration
- * that doesn't include physics refs (which stay local to components)
- */
-interface SceneContextState {
-  // Visual settings
-  cardPosition: THREE.Vector3
-  pinheadPosition: THREE.Vector3
-
-  // Card state
-  isCardGlowing: boolean
-  cardRotationCount: number
-
-  // Theme settings
-  ropeColor: string
-  ropeRadius: number
-
-  // Action handlers
-  setCardPosition: (position: THREE.Vector3) => void
-  setPinheadPosition: (position: THREE.Vector3) => void
-  setCardGlowing: (isGlowing: boolean) => void
-  incrementCardRotation: () => void
-  updateRopeVisuals: (color: string, radius: number) => void
-}
+import { SceneContextState } from '../utils/types'
 
 // Create the context
 export const SceneContext = createContext<SceneContextState | null>(null)

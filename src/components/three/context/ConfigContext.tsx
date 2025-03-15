@@ -3,40 +3,16 @@
 import React, { createContext, useContext, ReactNode } from 'react'
 import {
   ROPE_INITIAL_RADIUS,
-  PINHEAD_SIZE,
   PINHEAD_COLOR,
   CARD_DEFAULT_MAX_SPEED,
   CARD_DEFAULT_MIN_SPEED,
+  PARTICLE_SIZE,
+  PARTICLE_COUNT,
+  ROPE_COLOR_STRETCH_SPEED,
+  ROPE_RADIUS_STRETCH_SPEED,
+  ROPE_MIN_RADIUS,
 } from '../utils/constants'
-
-// Configuration interface that contains settings and theme options
-interface ConfigContextState {
-  // Physics settings
-  cardPhysics: {
-    maxSpeed: number
-    minSpeed: number
-  }
-
-  // Visual settings
-  ropeStyling: {
-    initialRadius: number
-    minRadius: number
-    colorStretchSpeed: number
-    radiusStretchSpeed: number
-  }
-
-  // Particle settings
-  particleSettings: {
-    size: number
-    count: number
-  }
-
-  // Colors and themes
-  colors: {
-    pinhead: string
-    ropeDefault: string
-  }
-}
+import { ConfigContextState } from '../utils/types'
 
 // Create the context with default values from constants
 export const ConfigContext = createContext<ConfigContextState>({
@@ -47,14 +23,14 @@ export const ConfigContext = createContext<ConfigContextState>({
 
   ropeStyling: {
     initialRadius: ROPE_INITIAL_RADIUS,
-    minRadius: ROPE_INITIAL_RADIUS * 0.3,
-    colorStretchSpeed: 10,
-    radiusStretchSpeed: 5,
+    minRadius: ROPE_MIN_RADIUS,
+    colorStretchSpeed: ROPE_COLOR_STRETCH_SPEED,
+    radiusStretchSpeed: ROPE_RADIUS_STRETCH_SPEED,
   },
 
   particleSettings: {
-    size: 0.075,
-    count: 200,
+    size: PARTICLE_SIZE,
+    count: PARTICLE_COUNT,
   },
 
   colors: {
@@ -78,14 +54,14 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children, custom
 
     ropeStyling: {
       initialRadius: ROPE_INITIAL_RADIUS,
-      minRadius: ROPE_INITIAL_RADIUS * 0.3,
-      colorStretchSpeed: 10,
-      radiusStretchSpeed: 5,
+      minRadius: ROPE_MIN_RADIUS,
+      colorStretchSpeed: ROPE_COLOR_STRETCH_SPEED,
+      radiusStretchSpeed: ROPE_RADIUS_STRETCH_SPEED,
     },
 
     particleSettings: {
-      size: 0.075,
-      count: 200,
+      size: PARTICLE_SIZE,
+      count: PARTICLE_COUNT,
     },
 
     colors: {
