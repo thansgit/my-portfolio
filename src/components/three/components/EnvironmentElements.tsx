@@ -1,7 +1,8 @@
 'use client'
 
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei'
-import { useSceneContext } from '@/components/three/context/SceneContext'
+import { useTetheredCardContext } from '@/components/three/context'
+import { useEnvironment } from '@/components/three/context/EnvironmentContext'
 import { BACKGROUND_MESH_POSITION, BACKGROUND_MESH_SIZE, BACKGROUND_COLOR } from '../utils/constants'
 
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {
@@ -28,9 +29,14 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
   )
 }
 
-export const Environment = ({ cardPosition }: { cardPosition?: [number, number, number] }) => {
-  // Get state from context
-  const { cardRotationCount } = useSceneContext()
+export const EnvironmentElements = () => {
+  const { ambientLightIntensity } = useEnvironment()
+  const { cardRotationCount, cardExperiencePosition } = useTetheredCardContext()
+
+  // Convert Vector3 to array format
+  const cardPositionArray: [number, number, number] = cardExperiencePosition
+    ? [cardExperiencePosition.x, cardExperiencePosition.y, cardExperiencePosition.z]
+    : [0, 0, 0]
 
   return (
     <>
@@ -42,7 +48,7 @@ export const Environment = ({ cardPosition }: { cardPosition?: [number, number, 
       {/* Environment for card reflections only */}
       <DreiEnvironment background={false} resolution={128} preset={undefined}>
         {/* These lightformers will only affect reflections */}
-        {cardPosition && <CardLightformer cardPosition={cardPosition} />}
+        <CardLightformer cardPosition={cardPositionArray} />
       </DreiEnvironment>
     </>
   )

@@ -5,14 +5,14 @@ import { Canvas } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
 import { useLoading } from '@/components/three/context'
 
-interface CanvasProviderProps {
+interface CanvasWrapperProps {
   children: ReactNode
 }
 
 /**
- * Main Canvas Provider that sets up the Three.js rendering context
+ * Main Canvas Wrapper that sets up the Three.js rendering context
  */
-export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
+export const CanvasWrapper: React.FC<CanvasWrapperProps> = ({ children }) => {
   const { isLoaded } = useLoading()
 
   return (

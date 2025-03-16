@@ -3,6 +3,14 @@ import { MOBILE_OFFSET } from '@/components/three/utils/constants'
 import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
 
+/**
+ * Calculates the card position based on viewport dimensions and device type
+ * @param viewport The current viewport dimensions
+ * @param isMobile Whether the current device is mobile
+ * @returns A tuple containing [x, y, z] coordinates
+ */
+
+//TODO: move to viewport manager if not used anywhere else
 export const calculateCardPosition = (
   viewport: { width: number; height: number },
   isMobile: boolean,
@@ -10,26 +18,6 @@ export const calculateCardPosition = (
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
   const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2)
   return [xPosition, 2.5, 0]
-}
-
-export const degToRad = (degrees: number) => {
-  return degrees * (Math.PI / 180)
-}
-
-export const radToDeg = (radians: number) => {
-  return radians * (180 / Math.PI)
-}
-
-export const lerpVectors = (v1: THREE.Vector3, v2: THREE.Vector3, alpha: number): THREE.Vector3 => {
-  return v1.clone().lerp(v2, alpha)
-}
-
-export const getDistance = (p1: THREE.Vector3, p2: THREE.Vector3): number => {
-  return p1.distanceTo(p2)
-}
-
-export const mapRange = (value: number, inMin: number, inMax: number, outMin: number, outMax: number): number => {
-  return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
 }
 
 /**
@@ -69,6 +57,7 @@ export const useScreenToWorld = (x: number, y: number, distance: number = 13): T
   return point
 }
 
+//TODO: move to pinhead if not used anywhere else
 export function createStandardMaterial(color: string): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color: color,

@@ -3,10 +3,11 @@
 import React, { Suspense, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
-import { ConfigProvider, EnvironmentProvider, SceneProvider, useLoading } from './context'
+import { ConfigProvider, EnvironmentProvider, TetheredCardProvider, useLoading } from './context'
 import { ViewportProvider } from './context/ViewportContext'
-import { CameraManager, SceneManager } from './core'
-import { LoadingTracker } from './viewport/ThreeLoadingTracker'
+import { CameraManager, TetheredCardManager } from './core'
+import { ViewportManager } from './viewport/ViewportManager'
+import { LoadingTracker } from './viewport/LoadingTracker'
 
 /**
  * Renderer configuration component
@@ -31,14 +32,20 @@ const RendererSettings = () => {
 }
 
 /**
- * Main Scene component that sets up the Three.js environment
- * with all providers in the correct order
+ * Main Three.js canvas component
  */
-export const Scene = () => {
+export const ThreeCanvas = () => {
   const { isLoaded } = useLoading()
 
   return (
-    <div className='fixed inset-0 h-screen w-screen overflow-hidden'>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+      }}
+    >
       <LoadingTracker>
         <Canvas
           camera={{ position: [0, 0, 13], fov: 25 }}
@@ -53,6 +60,11 @@ export const Scene = () => {
             precision: 'highp',
           }}
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
             pointerEvents: 'auto',
             background: 'transparent',
             opacity: isLoaded ? 1 : 0,
@@ -64,13 +76,14 @@ export const Scene = () => {
             <RendererSettings />
             <ConfigProvider>
               <EnvironmentProvider ambientLightIntensity={0.5}>
-                <SceneProvider>
+                <TetheredCardProvider>
                   <ViewportProvider>
+                    <ViewportManager />
                     <CameraManager>
-                      <SceneManager />
+                      <TetheredCardManager />
                     </CameraManager>
                   </ViewportProvider>
-                </SceneProvider>
+                </TetheredCardProvider>
               </EnvironmentProvider>
             </ConfigProvider>
           </Suspense>

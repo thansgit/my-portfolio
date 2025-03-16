@@ -1,44 +1,66 @@
 'use client'
 
-import React, { Suspense } from 'react'
+import React, { useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
-import { Physics } from '@react-three/rapier'
 import { useViewportContext } from '@/components/three/context/ViewportContext'
-import { TetheredCard } from '@/components/three/experiences/TetheredCard'
-import { Environment } from '@/components/three/components'
-import { calculateCardPosition } from '@/components/three/utils/threeHelpers'
+import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '@/components/three/utils/constants'
 
-const TetheredCardWrapper = () => {
-  const { viewport } = useThree()
-  const { isMobile } = useViewportContext()
-  const initialPosition = calculateCardPosition(viewport, isMobile)
-
-  return <TetheredCard position={initialPosition} />
-}
-
-// Physics and visible content container
-const SceneContent = () => {
-  const { isVisible } = useViewportContext()
-
-  if (!isVisible) return null
-
-  return (
-    <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-      <TetheredCardWrapper />
-    </Physics>
-  )
-}
-
+/**
+ * ViewportManager handles viewport state management
+ * (mobile detection, visibility, etc.) and updates the ViewportContext.
+ */
 export const ViewportManager = () => {
-  const { isMobile } = useViewportContext()
-  const { viewport } = useThree()
-  const cardPosition = calculateCardPosition(viewport, isMobile)
+  const { size } = useThree()
+  const { isMobile, isVisible, setIsMobile, setIsVisible } = useViewportContext()
 
-  return (
-    <Suspense fallback={null}>
-      <ambientLight intensity={0.5} />
-      <Environment cardPosition={cardPosition} />
-      <SceneContent />
-    </Suspense>
-  )
+  // Handle viewport state (mobile detection, visibility)
+  // ===================================================
+
+  // Handle resize events
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    const updateViewport = () => {
+      console.log('ViewportManager: Setting isVisible to false during resize')
+      setIsVisible(false)
+
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        console.log('ViewportManager: Resize complete, setting isVisible to true')
+        setIsVisible(true)
+        setIsMobile(size.width < MOBILE_BREAKPOINT)
+      }, RESIZE_DELAY)
+    }
+
+    updateViewport()
+
+    return () => clearTimeout(timeoutId)
+  }, [size.width, setIsMobile, setIsVisible])
+
+  // Handle scroll events for mobile view
+  useEffect(() => {
+    if (!isMobile) return
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const viewportHeight = window.innerHeight
+      const scrollThreshold = viewportHeight * 0.5
+
+      const shouldBeVisible = scrollY < scrollThreshold
+      if (isVisible !== shouldBeVisible) {
+        console.log('ViewportManager: Scroll changed visibility to', shouldBeVisible)
+        setIsVisible(shouldBeVisible)
+      }
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll)
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isMobile, isVisible, setIsVisible])
+
+  console.log('ViewportManager rendering')
+
+  // This component doesn't render anything - it just manages viewport state
+  return null
 }

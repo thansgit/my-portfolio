@@ -1,6 +1,6 @@
 'use client'
 
-import { useSceneContext } from '@/components/three/context/SceneContext'
+import { useTetheredCardContext } from '@/components/three/context'
 import { useConfigContext } from '@/components/three/context/ConfigContext'
 import {
   ROPE_SEGMENT_LENGTH,
@@ -25,7 +25,7 @@ import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } fro
 export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
   // Get configuration from context
   const { cardPhysics } = useConfigContext()
-  const { setCardPosition, updateRopeVisuals, ropeColor, ropeRadius, setCardRotationCount } = useSceneContext()
+  const { updateRopeVisuals, ropeColor, ropeRadius, setCardRotationCount } = useTetheredCardContext()
 
   // Physics settings from config context
   const maxSpeed = cardPhysics.maxSpeed
@@ -77,9 +77,6 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
       const cardPos = cardRef.current.translation()
       planePosition.current.set(cardPos.x, cardPos.y, cardPos.z)
       planeGroupRef.current.position.copy(planePosition.current)
-
-      // Update position in scene context for sharing
-      setCardPosition(new THREE.Vector3(cardPos.x, cardPos.y, cardPos.z))
     }
   })
 
@@ -92,7 +89,7 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
 
   // Update rotation count in scene context
   useEffect(() => {
-    console.log(`Setting rotation count in SceneContext: ${rotations}`)
+    console.log(`Setting rotation count in TetheredCardContext: ${rotations}`)
     setCardRotationCount(rotations)
   }, [rotations, setCardRotationCount])
 

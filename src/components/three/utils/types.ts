@@ -11,8 +11,9 @@ export interface ExtendedRigidBody extends RapierRigidBody {
   lerped?: THREE.Vector3
 }
 
-export interface SceneContextState {
-  cardPosition: THREE.Vector3
+export interface TetheredCardContextState {
+  // Experience position (for viewport layout)
+  cardExperiencePosition: THREE.Vector3
 
   // Card state
   cardRotationCount: number
@@ -21,7 +22,7 @@ export interface SceneContextState {
   ropeColor: string
   ropeRadius: number
 
-  setCardPosition: (position: THREE.Vector3) => void
+  setCardExperiencePosition: (position: THREE.Vector3) => void
   setCardRotationCount: (count: number) => void
   updateRopeVisuals: (color: string, radius: number) => void
 }
@@ -30,5 +31,3 @@ export interface EnvironmentContextState {
   ambientLightIntensity: number
   cardPosition?: [number, number, number]
 }
-
-// Removed ConfigContextState interface as it's now defined directly in ConfigContext.tsx

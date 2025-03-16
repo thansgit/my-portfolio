@@ -9,9 +9,9 @@ import { NeuContainer, NeuIconButton, ThreeDLoadingIndicators } from '@/componen
 import { initThemeColors } from '@/lib/neumorphic'
 
 // Dynamically import the Scene component with no SSR
-const Scene = dynamic(() => import('@/components/three').then((mod) => mod.Scene), {
+const ThreeCanvas = dynamic(() => import('@/components/three').then((mod) => mod.ThreeCanvas), {
   ssr: false,
-  loading: () => <div className='bg-neu-bg fixed inset-0' />,
+  loading: () => <div className='fixed inset-0 bg-neu-bg' />,
 })
 
 const RoutePrefetcher = () => {
@@ -33,17 +33,17 @@ const RoutePrefetcher = () => {
   return null
 }
 
-const SceneContainer = () => {
+const ThreeCanvasContainer = () => {
   const { isLoaded } = useLoading()
 
   return (
     <div className='pointer-events-none fixed inset-0'>
       {/* Always show placeholder gradient until 3D scene is loaded */}
-      <div className={`bg-neu-bg absolute inset-0 ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
+      <div className={`absolute inset-0 bg-neu-bg ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
 
       {/* Load 3D scene in parallel */}
       <Suspense fallback={null}>
-        <Scene />
+        <ThreeCanvas />
       </Suspense>
     </div>
   )
@@ -59,11 +59,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   }, [])
 
   return (
-    <div className='bg-neu-bg text-neu-text min-h-screen'>
+    <div className='min-h-screen bg-neu-bg text-neu-text'>
       <LoadingProvider>
         <RoutePrefetcher />
         <ThreeDLoadingIndicators />
-        <SceneContainer />
+        <ThreeCanvasContainer />
 
         {/* Main Content */}
         <div className='relative z-10 mt-[60vh] p-8 pb-24 md:ml-[35%] md:mt-0 md:pb-8'>

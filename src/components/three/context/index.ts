@@ -1,4 +1,4 @@
-export { SceneContext, SceneProvider, useSceneContext } from './SceneContext'
+export { TetheredCardContext, TetheredCardProvider, useTetheredCardContext } from './TetheredCardContext'
 
 export { ConfigContext, ConfigProvider, useConfigContext } from './ConfigContext'
 
