@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import { useViewportContext } from '@/components/three/context/ViewportContext'
 import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '@/components/three/utils/constants'
@@ -12,6 +12,7 @@ import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '@/components/three/utils/consta
 export const ViewportManager = () => {
   const { size } = useThree()
   const { isMobile, isVisible, setIsMobile, setIsVisible } = useViewportContext()
+  const isResizing = useRef(false)
 
   // Handle viewport state (mobile detection, visibility)
   // ===================================================
@@ -22,19 +23,28 @@ export const ViewportManager = () => {
 
     const updateViewport = () => {
       console.log('ViewportManager: Setting isVisible to false during resize')
+      isResizing.current = true
       setIsVisible(false)
 
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
         console.log('ViewportManager: Resize complete, setting isVisible to true')
-        setIsVisible(true)
         setIsMobile(size.width < MOBILE_BREAKPOINT)
+        setIsVisible(true)
+
+        // Add a small delay before allowing scroll handler to run again
+        setTimeout(() => {
+          isResizing.current = false
+        }, 100)
       }, RESIZE_DELAY)
     }
 
     updateViewport()
 
-    return () => clearTimeout(timeoutId)
+    return () => {
+      clearTimeout(timeoutId)
+      isResizing.current = false
+    }
   }, [size.width, setIsMobile, setIsVisible])
 
   // Handle scroll events for mobile view
@@ -42,6 +52,9 @@ export const ViewportManager = () => {
     if (!isMobile) return
 
     const handleScroll = () => {
+      // Skip scroll handling during resize operations
+      if (isResizing.current) return
+
       const scrollY = window.scrollY
       const viewportHeight = window.innerHeight
       const scrollThreshold = viewportHeight * 0.5
@@ -58,8 +71,6 @@ export const ViewportManager = () => {
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isMobile, isVisible, setIsVisible])
-
-  console.log('ViewportManager rendering')
 
   // This component doesn't render anything - it just manages viewport state
   return null

@@ -1,5 +1,6 @@
 'use client'
 
+import { MOBILE_BREAKPOINT } from '@/components/three/utils/constants'
 import React, { createContext, useContext, useState } from 'react'
 
 interface ViewportContextState {
@@ -34,7 +35,7 @@ interface ViewportProviderProps {
 
 export const ViewportProvider: React.FC<ViewportProviderProps> = ({
   children,
-  initialIsMobile = false,
+  initialIsMobile = window.innerWidth < MOBILE_BREAKPOINT,
   initialIsVisible = true,
 }) => {
   const [isMobile, setIsMobile] = useState(initialIsMobile)
