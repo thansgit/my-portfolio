@@ -16,7 +16,6 @@ export const LoadingTracker: React.FC<{ children: React.ReactNode }> = ({ childr
     if (loaded || (progress >= 100 && !active)) {
       // Small delay ensures everything is definitely ready
       const timer = setTimeout(() => {
-        console.log('3D content loaded via drei progress!')
         setLoaded(true)
       }, 200)
       return () => clearTimeout(timer)
@@ -26,7 +25,6 @@ export const LoadingTracker: React.FC<{ children: React.ReactNode }> = ({ childr
   // Fallback timeout in case loading gets stuck
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log('3D content loaded via fallback timeout!')
       setLoaded(true)
     }, 5000)
 

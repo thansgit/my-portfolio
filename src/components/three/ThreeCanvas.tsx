@@ -21,10 +21,6 @@ const RendererSettings = () => {
       // Optimize renderer
       gl.setClearColor(0x000000, 0) // Transparent background
       gl.setPixelRatio(window.devicePixelRatio)
-
-      // Enable shadow maps
-      gl.shadowMap.enabled = true
-      gl.shadowMap.type = 2 // PCFSoftShadowMap
     }
   }, [gl])
 

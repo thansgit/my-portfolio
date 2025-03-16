@@ -50,7 +50,6 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   useEffect(() => {
     // If we weren't dragging before but now we are, reset the count
     if (isDragging && !wasDragging.current) {
-      console.log('New drag detected - resetting rotation count')
       totalRotations.current = 0
       lastQuadrants.current = []
       currentQuadrant.current = null
@@ -122,7 +121,6 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
     if (rotationPatterns.some((pattern) => checkSequence(last5, pattern))) {
       if (isMoving.current) {
         totalRotations.current++
-        console.log(`Rotation detected! New total: ${totalRotations.current}, Quadrant sequence: ${last5.join(' → ')}`)
       }
       lastQuadrants.current = [last5[last5.length - 1]]
       lastRotationTime.current = now

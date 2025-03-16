@@ -22,13 +22,11 @@ export const ViewportManager = () => {
     let timeoutId: NodeJS.Timeout
 
     const updateViewport = () => {
-      console.log('ViewportManager: Setting isVisible to false during resize')
       isResizing.current = true
       setIsVisible(false)
 
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
-        console.log('ViewportManager: Resize complete, setting isVisible to true')
         setIsMobile(size.width < MOBILE_BREAKPOINT)
         setIsVisible(true)
 
@@ -61,7 +59,6 @@ export const ViewportManager = () => {
 
       const shouldBeVisible = scrollY < scrollThreshold
       if (isVisible !== shouldBeVisible) {
-        console.log('ViewportManager: Scroll changed visibility to', shouldBeVisible)
         setIsVisible(shouldBeVisible)
       }
     }

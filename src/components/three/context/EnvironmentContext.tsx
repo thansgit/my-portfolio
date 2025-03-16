@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import { EnvironmentContextState } from '../utils/types'
 
+//TODO: see where this is used and if it's needed
+
 // Create context with default values
 export const EnvironmentContext = createContext<EnvironmentContextState | null>(null)
 
