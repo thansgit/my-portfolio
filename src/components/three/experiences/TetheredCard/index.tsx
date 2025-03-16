@@ -1,6 +1,7 @@
 'use client'
 
-import { useSceneContext, useConfigContext } from '@/components/three/hooks'
+import { useSceneContext } from '@/components/three/context/SceneContext'
+import { useConfigContext } from '@/components/three/context/ConfigContext'
 import {
   ROPE_SEGMENT_LENGTH,
   SEGMENT_PROPS,

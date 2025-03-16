@@ -14,21 +14,11 @@ export { Pinhead } from './experiences/TetheredCard/components'
 export { Environment, ModelWrapper, ShaderBackground } from './components'
 
 // Context providers and hooks
-export {
-  SceneProvider,
-  ConfigProvider,
-  EnvironmentProvider,
-  LoadingProvider,
-  useLoading,
-  useSceneContext,
-  useConfigContext,
-  useEnvironment,
-  type LoadingContextType,
-} from './context'
+export { SceneProvider, useSceneContext } from './context/SceneContext'
+export { ConfigProvider, useConfigContext } from './context/ConfigContext'
+export { EnvironmentProvider, useEnvironment } from './context/EnvironmentContext'
+export { LoadingProvider, useLoading, type LoadingContextType } from './context/LoadingContext'
 
 // Viewport components
 export { LoadingTracker } from './viewport/ThreeLoadingTracker'
 export { ViewportManager } from './viewport/ViewportManager'
-
-// Hooks
-export * from './hooks'

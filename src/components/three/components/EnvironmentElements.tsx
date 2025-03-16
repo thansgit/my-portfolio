@@ -1,7 +1,7 @@
 'use client'
 
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei'
-import { useSceneContext } from '@/components/three/hooks'
+import { useSceneContext } from '@/components/three/context/SceneContext'
 import { BACKGROUND_MESH_POSITION, BACKGROUND_MESH_SIZE, BACKGROUND_COLOR } from '../utils/constants'
 
 export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [number, number, number] }) => {

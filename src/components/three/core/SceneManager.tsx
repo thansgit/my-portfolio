@@ -4,7 +4,7 @@ import React, { useEffect, Suspense } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import * as THREE from 'three'
-import { useViewport } from '@/components/three/hooks'
+import { useViewportContext } from '@/components/three/context/ViewportContext'
 import { MOBILE_OFFSET, DESKTOP_OFFSET } from '../utils/constants'
 import { TetheredCard } from '@/components/three/experiences/TetheredCard'
 import { Environment } from '@/components/three/components'
@@ -12,7 +12,7 @@ import { Environment } from '@/components/three/components'
 // Wrapper component for the TetheredCard element
 const TetheredCardWrapper = () => {
   const { viewport } = useThree()
-  const { isMobile } = useViewport()
+  const { isMobile } = useViewportContext()
 
   // Calculate position based on device type
   const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
@@ -24,7 +24,7 @@ const TetheredCardWrapper = () => {
 
 // Physics and visible content container
 const SceneContent = () => {
-  const { isVisible } = useViewport()
+  const { isVisible } = useViewportContext()
 
   if (!isVisible) return null
 
@@ -40,7 +40,7 @@ const SceneContent = () => {
  * physics, lighting, and environment setup
  */
 export const SceneManager: React.FC = () => {
-  const viewportState = useViewport()
+  const viewportState = useViewportContext()
   const { viewport } = useThree()
 
   // Calculate card position for environment lighting

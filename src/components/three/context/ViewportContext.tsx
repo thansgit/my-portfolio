@@ -5,23 +5,31 @@ import { useThree } from '@react-three/fiber'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '../utils/constants'
 
-export interface ViewportState {
+interface ViewportContextState {
   isMobile: boolean
   isVisible: boolean
 }
 
-export const ViewportContext = createContext<ViewportState>({
+export const ViewportContext = createContext<ViewportContextState>({
   isMobile: false,
   isVisible: true,
 })
 
-export const useViewport = () => {
-  return useContext(ViewportContext)
+export const useViewportContext = () => {
+  const context = useContext(ViewportContext)
+  if (!context) {
+    throw new Error('useViewportContext must be used within a ViewportProvider')
+  }
+  return context
 }
 
-export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface ViewportProviderProps {
+  children: React.ReactNode
+}
+
+export const ViewportProvider: React.FC<ViewportProviderProps> = ({ children }) => {
   const { size } = useThree()
-  const [state, setState] = useState<ViewportState>({
+  const [state, setState] = useState<ViewportContextState>({
     isMobile: size.width < MOBILE_BREAKPOINT,
     isVisible: true,
   })
@@ -31,10 +39,8 @@ export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     let timeoutId: NodeJS.Timeout
 
     const updateViewport = () => {
-      // Hide content immediately
       setState((prev) => ({ ...prev, isVisible: false }))
 
-      // Show content and update mobile state after delay
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
         setState({
@@ -56,7 +62,7 @@ export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const handleScroll = () => {
       const scrollY = window.scrollY
       const viewportHeight = window.innerHeight
-      const scrollThreshold = viewportHeight * 0.5 // 50% of viewport height
+      const scrollThreshold = viewportHeight * 0.5
 
       setState((prev) => {
         const shouldBeVisible = scrollY < scrollThreshold
@@ -67,10 +73,7 @@ export const ViewportProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })
     }
 
-    // Initial check
     handleScroll()
-
-    // Add scroll event listener
     window.addEventListener('scroll', handleScroll)
 
     return () => window.removeEventListener('scroll', handleScroll)

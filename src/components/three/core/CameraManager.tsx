@@ -3,7 +3,7 @@
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { useViewport } from '@/components/three/hooks'
+import { useViewportContext } from '@/components/three/context/ViewportContext'
 
 interface CameraManagerProps {
   initialPosition?: [number, number, number]
@@ -16,7 +16,7 @@ interface CameraManagerProps {
  */
 export const CameraManager: React.FC<CameraManagerProps> = ({ initialPosition = [0, 0, 13], fov = 25, children }) => {
   const { camera, size } = useThree()
-  const { isMobile } = useViewport()
+  const { isMobile } = useViewportContext()
   const cameraRef = useRef<THREE.PerspectiveCamera>()
 
   // Set initial camera position and properties

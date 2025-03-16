@@ -4,7 +4,7 @@ import React, { Suspense, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { Perf } from 'r3f-perf'
 import { ConfigProvider, EnvironmentProvider, SceneProvider, useLoading } from './context'
-import { ViewportProvider } from './hooks'
+import { ViewportProvider } from './context/ViewportContext'
 import { CameraManager, SceneManager } from './core'
 import { LoadingTracker } from './viewport/ThreeLoadingTracker'
 
