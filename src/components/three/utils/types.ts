@@ -24,7 +24,8 @@ export interface TetheredCardContextState {
 
   setCardExperiencePosition: (position: THREE.Vector3) => void
   setCardRotationCount: (count: number) => void
-  updateRopeVisuals: (color: string, radius: number) => void
+  setRopeColor: (color: string) => void
+  setRopeRadius: (radius: number) => void
 }
 
 export interface EnvironmentContextState {

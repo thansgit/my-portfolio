@@ -39,13 +39,23 @@ const SceneContent = () => {
 export const TetheredCardManager: React.FC = () => {
   const { isMobile } = useViewportContext()
   const { viewport } = useThree()
-  const { setCardExperiencePosition } = useTetheredCardContext()
+  const { setCardExperiencePosition, setRopeColor, setRopeRadius } = useTetheredCardContext()
 
   // Calculate and update card position when viewport changes
   useEffect(() => {
     const [x, y, z] = calculateCardPosition(viewport, isMobile)
     setCardExperiencePosition(new THREE.Vector3(x, y, z))
   }, [viewport.width, viewport.height, isMobile, setCardExperiencePosition])
+
+  /**
+   * Updates rope visual properties
+   * @param color - The color of the rope
+   * @param radius - The radius of the rope
+   */
+  const updateRopeVisuals = (color: string, radius: number) => {
+    setRopeColor(color)
+    setRopeRadius(radius)
+  }
 
   return (
     <Suspense fallback={null}>

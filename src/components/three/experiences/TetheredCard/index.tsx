@@ -25,7 +25,7 @@ import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } fro
 export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
   // Get configuration from context
   const { cardPhysics } = useConfigContext()
-  const { updateRopeVisuals, ropeColor, ropeRadius, setCardRotationCount } = useTetheredCardContext()
+  const { ropeColor, ropeRadius, setCardRotationCount, setRopeColor, setRopeRadius } = useTetheredCardContext()
 
   // Physics settings from config context
   const maxSpeed = cardPhysics.maxSpeed
@@ -121,13 +121,15 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
 
       const newRadius = ROPE_INITIAL_RADIUS - radiusStretch * (ROPE_INITIAL_RADIUS - ROPE_MIN_RADIUS)
 
-      // Update shared state through context
-      updateRopeVisuals(newColor, newRadius)
+      // Update shared state through individual setters
+      setRopeColor(newColor)
+      setRopeRadius(newRadius)
     } else {
       // Reset to defaults
-      updateRopeVisuals('#000000', ROPE_INITIAL_RADIUS)
+      setRopeColor('#000000')
+      setRopeRadius(ROPE_INITIAL_RADIUS)
     }
-  }, [points, updateRopeVisuals, restingLength])
+  }, [points, setRopeColor, setRopeRadius, restingLength])
 
   // Set up physics joints
   useJoints(fixedRef, j2Ref, j3Ref, j4Ref, cardRef, ROPE_SEGMENT_LENGTH)

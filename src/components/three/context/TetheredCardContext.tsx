@@ -27,11 +27,6 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
   const [ropeColor, setRopeColor] = useState('#000000')
   const [ropeRadius, setRopeRadius] = useState(0.04) // Default from constants
 
-  const updateRopeVisuals = (color: string, radius: number) => {
-    setRopeColor(color)
-    setRopeRadius(radius)
-  }
-
   const contextValue: TetheredCardContextState = {
     // State
     cardExperiencePosition,
@@ -42,7 +37,8 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
     // Handlers
     setCardExperiencePosition,
     setCardRotationCount,
-    updateRopeVisuals,
+    setRopeColor,
+    setRopeRadius,
   }
 
   return <TetheredCardContext.Provider value={contextValue}>{children}</TetheredCardContext.Provider>
