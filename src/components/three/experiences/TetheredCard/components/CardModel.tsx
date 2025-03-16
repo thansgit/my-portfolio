@@ -1,17 +1,11 @@
 import * as THREE from 'three'
 import { useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
-import { useReflectiveMaterial } from '../utils/materials'
+import { useReflectiveMaterial } from '../hooks/useMaterials'
 import { useDragHandlers, useHoverState } from '../hooks/useControls'
-import {
-  CARD_MODEL_SCALE,
-  CARD_POSITION_OFFSET,
-  CARD_SWING_AMPLITUDE,
-  CARD_SWING_FREQUENCY,
-  CARD_ROTATION_DAMPING,
-} from '@/components/three/utils/constants'
+import { useRestingRotation } from '../hooks/usePhysics'
+import { CARD_MODEL_SCALE, CARD_POSITION_OFFSET } from '@/components/three/utils/constants'
 import { ModelWrapper } from '@/components/three/components'
 
 // Model path
@@ -40,26 +34,14 @@ interface CardModelProps {
 export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
   const { nodes } = useGLTF(MODEL_PATH) as GLTFResult
   const groupRef = useRef<THREE.Group>(null)
-  const initialRotation = useRef(Math.random() * Math.PI * 2)
   const sceneRef = useRef<THREE.Object3D | null>(null)
 
   const { hovered, setHovered } = useHoverState(onHover, Boolean(dragged))
   const { handlePointerDown, handlePointerUp, handlePointerCancel } = useDragHandlers(nodeRef, onDrag)
   const reflectiveMaterial = useReflectiveMaterial()
 
-  // Add gentle swinging motion when card is at rest
-  useFrame((state) => {
-    if (!sceneRef.current) return
-
-    if (dragged === false) {
-      const time = state.clock.getElapsedTime()
-      const swingAngle = Math.sin(time * CARD_SWING_FREQUENCY + initialRotation.current) * CARD_SWING_AMPLITUDE
-      sceneRef.current.rotation.z = swingAngle
-    } else {
-      // Smoothly dampen rotation when card is dragged
-      sceneRef.current.rotation.z *= CARD_ROTATION_DAMPING
-    }
-  })
+  // Apply resting rotation to the card when it's not being dragged
+  useRestingRotation(sceneRef, dragged)
 
   // Apply materials to the model meshes
   useEffect(() => {
@@ -68,55 +50,30 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
     nodes.Scene.renderOrder = 10
     sceneRef.current = nodes.Scene
 
+    // Apply materials to meshes
     nodes.Scene.traverse((child) => {
-      if (!(child instanceof THREE.Mesh)) return
-
-      // Store original material for cleanup
-      if (!child.userData.originalMaterial) {
-        child.userData.originalMaterial = child.material
-      }
-
-      const materialName = child.material?.name || ''
-
-      if (materialName.toLowerCase().includes('back')) {
-        // Hide back material
-        child.visible = false
-        child.position.z += 1000
-        child.renderOrder = -1
-      } else if (materialName.toLowerCase().includes('front')) {
-        // Apply reflective material to front
+      if (child instanceof THREE.Mesh) {
         child.material = reflectiveMaterial
-        child.renderOrder = 100
+        child.castShadow = true
+        child.receiveShadow = true
       }
     })
-
-    // Cleanup on unmount
-    return () => {
-      if (reflectiveMaterial) {
-        reflectiveMaterial.dispose()
-      }
-
-      nodes.Scene.traverse((child) => {
-        if (!(child instanceof THREE.Mesh) || !child.userData.originalMaterial) return
-        child.material = child.userData.originalMaterial
-      })
-    }
-  }, [reflectiveMaterial, nodes])
+  }, [nodes, reflectiveMaterial])
 
   return (
     <ModelWrapper>
       <group
         ref={groupRef}
-        scale={CARD_MODEL_SCALE}
-        position={CARD_POSITION_OFFSET}
         rotation={[Math.PI * 0.5, 0, 0]}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        position={CARD_POSITION_OFFSET}
+        scale={CARD_MODEL_SCALE}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
       >
-        <primitive object={nodes.Scene} />
+        {nodes.Scene && <primitive object={nodes.Scene} />}
       </group>
     </ModelWrapper>
   )

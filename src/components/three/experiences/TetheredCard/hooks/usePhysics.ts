@@ -3,6 +3,7 @@ import { RefObject, ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RapierRigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier'
 import { ExtendedRigidBody } from '@/components/three/utils/types'
+import { CARD_SWING_AMPLITUDE, CARD_SWING_FREQUENCY, CARD_ROTATION_DAMPING } from '@/components/three/utils/constants'
 
 /**
  * Props for the usePhysicsUpdate hook
@@ -42,6 +43,24 @@ export const useJoints = (
     [0, 0, 0],
     [0, 1.45, 0],
   ])
+}
+
+/**
+ * Applies natural swinging motion to an object when it's at rest (not being dragged)
+ */
+export const useRestingRotation = (objectRef: RefObject<THREE.Object3D>, dragged: THREE.Vector3 | false) => {
+  useFrame((state) => {
+    if (!objectRef.current) return
+
+    if (dragged === false) {
+      const time = state.clock.getElapsedTime()
+      const swingAngle = Math.sin(time * CARD_SWING_FREQUENCY) * CARD_SWING_AMPLITUDE
+      objectRef.current.rotation.z = swingAngle
+    } else {
+      // Smoothly dampen rotation when object is dragged
+      objectRef.current.rotation.z *= CARD_ROTATION_DAMPING
+    }
+  })
 }
 
 /**

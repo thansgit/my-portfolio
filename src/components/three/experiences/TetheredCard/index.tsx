@@ -174,12 +174,8 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
       >
         <CardModel nodeRef={cardRef} dragged={dragged} onHover={setHovered} onDrag={setDragged} />
       </RigidBody>
-      {/* 
-        Invisible draggable plane that follows the card's position but doesn't rotate.
-        This provides a larger, consistent touch target even when the card rotates on its z-axis,
-        significantly improving the mobile touch experience and preventing the draggable area from
-        becoming too small during card rotation.
-      */}
+
+      {/* Invisible draggable plane that follows the card's position but doesn't rotate. */}
       <group ref={planeGroupRef} position={[finalCardPosition[0], finalCardPosition[1], finalCardPosition[2]]}>
         <DraggablePlane
           nodeRef={cardRef}
