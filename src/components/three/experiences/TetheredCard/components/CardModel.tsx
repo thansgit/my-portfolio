@@ -38,27 +38,19 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
 
   const { hovered, setHovered } = useHoverState(onHover, Boolean(dragged))
   const { handlePointerDown, handlePointerUp, handlePointerCancel } = useDragHandlers(nodeRef, onDrag)
-  const reflectiveMaterial = useReflectiveMaterial()
 
   // Apply resting rotation to the card when it's not being dragged
   useRestingRotation(sceneRef, dragged)
 
-  // Apply materials to the model meshes
+  // Set the Scene from the model to the sceneRef
   useEffect(() => {
-    if (!reflectiveMaterial || !nodes || !nodes.Scene) return
-
-    nodes.Scene.renderOrder = 10
+    if (!nodes || !nodes.Scene) return
     sceneRef.current = nodes.Scene
+  }, [nodes])
 
-    // Apply materials to meshes
-    nodes.Scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = reflectiveMaterial
-        child.castShadow = true
-        child.receiveShadow = true
-      }
-    })
-  }, [nodes, reflectiveMaterial])
+  // Use the materials hook (now returns both front and back materials)
+  // The actual material application happens inside the hook
+  useReflectiveMaterial(sceneRef)
 
   return (
     <ModelWrapper>

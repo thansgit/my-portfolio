@@ -47,6 +47,7 @@ export const BALL_COLLIDER_SIZES = {
 export const BACKGROUND_MESH_POSITION = [0, 0, -20] as [number, number, number]
 export const BACKGROUND_MESH_SIZE = [100, 100] as [number, number]
 export const BACKGROUND_COLOR = '#252730'
+export const CARD_RENDER_ORDER = 10
 
 // ===== MATERIAL CONSTANTS =====
 // Card material constants
