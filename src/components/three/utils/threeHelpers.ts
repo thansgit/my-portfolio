@@ -24,18 +24,6 @@ export const lerpVectors = (v1: THREE.Vector3, v2: THREE.Vector3, alpha: number)
   return v1.clone().lerp(v2, alpha)
 }
 
-export const createBasicMaterial = (
-  color: string | number = 0xffffff,
-  options: Partial<THREE.MeshStandardMaterialParameters> = {},
-): THREE.MeshStandardMaterial => {
-  return new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.5,
-    metalness: 0.5,
-    ...options,
-  })
-}
-
 export const getDistance = (p1: THREE.Vector3, p2: THREE.Vector3): number => {
   return p1.distanceTo(p2)
 }
@@ -79,4 +67,37 @@ export const useScreenToWorld = (x: number, y: number, distance: number = 13): T
   point.addScaledVector(direction, distance)
 
   return point
+}
+
+export function createStandardMaterial(color: string): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
+    color: color,
+    roughness: 0.7,
+    metalness: 0.1,
+  })
+}
+
+export function createDisposableGeometry(createFn: () => THREE.BufferGeometry | null): {
+  geometry: THREE.BufferGeometry | null
+  dispose: () => void
+} {
+  let geometry: THREE.BufferGeometry | null = null
+
+  const create = () => {
+    dispose() // Clean up previous geometry
+    geometry = createFn()
+    return geometry
+  }
+
+  const dispose = () => {
+    if (geometry) {
+      geometry.dispose()
+      geometry = null
+    }
+  }
+
+  return {
+    geometry: create(),
+    dispose,
+  }
 }

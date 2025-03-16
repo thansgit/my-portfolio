@@ -1,10 +1,9 @@
 import * as THREE from 'three'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { RapierRigidBody } from '@react-three/rapier'
+import { ThreeEvent } from '@react-three/fiber'
+import { useCursor } from '@react-three/drei'
 
-/**
- * Quadrants in the XY plane for rotation tracking
- */
 export enum Quadrant {
   Q1 = 1, // (+X, +Y) - top right
   Q2 = 2, // (-X, +Y) - top left
@@ -12,18 +11,12 @@ export enum Quadrant {
   Q4 = 4, // (+X, -Y) - bottom right
 }
 
-/**
- * Props for the useRotationTracker hook
- */
 export interface RotationTrackerProps {
   card: React.RefObject<RapierRigidBody>
   fixed: React.RefObject<RapierRigidBody>
   isDragging: boolean
 }
 
-/**
- * Tracks rotations of a tethered object by monitoring its movement through quadrants
- */
 export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerProps) => {
   // Current quadrant and history
   const currentQuadrant = useRef<Quadrant | null>(null)
@@ -280,4 +273,43 @@ export const useTouchHandling = (dragged: THREE.Vector3 | false, hovered: boolea
       return () => void (document.body.style.cursor = 'auto')
     }
   }, [hovered, dragged])
+}
+
+export const useDragHandlers = (
+  nodeRef: React.RefObject<{ translation(): { x: number; y: number; z: number } }>,
+  onDrag: (drag: THREE.Vector3 | false) => void,
+) => {
+  const vec = new THREE.Vector3()
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    if (nodeRef.current) {
+      const pos = nodeRef.current.translation()
+      vec.set(pos.x, pos.y, pos.z)
+      onDrag(new THREE.Vector3().copy(e.point).sub(vec))
+    }
+  }
+
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+    onDrag(false)
+  }
+
+  const handlePointerCancel = () => {
+    onDrag(false)
+  }
+
+  return { handlePointerDown, handlePointerUp, handlePointerCancel }
+}
+
+export const useHoverState = (onHover: (state: boolean) => void, dragged: boolean) => {
+  const [hovered, setHovered] = useState(false)
+
+  useCursor(hovered, dragged ? 'grabbing' : 'grab')
+
+  useEffect(() => {
+    onHover(hovered)
+  }, [hovered, onHover])
+
+  return { hovered, setHovered }
 }

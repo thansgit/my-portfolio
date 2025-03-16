@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
 import { Sphere, Billboard } from '@react-three/drei'
-import { Vector3, Mesh, Group } from 'three'
+import { Vector3 } from 'three'
 
 interface PinheadProps {
   position?: [number, number, number]

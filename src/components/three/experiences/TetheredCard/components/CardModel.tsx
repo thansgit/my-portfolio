@@ -1,11 +1,10 @@
-// CardModel component
-
 import * as THREE from 'three'
-import { useRef, useEffect, useState } from 'react'
-import { ThreeEvent, useFrame } from '@react-three/fiber'
-import { useGLTF, useCursor } from '@react-three/drei'
+import { useRef, useEffect } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { useReflectiveMaterial } from '../utils/materials'
+import { useDragHandlers, useHoverState } from '../hooks/useControls'
 import {
   CARD_MODEL_SCALE,
   CARD_POSITION_OFFSET,
@@ -40,22 +39,13 @@ interface CardModelProps {
 
 export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
   const { nodes } = useGLTF(MODEL_PATH) as GLTFResult
-  const vec = new THREE.Vector3()
   const groupRef = useRef<THREE.Group>(null)
   const initialRotation = useRef(Math.random() * Math.PI * 2)
   const sceneRef = useRef<THREE.Object3D | null>(null)
-  const [hovered, setHovered] = useState(false)
 
-  // Use reflective material instead of glass
+  const { hovered, setHovered } = useHoverState(onHover, Boolean(dragged))
+  const { handlePointerDown, handlePointerUp, handlePointerCancel } = useDragHandlers(nodeRef, onDrag)
   const reflectiveMaterial = useReflectiveMaterial()
-
-  // Handle cursor appearance based on hover state
-  useCursor(hovered, dragged ? 'grabbing' : 'grab')
-
-  // This effect forwards hover state to the parent
-  useEffect(() => {
-    onHover(hovered)
-  }, [hovered, onHover])
 
   // Add gentle swinging motion when card is at rest
   useFrame((state) => {
@@ -70,21 +60,6 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
       sceneRef.current.rotation.z *= CARD_ROTATION_DAMPING
     }
   })
-
-  // Handle pointer events
-  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-    if (nodeRef.current) {
-      const pos = nodeRef.current.translation()
-      vec.set(pos.x, pos.y, pos.z)
-      onDrag(new THREE.Vector3().copy(e.point).sub(vec))
-    }
-  }
-
-  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
-    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
-    onDrag(false)
-  }
 
   // Apply materials to the model meshes
   useEffect(() => {
@@ -139,7 +114,7 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
         onPointerOut={() => setHovered(false)}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
-        onPointerCancel={() => onDrag(false)}
+        onPointerCancel={handlePointerCancel}
       >
         <primitive object={nodes.Scene} />
       </group>

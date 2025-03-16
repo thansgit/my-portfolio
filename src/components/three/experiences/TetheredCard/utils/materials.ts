@@ -5,10 +5,6 @@ import { useLoader } from '@react-three/fiber'
 import { useMemo, useRef, useEffect } from 'react'
 import { CARD_MATERIAL } from '@/components/three/utils/constants'
 
-/**
- * Custom hook for creating a reflective material with normal map and texture
- * This replaces the glass material with a more opaque reflective surface
- */
 export const useReflectiveMaterial = () => {
   const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
   const colorMap = useLoader(THREE.TextureLoader, '/assets/textures/2.png')
