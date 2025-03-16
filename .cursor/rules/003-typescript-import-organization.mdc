@@ -1,0 +1,89 @@
+---
+description: ALWAYS organize imports in groups and alphabetically in TypeScript files
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript Import Organization
+
+## Context
+- When writing or modifying any TypeScript or TSX file
+- When introducing new imports to existing files
+- When refactoring or cleaning up code
+
+## Requirements
+- Group imports by category with blank lines between groups
+- Sort imports alphabetically within each group
+- Use the following grouping order:
+  1. Node.js built-in modules
+  2. External libraries/dependencies (npm packages)
+  3. Absolute imports from project (starting with '@/' or similar)
+  4. Relative imports from parent directories (starting with '../')
+  5. Relative imports from same directory (starting with './')
+  6. Type imports (if separated with a `type` import)
+  7. Asset imports (CSS, images, etc.)
+- Avoid unused imports
+- Use named imports instead of default imports when possible
+- Preserve side-effect imports at the top of the appropriate section
+
+## Examples
+<example>
+// Good: Properly grouped and alphabetically sorted imports
+// 1. Node.js builtins
+import { readFileSync } from 'fs';
+import path from 'path';
+
+// 2. External libraries
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useRef, useState } from 'react';
+import * as THREE from 'three';
+
+// 3. Absolute imports
+import { AppConfig } from '@/config';
+import { useAppContext } from '@/context';
+
+// 4. Relative parent imports
+import { useThemeColors } from '../../hooks/useThemeColors';
+import { formatData } from '../utils/formatters';
+
+// 5. Relative same-directory imports
+import { CardProps } from './Card.types';
+import { renderHelper } from './helpers';
+
+// 6. Type imports
+import type { Vector3 } from 'three';
+import type { AnimationConfig } from './animations.types';
+
+// 7. Assets
+import './Component.css';
+import logoImage from './logo.png';
+</example>
+
+<example type="invalid">
+// Bad: Unsorted, ungrouped imports
+import styles from './styles.module.css';
+import { formatData } from '../utils/formatters';
+import { useAppContext } from '@/context';
+import * as THREE from 'three';
+import { CardProps } from './Card.types';
+import { AppConfig } from '@/config';
+import logoImage from './logo.png';
+import { readFileSync } from 'fs';
+import { renderHelper } from './helpers';
+import { useThemeColors } from '../../hooks/useThemeColors';
+import { Canvas, useFrame } from '@react-three/fiber';
+import path from 'path';
+import './Component.css';
+import { useRef, useState } from 'react';
+import type { Vector3 } from 'three';
+import type { AnimationConfig } from './animations.types';
+</example>
+
+## Critical Rules
+  - ALWAYS separate imports into logical groups with blank lines between them
+  - ALWAYS sort imports alphabetically within each group
+  - Node.js builtins and external packages MUST come before internal project imports
+  - Absolute imports MUST come before relative imports
+  - Type imports should be grouped together
+  - Asset imports should come last
+  - Follow consistent import style across the entire codebase

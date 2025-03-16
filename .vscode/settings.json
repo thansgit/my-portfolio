@@ -44,5 +44,9 @@
 
   // Reduce noise in explorer
   "explorer.excludeGitIgnore": true,
-  "explorer.compactFolders": false
+  "explorer.compactFolders": false,
+
+  "workbench.editorAssociations": {
+    "*.mdc": "default"
+  }
 }

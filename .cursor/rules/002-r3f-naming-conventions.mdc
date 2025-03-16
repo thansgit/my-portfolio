@@ -1,0 +1,103 @@
+---
+description: ALWAYS use consistent naming patterns for React Three Fiber components
+globs: src/components/three/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# React Three Fiber Naming Conventions
+
+## Context
+- When creating or modifying React Three Fiber (R3F) components
+- When defining 3D scene graphs, meshes, materials, or geometries
+- When creating Three.js hooks, utilities, or context files
+
+## Requirements
+- Use **PascalCase** for all R3F component names (e.g., `TerrainMesh`, `SpinningCube`)
+- Files containing a single R3F component should match the component name (e.g., `TerrainMesh.tsx`)
+- Use **camelCase** for hooks and utility functions
+- Use descriptive prefix naming patterns based on the component's purpose:
+  - Use `use` prefix for custom hooks (e.g., `usePhysics`, `useAnimation`)
+  - Use `with` prefix for higher-order components (e.g., `withPhysics`)
+  - Use `<Name>Provider` pattern for context providers
+- Use the following naming patterns for Three.js primitives:
+  - Use lowercase Three.js element names matching R3F JSX elements (e.g., `<mesh>`, `<boxGeometry>`)
+  - Name 3D objects after their visual or functional purpose (e.g., `PlayerModel`, `TerrainChunk`)
+
+## Examples
+<example>
+// Good: Component names in PascalCase with descriptive names
+function FloatingCard({ position }) {
+  return (
+    <group position={position}>
+      <mesh castShadow>
+        <boxGeometry args={[1, 0.1, 1.5]} />
+        <meshStandardMaterial color="#f5f5f5" />
+      </mesh>
+    </group>
+  );
+}
+
+// Good: Custom hook with 'use' prefix
+function useCardAnimation(meshRef) {
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.01;
+    }
+  });
+}
+</example>
+
+<example>
+// Good: Context provider with 'Provider' suffix
+export const SceneConfigProvider = ({ children, initialConfig }) => {
+  const [config, setConfig] = useState(initialConfig);
+  
+  return (
+    <SceneConfigContext.Provider value={{ config, setConfig }}>
+      {children}
+    </SceneConfigContext.Provider>
+  );
+};
+
+// Good: HOC with 'with' prefix
+const withInteractivity = (Component) => {
+  return function WithInteractivity(props) {
+    const [hovered, setHovered] = useState(false);
+    
+    return (
+      <Component 
+        {...props} 
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+        scale={hovered ? 1.1 : 1}
+      />
+    );
+  };
+};
+</example>
+
+<example type="invalid">
+// Bad: Inconsistent naming for Three.js elements
+function scene_component() {
+  return (
+    <MESH>
+      <BoxGeo args={[1, 1, 1]} />
+      <material color="red" />
+    </MESH>
+  );
+}
+
+// Bad: Non-descriptive component and file names
+// In file: 3d.tsx
+function Thing() {
+  return <mesh />;
+}
+</example>
+
+## Critical Rules
+  - ALWAYS use PascalCase for all R3F component names
+  - File names should match the component name they export
+  - Use the standard R3F lowercase element names for Three.js primitives (`<mesh>`, not `<Mesh>`)
+  - Custom hooks MUST start with the `use` prefix
+  - Higher-order components MUST start with the `with` prefix
+  - Name 3D objects descriptively based on their visual or functional purpose, not their technical implementation 
