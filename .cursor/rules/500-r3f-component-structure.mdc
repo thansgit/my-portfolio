@@ -1,0 +1,210 @@
+---
+description: ALWAYS structure React Three Fiber components consistently for maintainability and performance
+globs: src/components/three/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# React Three Fiber Component Structure Organization
+
+## Context
+- When creating new React Three Fiber components
+- When refactoring existing 3D components
+- When organizing complex 3D scenes and experiences
+
+## Requirements
+- Structure all R3F components in a consistent order:
+  1. Props interface definition with JSDoc comments
+  2. Component function declaration (PascalCase)
+  3. References and instance variables
+  4. State declarations
+  5. Context hooks
+  6. Custom hooks
+  7. Event handlers and utility functions
+  8. useEffect hooks (ordered from most general to specific)
+  9. useFrame callbacks
+  10. Return statement with JSX
+- Separate complex 3D components into logical sub-components
+- Extract reusable logic to custom hooks in separate files
+- Maintain performance optimizations:
+  - Use `useThree` for scene, camera, and renderer access
+  - Memoize expensive calculations with useMemo
+  - Use refs for direct Three.js object manipulation
+  - Implement proper dispose/cleanup in useEffect return functions
+- Handle scene management:
+  - Use context for shared scene state
+  - Implement object pooling for repetitive elements
+  - Use instancedMesh for repeated geometries
+
+## Examples
+<example>
+// Good: Well-structured React Three Fiber component
+import { useRef, useState, useMemo, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
+
+import { useSceneContext } from '@/components/three/context';
+import { useAnimation } from '@/components/three/hooks/useAnimation';
+import type { GLTFResult } from './types';
+
+/**
+ * Props for the InteractiveModel component
+ * @property {[number, number, number]} position - The 3D position
+ * @property {number} scale - Uniform scale factor
+ * @property {boolean} castShadow - Whether the model casts shadows
+ * @property {() => void} onClick - Handler for click events
+ */
+interface InteractiveModelProps {
+  position?: [number, number, number];
+  scale?: number;
+  castShadow?: boolean;
+  onClick?: () => void;
+}
+
+export function InteractiveModel({
+  position = [0, 0, 0],
+  scale = 1,
+  castShadow = true,
+  onClick,
+}: InteractiveModelProps) {
+  // References
+  const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  // State
+  const [hovered, setHovered] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  
+  // Context
+  const { isHighQuality } = useSceneContext();
+  
+  // Custom hooks
+  const { scene } = useGLTF('/models/interactive_object.glb') as GLTFResult;
+  const { animate } = useAnimation(meshRef);
+  
+  // Three.js hooks
+  const { camera } = useThree();
+  
+  // Memoized values
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
+  
+  // Event handlers
+  const handlePointerOver = () => setHovered(true);
+  const handlePointerOut = () => setHovered(false);
+  const handleClick = () => {
+    setClicked(!clicked);
+    if (onClick) onClick();
+  };
+  
+  // Effects - Setup
+  useEffect(() => {
+    if (groupRef.current) {
+      // Setup code here
+    }
+    
+    return () => {
+      // Cleanup and dispose resources
+      clonedScene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          if (object.material instanceof THREE.Material) {
+            object.material.dispose();
+          }
+        }
+      });
+    };
+  }, [clonedScene]);
+  
+  // Effects - Handle state changes
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.material.color.set(hovered ? '#ff0000' : '#ffffff');
+    }
+  }, [hovered]);
+  
+  // Animation loop
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.2;
+      
+      // Conditional animations based on state
+      if (clicked) {
+        animate(delta);
+      }
+    }
+  });
+  
+  return (
+    <group ref={groupRef} position={position} scale={scale}>
+      <mesh
+        ref={meshRef}
+        castShadow={castShadow}
+        receiveShadow
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
+        <primitive object={clonedScene} />
+      </mesh>
+      
+      {/* Conditional rendering based on state */}
+      {clicked && (
+        <pointLight position={[0, 2, 0]} intensity={1.5} color="#ffff00" />
+      )}
+    </group>
+  );
+}
+</example>
+
+<example type="invalid">
+// Bad: Disorganized React Three Fiber component
+import { useFrame } from '@react-three/fiber';
+import { useState } from 'react';
+import * as THREE from 'three';
+
+function DisorganizedModel(props) {
+  // References defined after hooks
+  useFrame(() => {
+    // Direct object manipulation without refs
+    props.mesh.rotation.x += 0.01;
+    // No delta time used for frame-rate independent animation
+  });
+  
+  // State declarations mixed with other logic
+  const [active, setActive] = useState(false);
+  
+  // Missing cleanup for event listeners or disposable resources
+  
+  // No organization of related logic
+  const ref = React.useRef();
+  const handleClick = () => setActive(!active);
+  
+  function changeColor() {
+    // Directly creating materials inside render function
+    const material = new THREE.MeshStandardMaterial({ color: 'red' });
+    return material;
+  }
+  
+  const { scene } = useThree();
+  
+  return (
+    <mesh onClick={handleClick}>
+      <boxGeometry />
+      <meshStandardMaterial color={active ? 'hotpink' : 'orange'} />
+      {/* No consistent pattern for conditional rendering */}
+      {active ? <pointLight /> : null}
+    </mesh>
+  );
+}
+</example>
+
+## Critical Rules
+  - ALWAYS define a clear props interface with proper typing and defaults
+  - Group related logic together (state, handlers, effects)
+  - Declare all refs at the beginning of the component
+  - Use proper cleanup in useEffect returns to prevent memory leaks
+  - Extract complex logic to custom hooks for reusability
+  - Organize useFrame callbacks with performance in mind
+  - Maintain proper disposal of Three.js resources (geometries, materials, textures)
+  - Use memoization for expensive calculations or object creation
+  - Keep rendering logic at the end of the component 

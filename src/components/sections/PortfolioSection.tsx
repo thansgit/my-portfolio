@@ -1,8 +1,9 @@
 'use client'
 
-import { Card, CardContent, Section, VideoPlayer } from '@/components/ui'
+import { NeuSection, NeuContainer, VideoPlayer, NeuButton } from '@/components/ui'
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
 import { PortfolioItem } from './types'
+import { cn } from '@/lib/utils'
 
 export function PortfolioSection() {
   // Portfolio items data
@@ -41,25 +42,29 @@ export function PortfolioSection() {
   ]
 
   return (
-    <Section title='Portfolio'>
+    <NeuSection title='Portfolio'>
       <div className='grid grid-cols-1 gap-6'>
         {portfolioItems.map((item) => (
-          <Card key={item.title} className='card-base group'>
-            <CardContent className='relative p-0'>
+          <NeuContainer key={item.title} className='group transition-all duration-300 hover:translate-y-[2px]'>
+            {/* Content area */}
+            <div className='relative'>
               {/* Use optimized VideoPlayer component */}
               <VideoPlayer videoUrl={item.videoUrl} title={item.title} />
 
-              {/* Content area */}
-              <div className='p-4'>
-                <h3 className='mb-2 text-xl font-semibold text-yellow-500'>{item.title}</h3>
-                <p className='mb-4 text-zinc-300'>{item.description}</p>
+              <div className='p-6'>
+                <h3 className='text-neu-accent mb-2 text-xl font-semibold'>{item.title}</h3>
+                <p className='text-neu-text mb-4'>{item.description}</p>
 
                 {/* Technology tags */}
                 <div className='mb-4 flex flex-wrap gap-2'>
                   {item.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className={`/* [Tech Tag] Pill-shaped tags for technologies */ rounded-full bg-zinc-700 px-2 py-1 text-xs text-zinc-300`}
+                      className={cn(
+                        'rounded-full px-2 py-1 text-xs',
+                        'bg-neu-bgDark text-neu-textSecondary',
+                        'shadow-neu-pressed-sm',
+                      )}
                     >
                       {tech}
                     </span>
@@ -73,7 +78,7 @@ export function PortfolioSection() {
                       href={item.githubUrl}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='link-style flex items-center gap-1'
+                      className='neu-link flex items-center gap-1'
                       aria-label={`GitHub repository for ${item.title}`}
                       tabIndex={0}
                     >
@@ -87,7 +92,7 @@ export function PortfolioSection() {
                       href={item.liveUrl}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='link-style flex items-center gap-1'
+                      className='neu-link flex items-center gap-1'
                       aria-label={`Live demo for ${item.title}`}
                       tabIndex={0}
                     >
@@ -97,10 +102,10 @@ export function PortfolioSection() {
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </NeuContainer>
         ))}
       </div>
-    </Section>
+    </NeuSection>
   )
 }

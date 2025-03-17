@@ -1,0 +1,93 @@
+---
+description: ALWAYS use when writing or updating Markdown files to ensure consistent formatting and readability
+globs: **/*.{md,mdx}
+alwaysApply: false
+---
+
+# Markdown Documentation Standards
+
+## Context
+- When creating new documentation in Markdown (.md) or MDX (.mdx) format
+- When updating existing documentation
+- When writing README files or project guides
+- When adding comments or explanations to code repositories
+
+## Requirements
+- Use consistent heading levels with # for titles and ## for sections
+- Each document must have a single H1 (#) title at the top
+- Include blank lines between paragraphs and sections
+- Use bullet lists with - for unordered lists and 1. for ordered lists
+- Use **bold** for emphasis and `code` for inline code references
+- Use code blocks with language specifiers for multi-line code examples
+- Include a table of contents for documents longer than 1000 words
+- Use contextual links with descriptive text instead of raw URLs
+- Structure content using these standard sections when applicable:
+  1. Overview/Introduction
+  2. Getting Started
+  3. Installation
+  4. Usage/Examples
+  5. API Reference
+  6. Contributing
+  7. License
+
+## Examples
+<example>
+# Project Title
+
+## Overview
+A brief description of what this project does and its main features.
+
+## Installation
+```bash
+npm install my-package
+```
+
+## Usage
+```typescript
+import { myFunction } from 'my-package';
+
+// Example usage
+const result = myFunction();
+```
+
+## API Reference
+### myFunction()
+Returns a value based on the input parameters.
+
+- **Parameters**: None
+- **Returns**: Boolean value
+
+## Contributing
+Contributions are welcome! Please read the contributing guidelines first.
+</example>
+
+<example type="invalid">
+Project Documentation
+=====================
+
+About
+-----
+This is some information about the project.
+It's not properly formatted and lacks structure.
+
+INSTALL:
+Do this: `npm install something`
+
+Examples
+Here's how to use it:
+```
+import Thing from 'something'
+var x = new Thing()
+```
+
+LICENSE: MIT
+</example>
+
+## Critical Rules
+  - Each document MUST have a single H1 (#) title at the top
+  - Use ## for sections, ### for subsections
+  - Use consistent formatting for lists, code blocks, and emphasis
+  - Use blank lines between paragraphs and sections
+  - Include descriptive link text rather than raw URLs
+  - Add language specifiers to code blocks
+  - Maintain a logical structure with standard sections 

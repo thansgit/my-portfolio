@@ -3,14 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  /* Theme variables will be set dynamically from neumorphic.ts */
+
+  /* Shadow variables */
+  --neu-shadow-dark: 0, 0, 0;
+  --neu-shadow-light: 255, 255, 255;
+  --neu-shadow-dark-opacity: 0.5;
+  --neu-shadow-light-opacity: 0.05;
+
+  /* Animation variables */
+  --neu-transition-fast: 150ms;
+  --neu-transition-default: 300ms;
+  --neu-transition-slow: 500ms;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
+  color: rgb(var(--neu-text));
+  background: rgb(var(--neu-bg));
   font-family:
     var(--font-inter),
     ui-sans-serif,
@@ -25,37 +34,128 @@ pre {
   font-family: var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Essential component classes - limited to the most commonly used patterns */
+/* Component classes */
 @layer components {
-  /* Common card styling used throughout the site */
-  .card-base {
-    @apply overflow-hidden rounded-xl border border-zinc-700 bg-zinc-800 shadow-lg;
+  /* Container */
+  .neu-container {
+    @apply overflow-hidden rounded-neu-lg bg-neu-surface;
+    box-shadow:
+      8px 8px 16px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      -8px -8px 16px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
   }
 
-  /* Section headings with consistent styling */
-  .section-title {
-    @apply mb-6 flex items-center text-xl font-semibold text-zinc-200;
+  /* Pressed container */
+  .neu-container-pressed {
+    @apply overflow-hidden rounded-neu-lg bg-neu-surface;
+    box-shadow:
+      inset 8px 8px 16px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      inset -8px -8px 16px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
   }
 
-  /* Section heading icon styling */
-  .section-icon {
-    @apply mr-3 inline-flex rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 p-2 text-zinc-900 shadow-lg;
+  /* Button */
+  .neu-button {
+    @apply rounded-neu-md bg-neu-surface text-neu-text transition-all duration-300;
+    box-shadow:
+      6px 6px 12px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      -6px -6px 12px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
   }
 
-  /* Primary button style */
-  .button-primary {
-    @apply rounded-md bg-yellow-500 px-4 py-2 font-medium text-zinc-900 transition-colors hover:bg-yellow-600;
+  .neu-button:hover {
+    @apply translate-y-0.5;
+    box-shadow:
+      4px 4px 8px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      -4px -4px 8px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
   }
 
-  /* Link styling */
-  .link-style {
-    @apply text-zinc-400 transition-colors hover:text-yellow-500;
+  .neu-button:active {
+    @apply translate-y-1;
+    box-shadow:
+      inset 4px 4px 8px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      inset -4px -4px 8px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
+  }
+
+  /* Accent button */
+  .neu-button-accent {
+    @apply bg-neu-accent text-neu-textOnAccent;
+  }
+
+  /* Section title */
+  .neu-section-title {
+    @apply mb-6 flex items-center text-xl font-semibold text-neu-accent;
+  }
+
+  /* Icon */
+  .neu-icon {
+    @apply mr-3 inline-flex rounded-full p-2 text-neu-textOnAccent;
+    background: linear-gradient(to bottom right, rgb(var(--neu-accent-light)), rgb(var(--neu-accent-dark)));
+    box-shadow:
+      2px 2px 4px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      -2px -2px 4px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
+  }
+
+  /* Link */
+  .neu-link {
+    @apply text-neu-textSecondary transition-colors;
+    &:hover {
+      @apply text-neu-accent;
+    }
+  }
+
+  /* Input field */
+  .neu-input {
+    @apply w-full rounded-neu-md bg-neu-bgDark px-4 py-2 text-neu-text;
+    box-shadow:
+      inset 4px 4px 8px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
+      inset -4px -4px 8px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
+  }
+
+  /* Icon button sizes */
+  .neu-icon-button-sm {
+    @apply h-8 w-8 p-1.5;
+  }
+
+  .neu-icon-button-md {
+    @apply h-10 w-10 p-2;
+  }
+
+  .neu-icon-button-lg {
+    @apply h-12 w-12 p-2.5;
+  }
+
+  /* 3D text effect */
+  .neu-text-3d {
+    text-shadow:
+      2px 2px 1px rgba(0, 0, 0, 0.7),
+      -1px -1px 1px rgba(255, 255, 255, 0.15),
+      0 0 10px rgba(var(--neu-accent), 0.2);
+    @apply tracking-wider;
   }
 }
 
-/* Basic text effects */
-.text-glow {
+/* Glow text effect */
+.neu-text-glow {
   text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.3);
+    0 0 10px rgba(var(--neu-accent), 0.5),
+    0 0 20px rgba(var(--neu-accent), 0.3);
+}
+
+/* Prevent scrollbar from affecting layout width */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Optional: Style the scrollbar to be less intrusive */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: 3px solid transparent;
 }

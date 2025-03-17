@@ -1,0 +1,82 @@
+---
+description: ALWAYS use consistent, meaningful TSDoc comments for TypeScript code
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript Commenting Standards
+
+## Context
+- When writing or modifying TypeScript/JavaScript code
+- When documenting functions, classes, interfaces, or complex logic
+- When generating code that will be maintained by humans and AI
+
+## Requirements
+- Use TSDoc format (`/** */`) for documentation comments on exported/public APIs
+- Use single-line comments (`//`) for implementation details and explanations
+- Document "why" over "what" - the code shows what, comments explain why
+- Avoid redundant comments that merely restate the code or type information
+- Keep comments concise and clear, focusing on intent and non-obvious behavior
+- Include descriptive parameter and return descriptions for functions
+- Document edge cases, assumptions, and gotchas
+
+## Examples
+<example>
+// Good: TSDoc comment for exported function
+/**
+ * Calculates the total price including taxes and discounts
+ *
+ * @param basePrice - The original price before adjustments
+ * @param taxRate - Tax percentage (0-1 range)
+ * @param discount - Optional discount amount to apply
+ * @returns The final calculated price
+ */
+export function calculateTotal(basePrice: number, taxRate: number, discount?: number): number {
+  // Implementation logic
+}
+</example>
+
+<example>
+// Good: Implementation comment explaining non-obvious "why"
+function processTransaction(payment: Payment) {
+  // Using the legacy format for backward compatibility with payment gateway
+  const formattedData = convertToLegacyFormat(payment);
+  
+  // Skip validation for internal transfers to avoid double-checking
+  if (!payment.isInternalTransfer) {
+    validatePayment(formattedData);
+  }
+}
+</example>
+
+<example type="invalid">
+// Bad: Redundant comment that just restates the code
+/**
+ * Get user
+ * @param id - User id
+ * @returns User
+ */
+function getUser(id: number): User {
+  // Get the user with the specified id
+  return users.find(user => user.id === id);
+}
+</example>
+
+<example type="invalid">
+// Bad: Over-commented simple code
+// Create a new array
+const items = []; // Initialize empty array
+// Loop through each product
+for (let i = 0; i < products.length; i++) { // Iterate products array
+  // Add the product to items
+  items.push(products[i]); // Push current product
+}
+</example>
+
+## Critical Rules
+  - ALWAYS use TSDoc comments (`/** */`) for exported/public APIs
+  - NEVER include redundant information already expressed in the types
+  - Document complex logic, edge cases, and non-obvious behaviors
+  - Use consistent formatting: space after `//`, hyphen after parameter names
+  - Comments should be kept up-to-date when code changes
+  - Use clear, descriptive language optimized for both human and AI comprehension 

@@ -1,0 +1,53 @@
+---
+description: ALWAYS manage state in context files for Three.js components
+globs: src/components/three/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Three.js State Management
+
+## Context
+- When writing or modifying any Three.js components in the codebase
+- When adding new features that require state management
+
+## Requirements
+- Shared state must be managed in context files
+- Components should consume shared state from contexts, not prop drilling
+- Local component state that ONLY affects internal behavior of a single component MAY use useState
+- Props should be used for configuration, not state management
+- Any state needed by multiple components must be lifted to context
+
+## Examples
+<example>
+// Good: Shared state defined in context
+// In TetheredCardContext.tsx
+export const TetheredCardProvider: React.FC<Props> = ({ children }) => {
+  const [hovered, setHovered] = useState(false)
+  return <TetheredCardContext.Provider value={{ hovered, setHovered }}>{children}</TetheredCardContext.Provider>
+}
+
+// In Component.tsx
+const { hovered, setHovered } = useTetheredCardContext()
+</example>
+
+<example>
+// Good: Internal component state
+function MyComponent() {
+  // OK because this state only affects internal animation timing
+  const [animationProgress, setAnimationProgress] = useState(0)
+  return <mesh />
+}
+</example>
+
+<example type="invalid">
+// Bad: Using local state for data that should be shared
+// In Component.tsx
+const [cardPosition, setCardPosition] = useState([0, 0, 0])
+// This should be in context if other components need this position
+</example>
+
+## Critical Rules
+  - ONLY use useState for purely internal component behavior
+  - All shared state MUST be defined in dedicated context files
+  - Context files should be in src/components/three/context directory
+  - Each context should have a custom hook for easy consumption 

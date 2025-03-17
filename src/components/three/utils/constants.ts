@@ -23,8 +23,39 @@ export const SEGMENT_PROPS = {
   linearDamping: 2,
 }
 
-// ===== RENDERING CONSTANTS =====
-// Add rendering constants here as needed
+// ===== CARD CONSTANTS =====
+export const CARD_DEFAULT_MAX_SPEED = 50
+export const CARD_DEFAULT_MIN_SPEED = 10
+export const CARD_MODEL_SCALE = 2
+export const CARD_POSITION_OFFSET = [0, 0.3, 0] as [number, number, number]
+export const CARD_SWING_AMPLITUDE = 0.4
+export const CARD_SWING_FREQUENCY = 0.4
+export const CARD_ROTATION_DAMPING = 0.9
+export const PINHEAD_COLOR = 'red'
+export const PINHEAD_SIZE = 0.08
 
 // ===== INTERACTION CONSTANTS =====
-// Add interaction constants here as needed
+export const DRAGGABLE_PLANE_SIZE = 2.5
+export const BALL_COLLIDER_SIZES = {
+  JOINT_2: 0.1,
+  JOINT_3: 0.05,
+  JOINT_4: 0.05,
+}
+
+// ===== RENDERING CONSTANTS =====
+// Background mesh constants
+export const BACKGROUND_MESH_POSITION = [0, 0, -20] as [number, number, number]
+export const BACKGROUND_MESH_SIZE = [100, 100] as [number, number]
+export const BACKGROUND_COLOR = '#252730'
+export const CARD_RENDER_ORDER = 10
+
+// ===== MATERIAL CONSTANTS =====
+// Card material constants
+export const CARD_MATERIAL = {
+  roughness: 0.3,
+  metalness: 0.7,
+  envMapIntensity: 1.5,
+  reflectivity: 1,
+  clearcoat: 1,
+  clearcoatRoughness: 0.2,
+}

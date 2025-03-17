@@ -26,7 +26,7 @@ export function VideoPlayer({ videoUrl, title, posterUrl, className = '' }: Vide
 
         if (entry.isIntersecting) {
           if (videoRef.current.paused) {
-            // Only load and play when visible
+            // Lazy-load video src when in viewport to improve performance
             if (videoRef.current.getAttribute('data-src')) {
               videoRef.current.src = videoRef.current.getAttribute('data-src') || ''
               videoRef.current.removeAttribute('data-src')
@@ -56,7 +56,7 @@ export function VideoPlayer({ videoUrl, title, posterUrl, className = '' }: Vide
 
   return (
     <div className={`relative aspect-video overflow-hidden bg-black ${className}`}>
-      {/* Show poster image while video loads */}
+      {/* Poster image shown during video loading for better UX */}
       {posterUrl && (
         <div className='absolute inset-0 z-0'>
           <Image
