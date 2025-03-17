@@ -2,7 +2,7 @@
 
 import * as THREE from 'three'
 import { useEffect, useMemo } from 'react'
-import { createStandardMaterial, createDisposableGeometry } from '@/components/three/utils/threeHelpers'
+import { createDisposableGeometry } from '@/components/three/utils/threeHelpers'
 
 interface RopeMeshProps {
   points: THREE.Vector3[]
@@ -31,13 +31,15 @@ export const RopeMesh = ({ points, color = '#000000', radius = 0.03 }: RopeMeshP
     [curve, radius],
   )
 
-  const material = useMemo(() => createStandardMaterial(color), [color])
-
   useEffect(() => {
     return () => dispose()
   }, [dispose])
 
   if (!tubeGeometry) return null
 
-  return <mesh geometry={tubeGeometry} material={material} />
+  return (
+    <mesh geometry={tubeGeometry}>
+      <meshStandardMaterial color={color} />
+    </mesh>
+  )
 }

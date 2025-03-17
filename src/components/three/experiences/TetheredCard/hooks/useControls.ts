@@ -273,15 +273,26 @@ export const useTouchHandling = (dragged: THREE.Vector3 | false, hovered: boolea
   }, [hovered, dragged])
 }
 
-export const useDragHandlers = (
+export const useDragHandlersWithFaceDetection = (
   nodeRef: React.RefObject<{ translation(): { x: number; y: number; z: number } }>,
   onDrag: (drag: THREE.Vector3 | false) => void,
+  checkFacing: () => boolean,
+  onFacingChange?: (isFrontFacing: boolean) => void,
 ) => {
   const vec = new THREE.Vector3()
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
     if (nodeRef.current) {
+      // Check which face is showing when drag starts
+      const isFrontFacing = checkFacing()
+      // Call the callback if provided
+      if (onFacingChange) {
+        onFacingChange(isFrontFacing)
+      }
+      console.log(`Drag started with ${isFrontFacing ? 'front' : 'back'} side facing the camera`)
+
+      // Standard drag handling
       const pos = nodeRef.current.translation()
       vec.set(pos.x, pos.y, pos.z)
       onDrag(new THREE.Vector3().copy(e.point).sub(vec))

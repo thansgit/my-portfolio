@@ -17,6 +17,7 @@ import {
 import { ExtendedRigidBody, TetheredCardProps } from '@/components/three/utils/types'
 import { useFrame } from '@react-three/fiber'
 import { BallCollider, RapierRigidBody, RigidBody } from '@react-three/rapier'
+import { Billboard, Text } from '@react-three/drei'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { CardModel, DraggablePlane, Pinhead, RopeMesh } from './components'
@@ -154,6 +155,17 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
     minSpeed,
   })
 
+  // State for tracking which side of the card is facing the camera
+  const [isFrontFacing, setIsFrontFacing] = useState<boolean>(true)
+
+  // Handler for face orientation changes during drag
+  const handleFacingChange = (facing: boolean) => {
+    setIsFrontFacing(facing)
+    console.log(`Card is now ${facing ? 'front' : 'back'} facing during drag`)
+
+    // You can add any additional logic here that should run when the facing changes
+  }
+
   return (
     <>
       <RigidBody ref={fixedRef} position={jointPositions[0]} {...SEGMENT_PROPS} type='fixed' />
@@ -172,13 +184,7 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
         type={dragged ? 'kinematicPosition' : 'dynamic'}
         position={finalCardPosition}
       >
-        <CardModel
-          nodeRef={cardRef}
-          dragged={dragged}
-          onHover={setHovered}
-          onDrag={setDragged}
-          transparentColor={transparentColor}
-        />
+        <CardModel nodeRef={cardRef} dragged={dragged} transparentColor={transparentColor} />
       </RigidBody>
 
       {/* Invisible draggable plane that follows the card's position but doesn't rotate. */}
@@ -188,8 +194,8 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
           dragged={dragged}
           onHover={setHovered}
           onDrag={setDragged}
+          onFacingChange={handleFacingChange}
           size={DRAGGABLE_PLANE_SIZE}
-          debug={false}
         />
       </group>
       {/* Add the visual rope mesh */}

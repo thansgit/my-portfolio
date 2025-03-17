@@ -24,13 +24,7 @@ export const Pinhead: React.FC<PinheadProps> = ({
         <group>
           {/* Spherical pin head with metallic material */}
           <Sphere args={[size, 8, 8]}>
-            <meshStandardMaterial
-              color={color}
-              emissive={'#000000'}
-              metalness={metalness}
-              roughness={roughness}
-              depthTest={true}
-            />
+            <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} depthTest={true} />
           </Sphere>
         </group>
 

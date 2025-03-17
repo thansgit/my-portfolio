@@ -47,15 +47,6 @@ export const useScreenToWorld = (x: number, y: number, distance: number = 13): T
   return point
 }
 
-//TODO: move to pinhead if not used anywhere else
-export function createStandardMaterial(color: string): THREE.MeshStandardMaterial {
-  return new THREE.MeshStandardMaterial({
-    color: color,
-    roughness: 0.7,
-    metalness: 0.1,
-  })
-}
-
 export function createDisposableGeometry(createFn: () => THREE.BufferGeometry | null): {
   geometry: THREE.BufferGeometry | null
   dispose: () => void
