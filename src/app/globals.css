@@ -38,7 +38,7 @@ pre {
 @layer components {
   /* Container */
   .neu-container {
-    @apply bg-neu-surface rounded-neu-lg overflow-hidden;
+    @apply overflow-hidden rounded-neu-lg bg-neu-surface;
     box-shadow:
       8px 8px 16px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
       -8px -8px 16px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
@@ -46,7 +46,7 @@ pre {
 
   /* Pressed container */
   .neu-container-pressed {
-    @apply bg-neu-surface rounded-neu-lg overflow-hidden;
+    @apply overflow-hidden rounded-neu-lg bg-neu-surface;
     box-shadow:
       inset 8px 8px 16px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
       inset -8px -8px 16px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
@@ -54,7 +54,7 @@ pre {
 
   /* Button */
   .neu-button {
-    @apply bg-neu-surface rounded-neu-md text-neu-text transition-all duration-300;
+    @apply rounded-neu-md bg-neu-surface text-neu-text transition-all duration-300;
     box-shadow:
       6px 6px 12px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
       -6px -6px 12px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
@@ -81,12 +81,12 @@ pre {
 
   /* Section title */
   .neu-section-title {
-    @apply text-neu-accent mb-6 flex items-center text-xl font-semibold;
+    @apply mb-6 flex items-center text-xl font-semibold text-neu-accent;
   }
 
   /* Icon */
   .neu-icon {
-    @apply text-neu-textOnAccent mr-3 inline-flex rounded-full p-2;
+    @apply mr-3 inline-flex rounded-full p-2 text-neu-textOnAccent;
     background: linear-gradient(to bottom right, rgb(var(--neu-accent-light)), rgb(var(--neu-accent-dark)));
     box-shadow:
       2px 2px 4px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
@@ -103,7 +103,7 @@ pre {
 
   /* Input field */
   .neu-input {
-    @apply bg-neu-bgDark rounded-neu-md text-neu-text w-full px-4 py-2;
+    @apply w-full rounded-neu-md bg-neu-bgDark px-4 py-2 text-neu-text;
     box-shadow:
       inset 4px 4px 8px rgba(var(--neu-shadow-dark), var(--neu-shadow-dark-opacity)),
       inset -4px -4px 8px rgba(var(--neu-shadow-light), var(--neu-shadow-light-opacity));
@@ -137,4 +137,25 @@ pre {
   text-shadow:
     0 0 10px rgba(var(--neu-accent), 0.5),
     0 0 20px rgba(var(--neu-accent), 0.3);
+}
+
+/* Prevent scrollbar from affecting layout width */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Optional: Style the scrollbar to be less intrusive */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: 3px solid transparent;
 }

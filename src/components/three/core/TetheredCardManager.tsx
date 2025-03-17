@@ -1,14 +1,15 @@
 'use client'
 
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense, useEffect, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { useViewportContext } from '@/components/three/context/ViewportContext'
 import { useTetheredCardContext } from '@/components/three/context'
 import { TetheredCard } from '@/components/three/experiences/TetheredCard'
 import { Environment } from '@/components/three/components'
-import { calculateCardPosition } from '@/components/three/utils/threeHelpers'
 import * as THREE from 'three'
+import { MOBILE_OFFSET } from '@/components/three/utils/constants'
+import { DESKTOP_OFFSET } from '@/components/three/utils/constants'
 
 // Wrapper component for the TetheredCard element
 const TetheredCardWrapper = () => {
@@ -47,17 +48,11 @@ export const TetheredCardManager: React.FC = () => {
   const { viewport } = useThree()
   const { setCardExperiencePosition, setRopeColor, setRopeRadius } = useTetheredCardContext()
 
-  // Calculate and update card position when viewport changes
   useEffect(() => {
     const [x, y, z] = calculateCardPosition(viewport, isMobile)
     setCardExperiencePosition(new THREE.Vector3(x, y, z))
   }, [viewport.width, viewport.height, isMobile, setCardExperiencePosition])
 
-  /**
-   * Updates rope visual properties
-   * @param color - The color of the rope
-   * @param radius - The radius of the rope
-   */
   const updateRopeVisuals = (color: string, radius: number) => {
     setRopeColor(color)
     setRopeRadius(radius)
@@ -70,4 +65,13 @@ export const TetheredCardManager: React.FC = () => {
       <SceneContent />
     </Suspense>
   )
+}
+
+export const calculateCardPosition = (
+  viewport: { width: number; height: number },
+  isMobile: boolean,
+): [number, number, number] => {
+  const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
+  const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2)
+  return [xPosition, 2.5, 0]
 }

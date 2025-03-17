@@ -10,16 +10,6 @@ import { useThree } from '@react-three/fiber'
  * @returns A tuple containing [x, y, z] coordinates
  */
 
-//TODO: move to viewport manager if not used anywhere else
-export const calculateCardPosition = (
-  viewport: { width: number; height: number },
-  isMobile: boolean,
-): [number, number, number] => {
-  const xOffset = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET
-  const xPosition = viewport.width * xOffset - (isMobile ? 0 : viewport.width / 2)
-  return [xPosition, 2.5, 0]
-}
-
 /**
  * Returns the center point of the screen at the specified distance from camera
  */
