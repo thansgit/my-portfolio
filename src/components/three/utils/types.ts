@@ -5,6 +5,7 @@ export interface TetheredCardProps {
   position?: [number, number, number]
   maxSpeed?: number
   minSpeed?: number
+  transparentColor?: string
 }
 
 export interface ExtendedRigidBody extends RapierRigidBody {

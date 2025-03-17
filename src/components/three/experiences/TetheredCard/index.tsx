@@ -22,7 +22,7 @@ import * as THREE from 'three'
 import { CardModel, DraggablePlane, Pinhead, RopeMesh } from './components'
 import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } from './hooks'
 
-export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) => {
+export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: TetheredCardProps = {}) => {
   // Get configuration from context
   const { cardPhysics } = useConfigContext()
   const { ropeColor, ropeRadius, setCardRotationCount, setRopeColor, setRopeRadius } = useTetheredCardContext()
@@ -172,7 +172,13 @@ export const TetheredCard = ({ position = [0, 0, 0] }: TetheredCardProps = {}) =
         type={dragged ? 'kinematicPosition' : 'dynamic'}
         position={finalCardPosition}
       >
-        <CardModel nodeRef={cardRef} dragged={dragged} onHover={setHovered} onDrag={setDragged} />
+        <CardModel
+          nodeRef={cardRef}
+          dragged={dragged}
+          onHover={setHovered}
+          onDrag={setDragged}
+          transparentColor={transparentColor}
+        />
       </RigidBody>
 
       {/* Invisible draggable plane that follows the card's position but doesn't rotate. */}

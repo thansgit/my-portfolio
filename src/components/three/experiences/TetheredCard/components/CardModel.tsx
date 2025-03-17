@@ -29,9 +29,10 @@ interface CardModelProps {
   dragged: THREE.Vector3 | false
   onHover: (state: boolean) => void
   onDrag: (drag: THREE.Vector3 | false) => void
+  transparentColor?: string
 }
 
-export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps) => {
+export const CardModel = ({ nodeRef, dragged, onHover, onDrag, transparentColor }: CardModelProps) => {
   const { nodes } = useGLTF(MODEL_PATH) as GLTFResult
   const groupRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Object3D | null>(null)
@@ -48,9 +49,8 @@ export const CardModel = ({ nodeRef, dragged, onHover, onDrag }: CardModelProps)
     sceneRef.current = nodes.Scene
   }, [nodes])
 
-  // Use the materials hook (now returns both front and back materials)
-  // The actual material application happens inside the hook
-  useReflectiveMaterial(sceneRef)
+  // Use the materials hook with the color parameter
+  useReflectiveMaterial(sceneRef, { transparentColor })
 
   return (
     <ModelWrapper>

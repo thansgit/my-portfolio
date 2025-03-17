@@ -14,7 +14,13 @@ import * as THREE from 'three'
 const TetheredCardWrapper = () => {
   const { cardExperiencePosition } = useTetheredCardContext()
 
-  return <TetheredCard position={[cardExperiencePosition.x, cardExperiencePosition.y, cardExperiencePosition.z]} />
+  // Pass a test color to see the transparent areas colored
+  return (
+    <TetheredCard
+      position={[cardExperiencePosition.x, cardExperiencePosition.y, cardExperiencePosition.z]}
+      transparentColor='#FF0000'
+    />
+  )
 }
 
 // Physics and visible content container
