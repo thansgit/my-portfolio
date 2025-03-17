@@ -9,7 +9,7 @@ import { CARD_MODEL_SCALE, CARD_POSITION_OFFSET } from '@/components/three/utils
 import { ModelWrapper } from '@/components/three/components'
 
 // Model path
-const MODEL_PATH = '/assets/models/testcard1.glb'
+const MODEL_PATH = '/assets/models/card.glb'
 
 // Preload the model for better performance
 useGLTF.preload(MODEL_PATH, true)

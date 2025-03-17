@@ -1,0 +1,248 @@
+---
+description: ALWAYS structure Next.js/React components consistently for maintainability
+globs: src/**/*.{ts,tsx}
+exclude: src/components/three/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js/React Component Structure Organization
+
+## Context
+- When creating new React components for the Next.js part of the application
+- When refactoring existing UI components
+- When organizing page components and layouts
+
+## Requirements
+- Structure all React components in a consistent order:
+  1. Props interface definition with JSDoc comments
+  2. Component function declaration (PascalCase)
+  3. References and instance variables
+  4. State declarations
+  5. Context hooks
+  6. Data fetching (SWR, React Query, etc.)
+  7. Derived state calculations (useMemo)
+  8. Event handlers and utility functions
+  9. useEffect hooks (ordered from most general to specific)
+  10. Return statement with JSX
+- Organize Next.js pages with:
+  1. Clear page component naming (matching route if possible)
+  2. Data fetching methods at the bottom (getServerSideProps, getStaticProps)
+  3. Separation of page-level and component-level concerns
+- Extract reusable UI elements to dedicated components
+- Implement performance optimizations:
+  - Memoize expensive calculations with useMemo
+  - Memoize callback functions with useCallback for child components
+  - Use React.memo for pure components when appropriate
+- Leverage Next.js features appropriately:
+  - Use Image component for optimized images
+  - Use Link component for client-side navigation
+  - Implement proper dynamic imports for code splitting
+
+## Examples
+<example>
+// Good: Well-structured Next.js/React component
+import { useRef, useState, useMemo, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import { useUserContext } from '@/context/UserContext';
+import { useProducts } from '@/hooks/useProducts';
+import { Button } from '@/components/ui/Button';
+import { formatCurrency } from '@/utils/formatters';
+
+import type { Product } from '@/types';
+
+/**
+ * Props for the ProductCard component
+ * @property {Product} product - The product to display
+ * @property {boolean} featured - Whether this is a featured product
+ * @property {(id: string) => void} onAddToCart - Callback when product is added to cart
+ */
+interface ProductCardProps {
+  product: Product;
+  featured?: boolean;
+  onAddToCart?: (id: string) => void;
+}
+
+export function ProductCard({
+  product,
+  featured = false,
+  onAddToCart,
+}: ProductCardProps) {
+  // References
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  // State
+  const [isHovered, setIsHovered] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  
+  // Context
+  const { user } = useUserContext();
+  
+  // Router
+  const router = useRouter();
+  
+  // Derived values
+  const isDiscounted = useMemo(() => {
+    return product.discountPrice && product.discountPrice < product.price;
+  }, [product.discountPrice, product.price]);
+  
+  const finalPrice = useMemo(() => {
+    return isDiscounted ? product.discountPrice : product.price;
+  }, [isDiscounted, product.price, product.discountPrice]);
+  
+  // Event handlers
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
+  
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    setQuantity(isNaN(value) ? 1 : Math.max(1, value));
+  };
+  
+  const handleAddToCart = useCallback(() => {
+    if (onAddToCart) {
+      onAddToCart(product.id);
+    }
+  }, [product.id, onAddToCart]);
+  
+  const navigateToProduct = () => {
+    router.push(`/products/${product.slug}`);
+  };
+  
+  // Effects
+  useEffect(() => {
+    // Track product view
+    const trackView = async () => {
+      await fetch('/api/track-view', {
+        method: 'POST',
+        body: JSON.stringify({ productId: product.id })
+      });
+    };
+    
+    trackView();
+  }, [product.id]);
+  
+  // Render helpers
+  const renderBadge = () => {
+    if (featured) {
+      return <span className="badge badge-featured">Featured</span>;
+    }
+    if (isDiscounted) {
+      return <span className="badge badge-sale">Sale</span>;
+    }
+    return null;
+  };
+  
+  return (
+    <div 
+      ref={cardRef}
+      className={`product-card ${featured ? 'featured' : ''}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {renderBadge()}
+      
+      <div className="product-image" onClick={navigateToProduct}>
+        <Image 
+          src={product.imageUrl} 
+          alt={product.name}
+          width={300}
+          height={300}
+          priority={featured}
+        />
+      </div>
+      
+      <div className="product-info">
+        <Link href={`/products/${product.slug}`}>
+          <h3 className="product-name">{product.name}</h3>
+        </Link>
+        
+        <div className="product-price">
+          {isDiscounted && (
+            <span className="original-price">{formatCurrency(product.price)}</span>
+          )}
+          <span className="current-price">{formatCurrency(finalPrice)}</span>
+        </div>
+        
+        {product.stock > 0 ? (
+          <div className="product-actions">
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={handleQuantityChange}
+              className="quantity-input"
+            />
+            <Button 
+              onClick={handleAddToCart}
+              variant="primary"
+              size="medium"
+            >
+              Add to Cart
+            </Button>
+          </div>
+        ) : (
+          <p className="out-of-stock">Out of Stock</p>
+        )}
+      </div>
+    </div>
+  );
+}
+</example>
+
+<example type="invalid">
+// Bad: Disorganized Next.js/React component
+import React from 'react';
+
+function Product({ prod }) {
+  // No clear component structure
+  
+  // Event handler before state declaration
+  const add = () => {
+    setNum(num + 1);
+    addToCart(prod.id);
+  };
+  
+  // State scattered throughout component
+  const [num, setNum] = React.useState(1);
+  
+  // Missing type definitions
+  const addToCart = (id) => {
+    // Implementation
+  };
+  
+  // Expensive calculations directly in render
+  const finalPrice = prod.onSale ? prod.price * 0.8 : prod.price;
+  
+  // No clear organization in render
+  return (
+    <div>
+      <h2>{prod.title}</h2>
+      <img src={prod.img} />
+      <p>${finalPrice}</p>
+      <button onClick={add}>Add to Cart ({num})</button>
+      
+      {/* Inline conditional logic in JSX */}
+      {prod.stock < 5 && <span>Almost sold out!</span>}
+      
+      {/* Event handler created inline */}
+      <button onClick={() => window.location.href = '/cart'}>
+        Go to Cart
+      </button>
+    </div>
+  );
+}
+</example>
+
+## Critical Rules
+  - ALWAYS define a clear props interface with proper typing and defaults
+  - Group related logic together (state, handlers, effects)
+  - Declare all refs and state at the beginning of the component
+  - Extract complex rendering logic into helper functions
+  - Use appropriate Next.js components (Image, Link) for optimized performance
+  - Implement memoization for expensive calculations and callbacks
+  - Organize code in a logical top-to-bottom flow
+  - Keep JSX clean by extracting complex conditional rendering
+  - Use proper typing for event handlers and callbacks 

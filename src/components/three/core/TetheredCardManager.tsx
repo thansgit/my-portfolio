@@ -18,7 +18,7 @@ const TetheredCardWrapper = () => {
   return (
     <TetheredCard
       position={[cardExperiencePosition.x, cardExperiencePosition.y, cardExperiencePosition.z]}
-      transparentColor='#FF0000'
+      transparentColor='#D35400'
     />
   )
 }

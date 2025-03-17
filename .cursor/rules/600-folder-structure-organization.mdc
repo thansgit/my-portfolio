@@ -1,0 +1,171 @@
+---
+description: ALWAYS follow consistent folder structure organization patterns for maintainable code architecture
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Folder Structure Organization
+
+## Context
+- When creating new components, hooks, or utilities
+- When refactoring existing code
+- When expanding the project with new features or experiences
+- When organizing related files within a module
+
+## Requirements
+- Follow a feature-first organization pattern with clear separation of concerns
+- Maintain distinct organization for React Three Fiber and Next.js components
+- Use consistent file naming and exports across the project
+- Implement index files for clean exports at each directory level
+
+### React Three Fiber Structure
+Organize Three.js components in the following structure:
+```
+src/components/three/
+├── index.ts                  # Main exports
+├── ThreeCanvas.tsx           # Main canvas component
+│
+├── core/                     # Core rendering infrastructure
+│   ├── [ComponentName].tsx   # Core components
+│   └── index.ts              # Exports
+│
+├── context/                  # Context providers
+│   ├── [ContextName]Context.tsx  # Context definitions
+│   └── index.ts              # Context exports
+│
+├── viewport/                 # Viewport and display management
+│   └── [ComponentName].tsx   # Viewport components
+│
+├── components/               # Shared Three.js components
+│   ├── [ComponentName].tsx   # Reusable components
+│   └── index.ts              # Component exports
+│
+├── experiences/              # Self-contained 3D experiences
+│   └── [ExperienceName]/     # Each experience in its own directory
+│       ├── index.tsx         # Main experience component
+│       ├── components/       # Experience-specific components
+│       │   ├── [ComponentName].tsx
+│       │   └── index.ts      # Component exports
+│       ├── hooks/            # Experience-specific hooks
+│       │   ├── use[HookName].ts
+│       │   └── index.ts      # Hook exports
+│       └── utils/            # Experience-specific utilities (if needed)
+│
+└── utils/                    # Shared utilities
+    ├── types.ts              # TypeScript definitions
+    ├── constants.ts          # Constant values
+    ├── [utilityName].ts      # Utility functions
+    └── index.ts              # Utility exports
+```
+
+### Next.js Structure
+Organize Next.js components in the following structure:
+```
+src/
+├── app/                      # Next.js app router
+│   ├── layout.tsx            # Root layout
+│   ├── page.tsx              # Root page
+│   └── [route]/              # Route directories
+│       ├── page.tsx          # Page component
+│       └── layout.tsx        # Optional layout
+│
+├── components/               # Shared UI components
+│   ├── ui/                   # Generic UI components
+│   │   ├── [ComponentName].tsx
+│   │   └── index.ts
+│   ├── layout/               # Layout components
+│   │   ├── [ComponentName].tsx
+│   │   └── index.ts
+│   ├── forms/                # Form components
+│   │   ├── [ComponentName].tsx
+│   │   └── index.ts
+│   └── features/             # Feature-specific components
+│       └── [FeatureName]/    # Feature directories
+│           ├── [ComponentName].tsx
+│           └── index.ts
+│
+├── hooks/                    # React hooks
+│   ├── use[HookName].ts      # Custom hooks
+│   └── index.ts              # Hook exports
+│
+├── lib/                      # Library code and utilities
+│   ├── [utilityName].ts      # Utility functions
+│   └── api/                  # API utilities
+│
+├── types/                    # TypeScript type definitions
+│   └── index.ts              # Type exports
+│
+└── styles/                   # Global styles
+    └── globals.css           # Global CSS
+```
+
+## Examples
+<example>
+// Good: Properly organized Three.js experience
+// File: src/components/three/experiences/CardGame/index.tsx
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { CardModel } from './components';
+import { useCardPhysics } from './hooks';
+import { CARD_PARAMS } from '../../utils/constants';
+
+export function CardGame() {
+  // Implementation
+}
+
+// File: src/components/three/experiences/CardGame/components/index.ts
+export { CardModel } from './CardModel';
+export { CardDeck } from './CardDeck';
+export { PlayingTable } from './PlayingTable';
+
+// File: src/components/three/experiences/CardGame/hooks/index.ts
+export { useCardPhysics } from './useCardPhysics';
+export { useCardAnimation } from './useCardAnimation';
+export { useDealingSequence } from './useDealingSequence';
+</example>
+
+<example>
+// Good: Well-organized Next.js feature
+// File: src/components/features/Authentication/LoginForm.tsx
+import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+
+export function LoginForm() {
+  // Implementation
+}
+
+// File: src/components/features/Authentication/index.ts
+export { LoginForm } from './LoginForm';
+export { RegistrationForm } from './RegistrationForm';
+export { ForgotPasswordForm } from './ForgotPasswordForm';
+
+// File: src/hooks/index.ts
+export { useAuth } from './useAuth';
+export { useForm } from './useForm';
+export { useLocalStorage } from './useLocalStorage';
+</example>
+
+<example type="invalid">
+// Bad: Flat structure without organization
+// Single directory with mixed files
+// File: src/components/Card.tsx, Button.tsx, login.tsx, helpers.js, etc.
+
+// Bad: Inconsistent naming patterns
+// File: src/components/CardGameLogic.ts, card-model.tsx, CARD_DECK.tsx
+
+// Bad: Missing index files
+// Direct imports from nested files
+import { Button } from './components/ui/buttons/primary/Button.tsx';
+</example>
+
+## Critical Rules
+  - ALWAYS organize code in a feature-first structure with logical grouping
+  - Keep React Three Fiber components within src/components/three directory
+  - Keep UI components separate from Three.js components
+  - Use index.ts files for clean exports from directories
+  - Group related functionality within feature-specific directories
+  - Maintain consistent naming patterns across similar files
+  - Create self-contained experience folders for Three.js modules
+  - Use PascalCase for component files and camelCase for utility files
+  - Flatten deeply nested imports through index files 

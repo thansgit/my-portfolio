@@ -19,7 +19,7 @@ export const useReflectiveMaterial = (
   options: MaterialOptions = {},
 ) => {
   const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
-  const cardFrontTexture = useLoader(THREE.TextureLoader, '/assets/textures/transparent.png')
+  const cardFrontTexture = useLoader(THREE.TextureLoader, '/assets/textures/front.png')
   const cardBackTexture = useLoader(THREE.TextureLoader, '/assets/textures/back1.png')
   const frontMaterialRef = useRef<THREE.MeshPhysicalMaterial | null>(null)
   const backMaterialRef = useRef<THREE.MeshPhysicalMaterial | null>(null)
@@ -77,9 +77,55 @@ export const useReflectiveMaterial = (
     // Ensure proper texture formats for transparency
     cardFrontTexture.format = THREE.RGBAFormat
     cardFrontTexture.premultiplyAlpha = false
+    cardBackTexture.format = THREE.RGBAFormat
+    cardBackTexture.premultiplyAlpha = false
 
     // Initialize the color uniform
     colorUniformRef.current.value.copy(transparentColor)
+
+    // Set texture filtering for better quality (function to avoid code duplication)
+    const configureTextureQuality = (texture: THREE.Texture) => {
+      texture.minFilter = THREE.LinearFilter
+      texture.magFilter = THREE.LinearFilter
+      texture.anisotropy = 16 // Higher anisotropy for sharper edges
+    }
+
+    // Apply quality settings to both textures
+    configureTextureQuality(cardFrontTexture)
+    configureTextureQuality(cardBackTexture)
+
+    // Shared shader modifier function for both materials
+    const applyColorShaderModification = (material: THREE.MeshPhysicalMaterial) => {
+      material.onBeforeCompile = (shader) => {
+        // Add our custom uniform
+        shader.uniforms.fillColor = colorUniformRef.current
+
+        // Add uniform declaration to the fragment shader
+        shader.fragmentShader = 'uniform vec3 fillColor;\n' + shader.fragmentShader
+
+        // Replace the fragment shader's map color calculation to apply our color to transparent areas
+        const mapColorPattern = '#include <map_fragment>'
+        const customMapFragment = `
+  vec4 texelColor = texture2D( map, vMapUv );
+  
+  // Apply custom fill color to transparent areas with smooth transition
+  float alphaThreshold = 0.5;
+  float smoothingRange = 0.1; // Controls the width of transition
+  
+  if (texelColor.a < alphaThreshold + smoothingRange) {
+    // Create a smooth transition between original texture and fill color
+    float blendFactor = smoothstep(alphaThreshold - smoothingRange, alphaThreshold + smoothingRange, texelColor.a);
+    texelColor.rgb = mix(fillColor, texelColor.rgb, blendFactor);
+    texelColor.a = max(texelColor.a, 1.0 - blendFactor); // Ensure edges have some alpha
+  }
+  
+  diffuseColor *= texelColor;
+`
+
+        // Replace the map fragment
+        shader.fragmentShader = shader.fragmentShader.replace(mapColorPattern, customMapFragment)
+      }
+    }
 
     // Create front material with custom shader modification
     const frontMaterial = new THREE.MeshPhysicalMaterial({
@@ -88,48 +134,28 @@ export const useReflectiveMaterial = (
       normalScale: new THREE.Vector2(0.5, 0.5),
       side: THREE.FrontSide,
       transparent: true,
-      alphaTest: 0.0,
+      alphaTest: 0.01,
+      alphaToCoverage: true,
       ...CARD_MATERIAL,
     })
 
-    // Modify the front material's shader to color transparent areas
-    frontMaterial.onBeforeCompile = (shader) => {
-      // Add our custom uniform
-      shader.uniforms.fillColor = colorUniformRef.current
+    // Apply shader modification to front material
+    applyColorShaderModification(frontMaterial)
 
-      // Add uniform declaration to the fragment shader
-      shader.fragmentShader = 'uniform vec3 fillColor;\n' + shader.fragmentShader
-
-      // Replace the fragment shader's map color calculation to apply our color to transparent areas
-      // Look for the specific pattern in the THREE.js shader
-      const mapColorPattern = '#include <map_fragment>'
-      const customMapFragment = `
-  vec4 texelColor = texture2D( map, vMapUv );
-  
-  // Apply custom fill color to transparent areas
-  if (texelColor.a < 0.5) {
-    texelColor.rgb = fillColor;
-    texelColor.a = 1.0;
-  }
-  
-  diffuseColor *= texelColor;
-`
-
-      // Replace the map fragment
-      shader.fragmentShader = shader.fragmentShader.replace(mapColorPattern, customMapFragment)
-
-      // For debugging
-      // console.log("Modified shader:", shader.fragmentShader);
-    }
-
-    // Create back material
+    // Create back material with same modifications
     const backMaterial = new THREE.MeshPhysicalMaterial({
       map: cardBackTexture,
       normalMap,
       normalScale: new THREE.Vector2(0.5, 0.5),
       side: THREE.FrontSide,
+      transparent: true,
+      alphaTest: 0.01,
+      alphaToCoverage: true,
       ...CARD_MATERIAL,
     })
+
+    // Apply shader modification to back material
+    applyColorShaderModification(backMaterial)
 
     frontMaterialRef.current = frontMaterial
     backMaterialRef.current = backMaterial
