@@ -91,7 +91,6 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
 
   // Update rotation count in scene context
   useEffect(() => {
-    console.log(`Setting rotation count in TetheredCardContext: ${rotations}`)
     setCardRotationCount(rotations)
   }, [rotations, setCardRotationCount])
 
@@ -169,7 +168,6 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
   // Handler for face orientation changes during drag
   const handleFacingChange = (facing: boolean) => {
     setIsFrontFacing(facing)
-    console.log(`Card is now ${facing ? 'front' : 'back'} facing during drag`)
   }
 
   // Reset rotation when drag ends

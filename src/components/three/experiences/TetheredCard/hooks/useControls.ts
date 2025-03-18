@@ -71,7 +71,6 @@ export const useDragHandlersWithFaceDetection = (
       if (onFacingChange) {
         onFacingChange(isFrontFacing)
       }
-      console.log(`Drag started with ${isFrontFacing ? 'front' : 'back'} side facing the camera`)
 
       // Standard drag handling
       const pos = nodeRef.current.translation()

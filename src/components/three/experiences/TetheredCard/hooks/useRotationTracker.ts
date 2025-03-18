@@ -35,7 +35,7 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   const lastPosition = useRef<THREE.Vector3 | null>(null)
 
   // Configuration constants
-  const MIN_ROTATION_INTERVAL = 250 // Minimum time (ms) between detected rotations
+  const MIN_ROTATION_INTERVAL = 200 // Minimum time (ms) between detected rotations
   const MIN_DISTANCE_FROM_CENTER = 0.05 // Minimum distance to consider quadrant changes valid
   const MIN_MOVEMENT_THRESHOLD = 0.001 // Minimum movement to consider the card moving
 
@@ -46,7 +46,7 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
       lastQuadrants.current = []
       currentQuadrant.current = null
     }
-    
+
     // Update previous dragging state
     wasDragging.current = isDragging
   }, [isDragging])
@@ -74,124 +74,128 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   }
 
   /**
-   * Checks if the quadrant sequence indicates a clockwise rotation
+   * Checks if there has been a rotation between the top quadrants
    */
-  const isClockwiseRotation = (quadrants: Quadrant[]): boolean => {
-    // Need at least four quadrants to check for a complete rotation
-    if (quadrants.length < 4) return false
+  const hasRotatedBetweenTopQuadrants = (quadrants: Quadrant[]): boolean => {
+    // Need at least two quadrants to check for a transition
+    if (quadrants.length < 2) return false
 
-    // Check the last 4 quadrants for a clockwise pattern
-    const last4 = quadrants.slice(-4)
-    
-    // Clockwise pattern: Q1 -> Q4 -> Q3 -> Q2 -> Q1
+    // Get the last two quadrants
+    const last2 = quadrants.slice(-2)
+
+    // Check for a transition between Q1 and Q2 in either direction
     return (
-      last4[0] === Quadrant.Q1 &&
-      last4[1] === Quadrant.Q4 &&
-      last4[2] === Quadrant.Q3 &&
-      last4[3] === Quadrant.Q2
-    )
-  }
-
-  /**
-   * Checks if the quadrant sequence indicates a counter-clockwise rotation
-   */
-  const isCounterClockwiseRotation = (quadrants: Quadrant[]): boolean => {
-    // Need at least four quadrants to check for a complete rotation
-    if (quadrants.length < 4) return false
-
-    // Check the last 4 quadrants for a counter-clockwise pattern
-    const last4 = quadrants.slice(-4)
-    
-    // Counter-clockwise pattern: Q1 -> Q2 -> Q3 -> Q4 -> Q1
-    return (
-      last4[0] === Quadrant.Q1 &&
-      last4[1] === Quadrant.Q2 &&
-      last4[2] === Quadrant.Q3 &&
-      last4[3] === Quadrant.Q4
+      (last2[0] === Quadrant.Q1 && last2[1] === Quadrant.Q2) || (last2[0] === Quadrant.Q2 && last2[1] === Quadrant.Q1)
     )
   }
 
   // Main tracking effect that updates every frame
   useEffect(() => {
+    let frameId: number | null = null
+    let isMounted = true
+
     const trackerRaf = () => {
-      if (!card.current || !fixed.current) return
+      // Skip if component is unmounted
+      if (!isMounted) return
 
-      // Get positions of card and fixed point
-      const cardPos = card.current.translation()
-      const fixedPos = fixed.current.translation()
-
-      // Calculate position relative to fixed point
-      const relativeX = cardPos.x - fixedPos.x
-      const relativeY = cardPos.y - fixedPos.y
-      const distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY)
-
-      // Check if card is moving
-      const currentPosition = new THREE.Vector3(cardPos.x, cardPos.y, cardPos.z)
-      if (lastPosition.current) {
-        const movement = lastPosition.current.distanceTo(currentPosition)
-        isMoving.current = movement > MIN_MOVEMENT_THRESHOLD
+      // Check if references exist
+      if (!card.current || !fixed.current) {
+        // If refs don't exist but we're still mounted, schedule next frame and wait
+        frameId = requestAnimationFrame(trackerRaf)
+        return
       }
-      lastPosition.current = currentPosition
 
-      // Only track quadrants if we're far enough from center
-      if (distance >= MIN_DISTANCE_FROM_CENTER) {
-        // Get current quadrant
-        const newQuadrant = getQuadrant(relativeX, relativeY)
+      // Safely check if translation methods are available
+      try {
+        const cardTranslation = card.current.translation?.()
+        const fixedTranslation = fixed.current.translation?.()
 
-        // Process quadrant change if it occurred and the card is moving
-        if (newQuadrant !== currentQuadrant.current && isMoving.current) {
-          const isFirstQuadrant = currentQuadrant.current === null
-          const isValidMove = isFirstQuadrant || isAdjacentQuadrant(newQuadrant, currentQuadrant.current!)
-          
-          if (isValidMove) {
-            // Update quadrant and add to history
-            currentQuadrant.current = newQuadrant
-            lastQuadrants.current.push(newQuadrant)
+        // Exit if either translation is null
+        if (!cardTranslation || !fixedTranslation) {
+          frameId = requestAnimationFrame(trackerRaf)
+          return
+        }
 
-            // Limit history to last 10 entries
-            if (lastQuadrants.current.length > 10) {
-              lastQuadrants.current.shift()
-            }
+        const cardPos = cardTranslation
+        const fixedPos = fixedTranslation
 
-            // Check for complete rotations
-            const now = Date.now()
-            const timeSinceLastRotation = now - lastRotationTime.current
+        // Calculate position relative to fixed point
+        const relativeX = cardPos.x - fixedPos.x
+        const relativeY = cardPos.y - fixedPos.y
+        const distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY)
 
-            // Only count a rotation if enough time has passed since the last one
-            if (timeSinceLastRotation > MIN_ROTATION_INTERVAL) {
-              if (isClockwiseRotation(lastQuadrants.current) || 
-                  isCounterClockwiseRotation(lastQuadrants.current)) {
-                // Increment rotation count (mod 2 to alternate between 0 and 1)
-                totalRotations.current = (totalRotations.current + 1) % 2
-                
-                // Reset tracking state for next rotation
-                lastRotationTime.current = now
-                lastQuadrants.current = []
+        // Check if card is moving
+        const currentPosition = new THREE.Vector3(cardPos.x, cardPos.y, cardPos.z)
+        if (lastPosition.current) {
+          const movement = lastPosition.current.distanceTo(currentPosition)
+          isMoving.current = movement > MIN_MOVEMENT_THRESHOLD
+        }
+        lastPosition.current = currentPosition
+
+        // Only track quadrants if we're far enough from center
+        if (distance >= MIN_DISTANCE_FROM_CENTER) {
+          // Get current quadrant
+          const newQuadrant = getQuadrant(relativeX, relativeY)
+
+          // Process quadrant change if it occurred and the card is moving
+          if (newQuadrant !== currentQuadrant.current && isMoving.current) {
+            const isFirstQuadrant = currentQuadrant.current === null
+            const isValidMove = isFirstQuadrant || isAdjacentQuadrant(newQuadrant, currentQuadrant.current!)
+
+            if (isValidMove) {
+              // Update quadrant and add to history
+              currentQuadrant.current = newQuadrant
+              lastQuadrants.current.push(newQuadrant)
+
+              // Limit history to last 10 entries
+              if (lastQuadrants.current.length > 10) {
+                lastQuadrants.current.shift()
               }
+
+              // Check for complete rotations
+              const now = Date.now()
+              const timeSinceLastRotation = now - lastRotationTime.current
+
+              // Only count a rotation if enough time has passed since the last one
+              if (timeSinceLastRotation > MIN_ROTATION_INTERVAL) {
+                if (hasRotatedBetweenTopQuadrants(lastQuadrants.current)) {
+                  // Increment rotation count
+                  totalRotations.current = (totalRotations.current + 1) % 8
+
+                  // Reset tracking state for next rotation
+                  lastRotationTime.current = now
+                  lastQuadrants.current = []
+                }
+              }
+            } else {
+              // Invalid move (skipped quadrant), reset history
+              lastQuadrants.current = [newQuadrant]
+              currentQuadrant.current = newQuadrant
             }
-          } else {
-            // Invalid move (skipped quadrant), reset history
-            lastQuadrants.current = [newQuadrant]
-            currentQuadrant.current = newQuadrant
+          }
+
+          // Mark that we have received valid positions
+          if (!hasValidPosition.current) {
+            hasValidPosition.current = true
           }
         }
 
-        // Mark that we have received valid positions
-        if (!hasValidPosition.current) {
-          hasValidPosition.current = true
-        }
+        // Schedule next frame
+        frameId = requestAnimationFrame(trackerRaf)
+      } catch (error) {
+        // Safely handle any errors during tracking
       }
-
-      // Request next frame
-      requestAnimationFrame(trackerRaf)
     }
 
-    // Start the tracking animation
-    const rafId = requestAnimationFrame(trackerRaf)
+    // Start the tracking loop
+    frameId = requestAnimationFrame(trackerRaf)
 
-    // Clean up on unmount
+    // Cleanup function
     return () => {
-      cancelAnimationFrame(rafId)
+      isMounted = false
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
     }
   }, [card, fixed, MIN_DISTANCE_FROM_CENTER, MIN_MOVEMENT_THRESHOLD, MIN_ROTATION_INTERVAL])
 

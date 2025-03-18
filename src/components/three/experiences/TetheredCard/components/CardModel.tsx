@@ -31,7 +31,7 @@ export const CardModel = ({ nodeRef, dragged, transparentColor }: CardModelProps
   const { nodes } = useGLTF(MODEL_PATH) as GLTFResult
   const groupRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Object3D | null>(null)
-  
+
   // Get rotation count from context
   const { cardRotationCount } = useTetheredCardContext()
 
@@ -43,15 +43,10 @@ export const CardModel = ({ nodeRef, dragged, transparentColor }: CardModelProps
   }, [nodes])
 
   // Pass rotation count to material hook
-  useReflectiveMaterial(sceneRef, { 
+  useReflectiveMaterial(sceneRef, {
     transparentColor,
-    rotationCount: cardRotationCount 
+    rotationCount: cardRotationCount,
   })
-
-  // Log when rotation count changes to debug material updates
-  useEffect(() => {
-    console.log(`CardModel received rotation count: ${cardRotationCount}`)
-  }, [cardRotationCount])
 
   return (
     <ModelWrapper>
