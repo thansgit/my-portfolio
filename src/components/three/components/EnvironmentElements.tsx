@@ -31,7 +31,7 @@ export const CardLightformer = ({ cardPosition = [0, 0, 0] }: { cardPosition?: [
 
 export const EnvironmentElements = () => {
   const { ambientLightIntensity } = useEnvironment()
-  const { cardRotationCount, cardExperiencePosition } = useTetheredCardContext()
+  const { cardExperiencePosition } = useTetheredCardContext()
 
   // Convert Vector3 to array format
   const cardPositionArray: [number, number, number] = cardExperiencePosition
