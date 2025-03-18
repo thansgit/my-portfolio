@@ -17,12 +17,10 @@ import {
 import { ExtendedRigidBody, TetheredCardProps } from '@/components/three/utils/types'
 import { useFrame } from '@react-three/fiber'
 import { BallCollider, RapierRigidBody, RigidBody } from '@react-three/rapier'
-import { Billboard, Text } from '@react-three/drei'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { CardModel, DraggablePlane, Pinhead, RopeMesh } from './components'
-import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } from './hooks'
-import { useCardRotation } from './hooks/useCardRotation'
+import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling, useFaceOrientation } from './hooks'
 
 export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: TetheredCardProps = {}) => {
   // Get configuration from context
@@ -177,7 +175,7 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
   const [isFrontFacing, setIsFrontFacing] = useState<boolean>(true)
 
   // Use the rotation hook to make the card face the camera during drag
-  const { resetRotation } = useCardRotation({
+  const { resetRotation } = useFaceOrientation({
     cardRef,
     isDragging: Boolean(dragged),
     isFrontFacing,

@@ -4,4 +4,4 @@ export { useTouchHandling, useDragHandlersWithFaceDetection } from './useControl
 export { useReflectiveMaterial } from './useMaterials'
 export { useCardFaceTracking } from './useCardFaceTracking'
 export { useRotationTracker, Quadrant } from './useRotationTracker'
-export { useCardRotation } from './useCardRotation'
+export { useFaceOrientation } from './useFaceOrientation'
