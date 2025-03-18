@@ -16,15 +16,15 @@ export interface TetheredCardContextState {
   // Experience position (for viewport layout)
   cardExperiencePosition: THREE.Vector3
 
-  // Card state
-  cardRotationCount: number
+  // Card state - texture index instead of rotation count
+  currentTextureIndex: number
 
   // Theme settings
   ropeColor: string
   ropeRadius: number
 
   setCardExperiencePosition: (position: THREE.Vector3) => void
-  setCardRotationCount: (count: number) => void
+  setCurrentTextureIndex: (index: number) => void
   setRopeColor: (color: string) => void
   setRopeRadius: (radius: number) => void
 }

@@ -21,7 +21,8 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
     new THREE.Vector3(...initialCardPosition),
   )
 
-  const [cardRotationCount, setCardRotationCount] = useState(0)
+  // Store the current texture index instead of rotation count
+  const [currentTextureIndex, setCurrentTextureIndex] = useState(0)
 
   // Rope visuals
   const [ropeColor, setRopeColor] = useState('#000000')
@@ -30,13 +31,13 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
   const contextValue: TetheredCardContextState = {
     // State
     cardExperiencePosition,
-    cardRotationCount,
+    currentTextureIndex,
     ropeColor,
     ropeRadius,
 
     // Handlers
     setCardExperiencePosition,
-    setCardRotationCount,
+    setCurrentTextureIndex,
     setRopeColor,
     setRopeRadius,
   }

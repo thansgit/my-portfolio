@@ -35,7 +35,7 @@ export const useReflectiveMaterial = (
   sceneRef: React.RefObject<THREE.Object3D | null>,
   options: {
     transparentColor?: THREE.Color | string
-    rotationCount?: number
+    textureIndex?: number
     textureColorPairs?: TextureColorPair[]
   } = {},
 ) => {
@@ -52,8 +52,14 @@ export const useReflectiveMaterial = (
 
   const colorUniformRef = useRef<THREE.Uniform<THREE.Color>>(new THREE.Uniform(new THREE.Color('#ff6600')))
 
-  const rotationCount = options.rotationCount
-  const prevRotationCount = useRef<number | undefined>(undefined)
+  // Store the current texture index for persistence when component goes out of view
+  const currentTextureIndex = options.textureIndex ?? 0
+  const lastTextureIndexRef = useRef<number>(0)
+
+  // Update the stored index when it changes externally
+  useEffect(() => {
+    lastTextureIndexRef.current = currentTextureIndex
+  }, [currentTextureIndex])
 
   useEffect(() => {
     if (normalMap && cardFrontTexture && cardBackTextures.every((texture) => texture)) {
@@ -148,15 +154,23 @@ export const useReflectiveMaterial = (
     frontMaterial.name = 'front-material'
     frontMaterialRef.current = frontMaterial
 
+    // Use the current texture index from context or stored reference
+    const textureIndex = lastTextureIndexRef.current
     const backMaterial = new THREE.MeshPhysicalMaterial({
       ...baseMaterialParams,
-      map: cardBackTextures[0],
+      map: cardBackTextures[textureIndex],
     })
     backMaterial.name = 'back-material'
     backMaterialRef.current = backMaterial
 
+    // Apply the corresponding color for the current texture
+    const currentColor = new THREE.Color(textureColorPairs[textureIndex].color)
+    colorUniformRef.current.value.copy(currentColor)
+    frontMaterial.needsUpdate = true
+
     if (backMaterial.map) {
       backMaterial.map.channel = 1
+      backMaterial.needsUpdate = true
     }
 
     return {
@@ -166,29 +180,36 @@ export const useReflectiveMaterial = (
     }
   }, [normalMap, cardFrontTexture, ...cardBackTextures, transparentColor])
 
+  // Update texture and color when texture index changes
   useEffect(() => {
     if (!backMaterialRef.current || !cardBackTextures.length || !colorUniformRef.current) return
 
-    if (rotationCount !== prevRotationCount.current) {
-      // Use the rotation count directly as the texture index
-      const textureIndex = rotationCount || 0
-      
-      if (backMaterialRef.current.map) {
-        backMaterialRef.current.map = cardBackTextures[textureIndex]
-        backMaterialRef.current.map.channel = 1
-        backMaterialRef.current.needsUpdate = true
-      }
+    // Keep texture index in bounds (0-7)
+    const textureIndex = currentTextureIndex % 8
 
-      const newColor = new THREE.Color(textureColorPairs[textureIndex].color)
-      colorUniformRef.current.value.copy(newColor)
-
-      if (frontMaterialRef.current) {
-        frontMaterialRef.current.needsUpdate = true
-      }
+    // Update back texture
+    if (backMaterialRef.current.map) {
+      backMaterialRef.current.map = cardBackTextures[textureIndex]
+      backMaterialRef.current.map.channel = 1
+      backMaterialRef.current.needsUpdate = true
     }
 
-    prevRotationCount.current = rotationCount
-  }, [rotationCount, cardBackTextures, textureColorPairs])
+    // Update front color based on corresponding texture
+    const newColor = new THREE.Color(textureColorPairs[textureIndex].color)
+    colorUniformRef.current.value.copy(newColor)
+
+    if (frontMaterialRef.current) {
+      frontMaterialRef.current.needsUpdate = true
+    }
+  }, [currentTextureIndex, cardBackTextures, textureColorPairs])
+
+  useEffect(() => {
+    if (colorUniformRef.current) {
+      colorUniformRef.current.value.copy(transparentColor)
+
+      if (frontMaterialRef.current) frontMaterialRef.current.needsUpdate = true
+    }
+  }, [transparentColor])
 
   useEffect(() => {
     const scene = sceneRef.current
@@ -209,14 +230,6 @@ export const useReflectiveMaterial = (
       }
     })
   }, [materials, sceneRef])
-
-  useEffect(() => {
-    if (colorUniformRef.current) {
-      colorUniformRef.current.value.copy(transparentColor)
-
-      if (frontMaterialRef.current) frontMaterialRef.current.needsUpdate = true
-    }
-  }, [transparentColor])
 
   useEffect(() => {
     return () => {

@@ -27,7 +27,15 @@ import { useCardRotation } from './hooks/useCardRotation'
 export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: TetheredCardProps = {}) => {
   // Get configuration from context
   const { cardPhysics } = useConfigContext()
-  const { ropeColor, ropeRadius, setCardRotationCount, setRopeColor, setRopeRadius } = useTetheredCardContext()
+  const {
+    ropeColor,
+    ropeRadius,
+    setRopeColor,
+    setRopeRadius,
+    setCardExperiencePosition,
+    currentTextureIndex,
+    setCurrentTextureIndex,
+  } = useTetheredCardContext()
 
   // Physics settings from config context
   const maxSpeed = cardPhysics.maxSpeed
@@ -83,16 +91,26 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
   })
 
   // Use the rotation tracker
-  const { rotations } = useRotationTracker({
+  const { hasRotationHappened } = useRotationTracker({
     card: cardRef,
     fixed: fixedRef,
     isDragging: Boolean(dragged),
   })
 
-  // Update rotation count in scene context
+  // Track previous rotation state to detect changes
+  const prevRotationState = useRef(false)
+
+  // Update texture index when rotation happens
   useEffect(() => {
-    setCardRotationCount(rotations)
-  }, [rotations, setCardRotationCount])
+    // Only update if hasRotationHappened changed from false to true
+    if (hasRotationHappened && !prevRotationState.current) {
+      // Increment texture index (0-7) when rotation happens
+      const nextIndex = (currentTextureIndex + 1) % 8
+      setCurrentTextureIndex(nextIndex)
+    }
+    // Save current rotation state for the next render
+    prevRotationState.current = hasRotationHappened
+  }, [hasRotationHappened, setCurrentTextureIndex, currentTextureIndex])
 
   // Calculate rope length for physics
   const restingLength = ROPE_SEGMENT_LENGTH * 5

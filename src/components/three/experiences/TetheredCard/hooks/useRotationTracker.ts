@@ -20,12 +20,12 @@ export interface RotationTrackerProps {
 
 /**
  * Hook that tracks rotations of a card around a fixed point.
- * Detects when the card completes a full rotation by monitoring its position
+ * Detects when the card completes a rotation by monitoring its position
  * relative to the fixed point and tracking quadrant changes.
  */
 export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerProps) => {
   // Persistent state across renders
-  const totalRotations = useRef<number>(0)
+  const hasRotationHappened = useRef<boolean>(false)
   const currentQuadrant = useRef<Quadrant | null>(null)
   const lastQuadrants = useRef<Quadrant[]>([])
   const hasValidPosition = useRef<boolean>(false)
@@ -35,16 +35,18 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
   const lastPosition = useRef<THREE.Vector3 | null>(null)
 
   // Configuration constants
-  const MIN_ROTATION_INTERVAL = 200 // Minimum time (ms) between detected rotations
-  const MIN_DISTANCE_FROM_CENTER = 0.05 // Minimum distance to consider quadrant changes valid
+  const MIN_ROTATION_INTERVAL = 100 // Minimum time (ms) between detected rotations
+  const MIN_DISTANCE_FROM_CENTER = 0.025 // Minimum distance to consider quadrant changes valid
   const MIN_MOVEMENT_THRESHOLD = 0.001 // Minimum movement to consider the card moving
 
   // Update tracking state when drag state changes
   useEffect(() => {
-    // When drag starts, reset quadrant tracking but preserve rotation count
+    // When drag starts, reset quadrant tracking
     if (isDragging && !wasDragging.current) {
       lastQuadrants.current = []
       currentQuadrant.current = null
+      // Reset rotation flag at the start of a new drag
+      hasRotationHappened.current = false
     }
 
     // Update previous dragging state
@@ -84,6 +86,7 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
     const last2 = quadrants.slice(-2)
 
     // Check for a transition between Q1 and Q2 in either direction
+    // This works for both clockwise and counter-clockwise rotations
     return (
       (last2[0] === Quadrant.Q1 && last2[1] === Quadrant.Q2) || (last2[0] === Quadrant.Q2 && last2[1] === Quadrant.Q1)
     )
@@ -159,12 +162,15 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
               // Only count a rotation if enough time has passed since the last one
               if (timeSinceLastRotation > MIN_ROTATION_INTERVAL) {
                 if (hasRotatedBetweenTopQuadrants(lastQuadrants.current)) {
-                  // Increment rotation count
-                  totalRotations.current = (totalRotations.current + 1) % 8
+                  // Set rotation flag to true
+                  hasRotationHappened.current = true
 
                   // Reset tracking state for next rotation
                   lastRotationTime.current = now
                   lastQuadrants.current = []
+                  
+                  // We'll let the consumer component reset this flag
+                  // The rotation flag will be reset when the next drag begins
                 }
               }
             } else {
@@ -199,8 +205,9 @@ export const useRotationTracker = ({ card, fixed, isDragging }: RotationTrackerP
     }
   }, [card, fixed, MIN_DISTANCE_FROM_CENTER, MIN_MOVEMENT_THRESHOLD, MIN_ROTATION_INTERVAL])
 
-  // Return the current rotation count
+  // Return rotation state
   return {
-    rotations: totalRotations.current,
+    hasRotationHappened: hasRotationHappened.current,
+    hasValidPosition: hasValidPosition.current,
   }
 }

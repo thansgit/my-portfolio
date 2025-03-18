@@ -32,8 +32,8 @@ export const CardModel = ({ nodeRef, dragged, transparentColor }: CardModelProps
   const groupRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Object3D | null>(null)
 
-  // Get rotation count from context
-  const { cardRotationCount } = useTetheredCardContext()
+  // Get texture index from context
+  const { currentTextureIndex } = useTetheredCardContext()
 
   useRestingRotation(sceneRef, dragged)
 
@@ -42,10 +42,10 @@ export const CardModel = ({ nodeRef, dragged, transparentColor }: CardModelProps
     sceneRef.current = nodes.Scene
   }, [nodes])
 
-  // Pass rotation count to material hook
+  // Pass texture index to material hook instead of rotation count
   useReflectiveMaterial(sceneRef, {
     transparentColor,
-    rotationCount: cardRotationCount,
+    textureIndex: currentTextureIndex,
   })
 
   return (
