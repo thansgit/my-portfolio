@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { RapierRigidBody } from '@react-three/rapier'
 import { useRef, useState } from 'react'
 
-interface UseCardRotationProps {
+interface UseCardFaceOrientationProps {
   cardRef: React.RefObject<RapierRigidBody>
   isDragging: boolean
   isFrontFacing: boolean
@@ -12,7 +12,7 @@ interface UseCardRotationProps {
 /**
  * Hook that handles rotating the card to face the camera on the z-axis while dragging
  */
-export const useFaceOrientation = ({ cardRef, isDragging, isFrontFacing }: UseCardRotationProps) => {
+export const useFaceOrientation = ({ cardRef, isDragging, isFrontFacing }: UseCardFaceOrientationProps) => {
   const [targetRotation, setTargetRotation] = useState<THREE.Quaternion | null>(null)
   const rotationSpeed = useRef(8) // Adjust speed as needed
 
