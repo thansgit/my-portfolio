@@ -8,7 +8,7 @@
 export const neuColors = {
   // Main background and surface colors
   base: {
-    bg: '#252730', // Main background
+    bg: '#13151e', // Main background
     bgLight: '#2e3039', // Lighter variation
     bgDark: '#1c1e24', // Darker variation
     surface: '#2a2c36', // Container surfaces
