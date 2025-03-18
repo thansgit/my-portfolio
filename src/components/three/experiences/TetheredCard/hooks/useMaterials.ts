@@ -56,11 +56,15 @@ export const useReflectiveMaterial = (
   const currentTextureIndex = options.textureIndex ?? 0
   const lastTextureIndexRef = useRef<number>(0)
 
+  // Track whether materials have been created
+  const materialsCreatedRef = useRef<boolean>(false)
+
   // Update the stored index when it changes externally
   useEffect(() => {
     lastTextureIndexRef.current = currentTextureIndex
   }, [currentTextureIndex])
 
+  // Configure textures once when loaded
   useEffect(() => {
     if (normalMap && cardFrontTexture && cardBackTextures.every((texture) => texture)) {
       normalMap.wrapS = THREE.RepeatWrapping
@@ -81,7 +85,7 @@ export const useReflectiveMaterial = (
       configureCardTexture(cardFrontTexture)
       cardBackTextures.forEach(configureCardTexture)
     }
-  }, [normalMap, cardFrontTexture, ...cardBackTextures])
+  }, [normalMap, cardFrontTexture, cardBackTextures])
 
   const initialColor = useMemo(() => {
     const firstPairColor = textureColorPairs[0]?.color || '#ff6600'
@@ -101,15 +105,18 @@ export const useReflectiveMaterial = (
       : new THREE.Color(options.transparentColor)
   }, [options.transparentColor, initialColor])
 
-  const materials = useMemo<MaterialSet | null>(() => {
+  // Create materials only once when textures are loaded
+  useEffect(() => {
     if (!normalMap || !cardFrontTexture || cardBackTextures.some((texture) => !texture)) {
-      return null
+      return;
     }
 
-    if (frontMaterialRef.current) frontMaterialRef.current.dispose()
-    if (backMaterialRef.current) backMaterialRef.current.dispose()
+    if (materialsCreatedRef.current) {
+      return; // Materials already created
+    }
 
-    colorUniformRef.current.value.copy(transparentColor)
+    // Initial color setup
+    colorUniformRef.current.value.copy(transparentColor);
 
     const applyColorShaderModification = (material: THREE.MeshPhysicalMaterial) => {
       material.onBeforeCompile = (shader) => {
@@ -146,6 +153,7 @@ export const useReflectiveMaterial = (
       ...CARD_MATERIAL,
     }
 
+    // Create the front material only once
     const frontMaterial = new THREE.MeshPhysicalMaterial({
       ...baseMaterialParams,
       map: cardFrontTexture,
@@ -154,7 +162,7 @@ export const useReflectiveMaterial = (
     frontMaterial.name = 'front-material'
     frontMaterialRef.current = frontMaterial
 
-    // Use the current texture index from context or stored reference
+    // Create the back material only once
     const textureIndex = lastTextureIndexRef.current
     const backMaterial = new THREE.MeshPhysicalMaterial({
       ...baseMaterialParams,
@@ -163,7 +171,7 @@ export const useReflectiveMaterial = (
     backMaterial.name = 'back-material'
     backMaterialRef.current = backMaterial
 
-    // Apply the corresponding color for the current texture
+    // Apply initial texture and color
     const currentColor = new THREE.Color(textureColorPairs[textureIndex].color)
     colorUniformRef.current.value.copy(currentColor)
     frontMaterial.needsUpdate = true
@@ -173,12 +181,20 @@ export const useReflectiveMaterial = (
       backMaterial.needsUpdate = true
     }
 
+    materialsCreatedRef.current = true;
+  }, [normalMap, cardFrontTexture, cardBackTextures, transparentColor, textureColorPairs]);
+
+  const materials = useMemo<MaterialSet | null>(() => {
+    if (!frontMaterialRef.current || !backMaterialRef.current || !cardBackTextures.length) {
+      return null;
+    }
+
     return {
-      front: frontMaterial,
-      back: backMaterial,
+      front: frontMaterialRef.current,
+      back: backMaterialRef.current,
       backTextures: cardBackTextures,
     }
-  }, [normalMap, cardFrontTexture, ...cardBackTextures, transparentColor])
+  }, [cardBackTextures])
 
   // Update texture and color when texture index changes
   useEffect(() => {
