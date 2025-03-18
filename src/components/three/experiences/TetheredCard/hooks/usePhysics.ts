@@ -5,9 +5,6 @@ import { RapierRigidBody, useRopeJoint, useSphericalJoint } from '@react-three/r
 import { ExtendedRigidBody } from '@/components/three/utils/types'
 import { CARD_SWING_AMPLITUDE, CARD_SWING_FREQUENCY, CARD_ROTATION_DAMPING } from '@/components/three/utils/constants'
 
-/**
- * Props for the usePhysicsUpdate hook
- */
 export interface PhysicsProps {
   position: [number, number, number]
   ROPE_SEGMENT_LENGTH: number

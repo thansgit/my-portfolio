@@ -46,6 +46,9 @@
   "explorer.excludeGitIgnore": true,
   "explorer.compactFolders": false,
 
+  "workbench.sideBar.location": "right",
+  "workbench.panel.defaultLocation": "left",
+
   "workbench.editorAssociations": {
     "*.mdc": "default"
   }

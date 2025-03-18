@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { CardModel, DraggablePlane, Pinhead, RopeMesh } from './components'
 import { useJoints, usePhysicsUpdate, useRotationTracker, useTouchHandling } from './hooks'
+import { useCardRotation } from './hooks/useCardRotation'
 
 export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: TetheredCardProps = {}) => {
   // Get configuration from context
@@ -158,13 +159,25 @@ export const TetheredCard = ({ position = [0, 0, 0], transparentColor }: Tethere
   // State for tracking which side of the card is facing the camera
   const [isFrontFacing, setIsFrontFacing] = useState<boolean>(true)
 
+  // Use the rotation hook to make the card face the camera during drag
+  const { resetRotation } = useCardRotation({
+    cardRef,
+    isDragging: Boolean(dragged),
+    isFrontFacing,
+  })
+
   // Handler for face orientation changes during drag
   const handleFacingChange = (facing: boolean) => {
     setIsFrontFacing(facing)
     console.log(`Card is now ${facing ? 'front' : 'back'} facing during drag`)
-
-    // You can add any additional logic here that should run when the facing changes
   }
+
+  // Reset rotation when drag ends
+  useEffect(() => {
+    if (!dragged) {
+      resetRotation()
+    }
+  }, [dragged, resetRotation])
 
   return (
     <>
