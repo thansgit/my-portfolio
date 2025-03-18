@@ -8,24 +8,74 @@ import { CARD_MATERIAL, CARD_RENDER_ORDER } from '@/components/three/utils/const
 interface MaterialSet {
   front: THREE.MeshPhysicalMaterial
   back: THREE.MeshPhysicalMaterial
+  backTextures: THREE.Texture[]
 }
 
-interface MaterialOptions {
-  transparentColor?: THREE.Color | string
-}
-
+/**
+ * Hook that manages reflective materials for the card component.
+ * Creates and manages front and back materials with proper shader modifications
+ * and handles rotation-based texture swapping through 8 sequential textures
+ */
 export const useReflectiveMaterial = (
   sceneRef: React.RefObject<THREE.Object3D | null>,
-  options: MaterialOptions = {},
+  options: { transparentColor?: THREE.Color | string, rotationCount?: number } = {},
 ) => {
+  // Load all textures
   const normalMap = useLoader(THREE.TextureLoader, '/assets/textures/normal.jpg')
   const cardFrontTexture = useLoader(THREE.TextureLoader, '/assets/textures/front.png')
-  const cardBackTexture = useLoader(THREE.TextureLoader, '/assets/textures/back1.png')
+  
+  // Load all 8 back textures
+  const cardBackTextures = [
+    useLoader(THREE.TextureLoader, '/assets/textures/1.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/2.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/3.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/4.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/5.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/6.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/7.webp'),
+    useLoader(THREE.TextureLoader, '/assets/textures/8.webp')
+  ]
+
+  // Material references for disposal handling
   const frontMaterialRef = useRef<THREE.MeshPhysicalMaterial | null>(null)
   const backMaterialRef = useRef<THREE.MeshPhysicalMaterial | null>(null)
+
+  // Color uniform for shader modifications
   const colorUniformRef = useRef<THREE.Uniform<THREE.Color>>(new THREE.Uniform(new THREE.Color('#ff6600')))
 
-  // Convert string to THREE.Color if needed
+  // Extract rotation count from options
+  const rotationCount = options.rotationCount
+  
+  // Track the current texture index, persistent between renders
+  const currentTextureIndex = useRef<number>(0)
+  
+  // Previous rotation count to detect changes
+  const prevRotationCount = useRef<number | undefined>(undefined)
+
+  // Configure all textures once
+  useEffect(() => {
+    if (normalMap && cardFrontTexture && cardBackTextures.every(texture => texture)) {
+      normalMap.wrapS = THREE.RepeatWrapping
+      normalMap.wrapT = THREE.RepeatWrapping
+      normalMap.repeat.set(1, 1)
+
+      const configureCardTexture = (texture: THREE.Texture) => {
+        texture.center.set(0.5, 0.5)
+        texture.repeat.set(-1, 1)
+        texture.rotation = Math.PI
+        texture.format = THREE.RGBAFormat
+        texture.premultiplyAlpha = false
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.anisotropy = 16
+      }
+
+      configureCardTexture(cardFrontTexture)
+      cardBackTextures.forEach(configureCardTexture)
+    }
+  }, [normalMap, cardFrontTexture, ...cardBackTextures])
+
+  // Parse transparent color option
   const transparentColor = useMemo(() => {
     if (!options.transparentColor) return new THREE.Color('#ff6600')
     return options.transparentColor instanceof THREE.Color
@@ -33,142 +83,114 @@ export const useReflectiveMaterial = (
       : new THREE.Color(options.transparentColor)
   }, [options.transparentColor])
 
-  // Update color uniform when color changes
-  useEffect(() => {
-    if (colorUniformRef.current) {
-      colorUniformRef.current.value.copy(transparentColor)
-      console.log('Color updated to:', transparentColor.getHexString())
-
-      // Trigger material update
-      if (frontMaterialRef.current) {
-        frontMaterialRef.current.needsUpdate = true
-      }
-    }
-  }, [transparentColor])
-
-  // Create the materials
+  // Create all materials
   const materials = useMemo<MaterialSet | null>(() => {
-    if (!normalMap || !cardFrontTexture || !cardBackTexture) {
+    if (!normalMap || !cardFrontTexture || cardBackTextures.some(texture => !texture)) {
       return null
     }
 
-    // Clean up previous materials
+    // Dispose previous materials
     if (frontMaterialRef.current) frontMaterialRef.current.dispose()
     if (backMaterialRef.current) backMaterialRef.current.dispose()
 
-    // Set up normal map
-    normalMap.wrapS = THREE.RepeatWrapping
-    normalMap.wrapT = THREE.RepeatWrapping
-    normalMap.repeat.set(1, 1)
-
-    const configureCardTexture = (texture: THREE.Texture) => {
-      // Mirror texture horizontally and flip upside down
-      texture.center.set(0.5, 0.5)
-      texture.repeat.set(-1, 1)
-      texture.rotation = Math.PI
-
-      return texture
-    }
-
-    // Configure textures
-    configureCardTexture(cardFrontTexture)
-    configureCardTexture(cardBackTexture)
-
-    // Ensure proper texture formats for transparency
-    cardFrontTexture.format = THREE.RGBAFormat
-    cardFrontTexture.premultiplyAlpha = false
-    cardBackTexture.format = THREE.RGBAFormat
-    cardBackTexture.premultiplyAlpha = false
-
-    // Initialize the color uniform
+    // Update color uniform
     colorUniformRef.current.value.copy(transparentColor)
 
-    // Set texture filtering for better quality (function to avoid code duplication)
-    const configureTextureQuality = (texture: THREE.Texture) => {
-      texture.minFilter = THREE.LinearFilter
-      texture.magFilter = THREE.LinearFilter
-      texture.anisotropy = 16 // Higher anisotropy for sharper edges
-    }
-
-    // Apply quality settings to both textures
-    configureTextureQuality(cardFrontTexture)
-    configureTextureQuality(cardBackTexture)
-
-    // Shared shader modifier function for both materials
+    // Helper function for shader modifications
     const applyColorShaderModification = (material: THREE.MeshPhysicalMaterial) => {
       material.onBeforeCompile = (shader) => {
-        // Add our custom uniform
         shader.uniforms.fillColor = colorUniformRef.current
 
-        // Add uniform declaration to the fragment shader
         shader.fragmentShader = 'uniform vec3 fillColor;\n' + shader.fragmentShader
 
-        // Replace the fragment shader's map color calculation to apply our color to transparent areas
         const mapColorPattern = '#include <map_fragment>'
         const customMapFragment = `
   vec4 texelColor = texture2D( map, vMapUv );
   
-  // Apply custom fill color to transparent areas with smooth transition
   float alphaThreshold = 0.5;
-  float smoothingRange = 0.1; // Controls the width of transition
+  float smoothingRange = 0.1; 
   
   if (texelColor.a < alphaThreshold + smoothingRange) {
-    // Create a smooth transition between original texture and fill color
     float blendFactor = smoothstep(alphaThreshold - smoothingRange, alphaThreshold + smoothingRange, texelColor.a);
     texelColor.rgb = mix(fillColor, texelColor.rgb, blendFactor);
-    texelColor.a = max(texelColor.a, 1.0 - blendFactor); // Ensure edges have some alpha
+    texelColor.a = max(texelColor.a, 1.0 - blendFactor); 
   }
   
   diffuseColor *= texelColor;
 `
-
-        // Replace the map fragment
         shader.fragmentShader = shader.fragmentShader.replace(mapColorPattern, customMapFragment)
       }
     }
 
-    // Create front material with custom shader modification
+    // Create base material parameters
+    const baseMaterialParams = {
+      normalMap,
+      normalScale: new THREE.Vector2(0.5, 0.5),
+      side: THREE.FrontSide,
+      transparent: true,
+      alphaTest: 0.01,
+      alphaToCoverage: true,
+      ...CARD_MATERIAL,
+    }
+
+    // Create front material
     const frontMaterial = new THREE.MeshPhysicalMaterial({
+      ...baseMaterialParams,
       map: cardFrontTexture,
-      normalMap,
-      normalScale: new THREE.Vector2(0.5, 0.5),
-      side: THREE.FrontSide,
-      transparent: true,
-      alphaTest: 0.01,
-      alphaToCoverage: true,
-      ...CARD_MATERIAL,
     })
-
-    // Apply shader modification to front material
     applyColorShaderModification(frontMaterial)
-
-    // Create back material with same modifications
-    const backMaterial = new THREE.MeshPhysicalMaterial({
-      map: cardBackTexture,
-      normalMap,
-      normalScale: new THREE.Vector2(0.5, 0.5),
-      side: THREE.FrontSide,
-      transparent: true,
-      alphaTest: 0.01,
-      alphaToCoverage: true,
-      ...CARD_MATERIAL,
-    })
-
-    // Apply shader modification to back material
-    applyColorShaderModification(backMaterial)
-
+    frontMaterial.name = 'front-material'
     frontMaterialRef.current = frontMaterial
+
+    // Create a single back material with the first texture
+    const backMaterial = new THREE.MeshPhysicalMaterial({
+      ...baseMaterialParams,
+      map: cardBackTextures[0],
+    })
+    applyColorShaderModification(backMaterial)
+    backMaterial.name = 'back-material'
     backMaterialRef.current = backMaterial
+    
+    // Make sure to set the texture channel for the back UV mapping
+    if (backMaterial.map) {
+      backMaterial.map.channel = 1
+    }
 
-    return { front: frontMaterial, back: backMaterial }
-  }, [normalMap, cardFrontTexture, cardBackTexture, transparentColor])
+    return {
+      front: frontMaterial,
+      back: backMaterial,
+      backTextures: cardBackTextures
+    }
+  }, [normalMap, cardFrontTexture, ...cardBackTextures, transparentColor])
 
-  // Apply materials to the model meshes when materials and scene are ready
+  // Apply materials and handle texture cycling based on rotation count
   useEffect(() => {
     const scene = sceneRef.current
     if (!materials || !scene) return
+
+    // Set render order for proper transparency
     scene.renderOrder = CARD_RENDER_ORDER
 
+    // If rotation count changed, advance to the next texture
+    if (rotationCount !== undefined && prevRotationCount.current !== undefined && 
+        rotationCount !== prevRotationCount.current) {
+      // Advance to next texture in sequence
+      currentTextureIndex.current = (currentTextureIndex.current + 1) % 8
+      console.log(`Advancing to texture index: ${currentTextureIndex.current + 1}`)
+      
+      // Update the texture on the existing material (more efficient than swapping materials)
+      if (materials.back && materials.back.map) {
+        materials.back.map = materials.backTextures[currentTextureIndex.current]
+        // Make sure to maintain the texture channel for the back UV mapping
+        materials.back.map.channel = 1
+        materials.back.needsUpdate = true
+      }
+    }
+    
+    // Update previous rotation count
+    prevRotationCount.current = rotationCount
+    
+    // Apply materials to all meshes in the scene
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         if (child.material) {
@@ -176,34 +198,35 @@ export const useReflectiveMaterial = (
           if (materialName.includes('front')) {
             child.material = materials.front
           } else if (materialName.includes('back')) {
+            // Use the single back material with updated texture
             child.material = materials.back
-            // Tell Three.js to use the second UV map
-            if (child.material.map) {
-              child.material.map.channel = 1
-            }
           }
         }
       }
     })
-  }, [materials, sceneRef])
+  }, [materials, sceneRef, rotationCount])
 
-  // Cleanup on unmount or dependencies change
+  // Update color when transparent color changes
+  useEffect(() => {
+    if (colorUniformRef.current) {
+      colorUniformRef.current.value.copy(transparentColor)
+
+      // Update all materials to use the new color
+      if (frontMaterialRef.current) frontMaterialRef.current.needsUpdate = true
+      if (backMaterialRef.current) backMaterialRef.current.needsUpdate = true
+    }
+  }, [transparentColor])
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      ;[frontMaterialRef, backMaterialRef].forEach((ref) => {
-        if (ref.current) {
-          if (ref.current.map) ref.current.map.dispose()
-          ref.current.dispose()
-          ref.current = null
-        }
-      })
+      if (frontMaterialRef.current) frontMaterialRef.current.dispose()
+      if (backMaterialRef.current) backMaterialRef.current.dispose()
     }
   }, [])
-
-  return materials
 }
 
-// Export a utility function to easily create a color for the hook
+// Helper function to create a Three.js color from a string
 export const createCardColor = (colorString: string): THREE.Color => {
   return new THREE.Color(colorString)
 }
