@@ -40,10 +40,10 @@ export const EnvironmentElements = () => {
 
   return (
     <>
-      <mesh position={BACKGROUND_MESH_POSITION} renderOrder={-30000}>
+      {/* <mesh position={BACKGROUND_MESH_POSITION} renderOrder={-30000}>
         <planeGeometry args={BACKGROUND_MESH_SIZE} />
         <meshBasicMaterial color={BACKGROUND_COLOR} depthWrite={false} />
-      </mesh>
+      </mesh> */}
 
       {/* Environment for card reflections only */}
       <DreiEnvironment background={false} resolution={128} preset={undefined}>

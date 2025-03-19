@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, Suspense, useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/layout'
@@ -11,7 +11,6 @@ import { initThemeColors } from '@/lib/neumorphic'
 // Dynamically import the Scene component with no SSR
 const ThreeCanvas = dynamic(() => import('@/components/three').then((mod) => mod.ThreeCanvas), {
   ssr: false,
-  loading: () => <div className='fixed inset-0 bg-neu-bg' />,
 })
 
 const RoutePrefetcher = () => {
@@ -33,22 +32,6 @@ const RoutePrefetcher = () => {
   return null
 }
 
-const ThreeCanvasContainer = () => {
-  const { isLoaded } = useLoading()
-
-  return (
-    <div className='pointer-events-none fixed inset-0'>
-      {/* Always show placeholder gradient until 3D scene is loaded */}
-      <div className={`absolute inset-0 bg-neu-bg ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
-
-      {/* Load 3D scene in parallel */}
-      <Suspense fallback={null}>
-        <ThreeCanvas />
-      </Suspense>
-    </div>
-  )
-}
-
 interface ClientLayoutProps {
   children: ReactNode
 }
@@ -59,12 +42,15 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   }, [])
 
   return (
-    <div className='min-h-screen bg-neu-bg text-neu-text'>
+    <>
+      <div className='fixed inset-0 -z-[5] min-h-screen bg-neu-bgLight'></div>
+
       <LoadingProvider>
         <RoutePrefetcher />
         <ThreeDLoadingIndicators />
-        <ThreeCanvasContainer />
-
+        <div className='pointer-events-none fixed inset-0 z-0'>
+          <ThreeCanvas />
+        </div>
         {/* Main Content */}
         <div className='relative z-10 mt-[60vh] p-8 pb-24 md:ml-[35%] md:mt-0 md:pb-8'>
           <main className='max-w-4xl'>
@@ -158,6 +144,6 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           </div>
         </div>
       </LoadingProvider>
-    </div>
+    </>
   )
 }

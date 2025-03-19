@@ -26,9 +26,9 @@ const TetheredCardWrapper = () => {
 
 // Physics and visible content container
 const SceneContent = () => {
-  const { isVisible } = useViewportContext()
+  const { isVisible, isResizing } = useViewportContext()
 
-  if (!isVisible) {
+  if (!isVisible || isResizing) {
     return null
   }
 
@@ -44,19 +44,22 @@ const SceneContent = () => {
  * including positioning, physics, lighting, and environment setup
  */
 export const TetheredCardManager: React.FC = () => {
-  const { isMobile } = useViewportContext()
+  const { isMobile, setIsResizing } = useViewportContext()
   const { viewport } = useThree()
-  const { setCardExperiencePosition, setRopeColor, setRopeRadius } = useTetheredCardContext()
+  const { setCardExperiencePosition } = useTetheredCardContext()
 
+  //Wait for resize to happen to get the physics ready, otherwise the position is not correctly calculated
   useEffect(() => {
-    const [x, y, z] = calculateCardPosition(viewport, isMobile)
-    setCardExperiencePosition(new THREE.Vector3(x, y, z))
-  }, [viewport.width, viewport.height, isMobile, setCardExperiencePosition])
+    setIsResizing(true)
 
-  const updateRopeVisuals = (color: string, radius: number) => {
-    setRopeColor(color)
-    setRopeRadius(radius)
-  }
+    const timer = setTimeout(() => {
+      const [x, y, z] = calculateCardPosition(viewport, isMobile)
+      setCardExperiencePosition(new THREE.Vector3(x, y, z))
+      setIsResizing(false)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [isMobile, setCardExperiencePosition, setIsResizing])
 
   return (
     <Suspense fallback={null}>

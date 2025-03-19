@@ -63,8 +63,6 @@ export const ThreeCanvas = () => {
             height: '100%',
             pointerEvents: 'auto',
             background: 'transparent',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
           }}
         >
           {process.env.NODE_ENV === 'development' && <Perf position='top-left' />}

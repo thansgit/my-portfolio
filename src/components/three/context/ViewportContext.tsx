@@ -6,15 +6,19 @@ import React, { createContext, useContext, useState } from 'react'
 interface ViewportContextState {
   isMobile: boolean
   isVisible: boolean
+  isResizing: boolean
   setIsMobile: (value: boolean) => void
   setIsVisible: (value: boolean) => void
+  setIsResizing: (value: boolean) => void
 }
 
 const defaultState: ViewportContextState = {
   isMobile: false,
   isVisible: true,
+  isResizing: false,
   setIsMobile: () => {},
   setIsVisible: () => {},
+  setIsResizing: () => {},
 }
 
 export const ViewportContext = createContext<ViewportContextState>(defaultState)
@@ -40,12 +44,15 @@ export const ViewportProvider: React.FC<ViewportProviderProps> = ({
 }) => {
   const [isMobile, setIsMobile] = useState(initialIsMobile)
   const [isVisible, setIsVisible] = useState(initialIsVisible)
+  const [isResizing, setIsResizing] = useState(false)
 
   const contextValue: ViewportContextState = {
     isMobile,
     isVisible,
+    isResizing,
     setIsMobile,
     setIsVisible,
+    setIsResizing,
   }
 
   return <ViewportContext.Provider value={contextValue}>{children}</ViewportContext.Provider>
