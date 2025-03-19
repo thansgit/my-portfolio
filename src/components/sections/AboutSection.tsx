@@ -3,7 +3,17 @@
 import { NeuSection, NeuContainer, NeuIconCard, NeuSectionTitle } from '@/components/ui'
 import { ServiceItem } from './types'
 import { FaReact, FaNodeJs, FaPython, FaLaptopCode, FaServer, FaPaintBrush, FaMobileAlt } from 'react-icons/fa'
-import { SiTypescript, SiDjango, SiKotlin, SiThreedotjs, SiCypress } from 'react-icons/si'
+import {
+  SiTypescript,
+  SiDjango,
+  SiKotlin,
+  SiThreedotjs,
+  SiCypress,
+  SiNextdotjs,
+  SiBlender,
+  SiExpress,
+  SiTailwindcss,
+} from 'react-icons/si'
 import { cn } from '@/lib/utils'
 
 export function AboutSection() {
@@ -11,34 +21,38 @@ export function AboutSection() {
     {
       title: 'Frontend Development',
       description: 'Building user interfaces with clean code.',
-      icon: <FaLaptopCode className='text-neu-textOnAccent h-8 w-8' />,
+      icon: <FaLaptopCode className='h-8 w-8 text-neu-textOnAccent' />,
     },
     {
       title: 'Backend Development',
       description: 'Working on server-side logic and APIs.',
-      icon: <FaServer className='text-neu-textOnAccent h-8 w-8' />,
+      icon: <FaServer className='h-8 w-8 text-neu-textOnAccent' />,
     },
     {
       title: 'UI/UX Design',
       description: 'Designing functional and intuitive interfaces.',
-      icon: <FaPaintBrush className='text-neu-textOnAccent h-8 w-8' />,
+      icon: <FaPaintBrush className='h-8 w-8 text-neu-textOnAccent' />,
     },
     {
       title: 'Mobile Development',
       description: 'Developing Android apps with modern tools.',
-      icon: <FaMobileAlt className='text-neu-textOnAccent h-8 w-8' />,
+      icon: <FaMobileAlt className='h-8 w-8 text-neu-textOnAccent' />,
     },
   ]
 
   const skills = [
-    { name: 'React', icon: <FaReact className='text-neu-accent h-8 w-8' /> },
-    { name: 'Node.js', icon: <FaNodeJs className='text-neu-accent h-8 w-8' /> },
-    { name: 'TypeScript', icon: <SiTypescript className='text-neu-accent h-8 w-8' /> },
-    { name: 'Django', icon: <SiDjango className='text-neu-accent h-8 w-8' /> },
-    { name: 'Kotlin', icon: <SiKotlin className='text-neu-accent h-8 w-8' /> },
-    { name: 'Python', icon: <FaPython className='text-neu-accent h-8 w-8' /> },
-    { name: 'Three.js', icon: <SiThreedotjs className='text-neu-accent h-8 w-8' /> },
-    { name: 'Cypress', icon: <SiCypress className='text-neu-accent h-8 w-8' /> },
+    { name: 'React', icon: <FaReact className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Node.js', icon: <FaNodeJs className='h-8 w-8 text-neu-accent' /> },
+    { name: 'TypeScript', icon: <SiTypescript className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Next.js', icon: <SiNextdotjs className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Tailwind', icon: <SiTailwindcss className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Express', icon: <SiExpress className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Django', icon: <SiDjango className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Kotlin', icon: <SiKotlin className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Python', icon: <FaPython className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Three.js', icon: <SiThreedotjs className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Blender', icon: <SiBlender className='h-8 w-8 text-neu-accent' /> },
+    { name: 'Cypress', icon: <SiCypress className='h-8 w-8 text-neu-accent' /> },
   ]
 
   return (
@@ -47,7 +61,7 @@ export function AboutSection() {
       <div className='mb-12 space-y-16'>
         {/* Bio Card */}
         <NeuContainer withPadding>
-          <div className='text-neu-text space-y-5'>
+          <div className='space-y-5 text-neu-text'>
             <div className='flex items-start gap-4'>
               {/* Bio Icon */}
               <div className='neu-icon mt-1 flex-shrink-0'>
@@ -120,7 +134,7 @@ export function AboutSection() {
                 className={cn('flex flex-col items-center p-4 transition-all duration-300 hover:translate-y-[2px]')}
               >
                 {skill.icon}
-                <span className='text-neu-text mt-2'>{skill.name}</span>
+                <span className='mt-2 text-neu-text'>{skill.name}</span>
               </NeuContainer>
             ))}
           </div>
