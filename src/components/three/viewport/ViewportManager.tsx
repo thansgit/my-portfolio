@@ -11,39 +11,56 @@ import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '@/components/three/utils/consta
  */
 export const ViewportManager = () => {
   const { size } = useThree()
-  const { isMobile, isVisible, setIsMobile, setIsVisible } = useViewportContext()
-  const isResizing = useRef(false)
+  const { isMobile, isVisible, setIsMobile, setIsVisible, setIsResizing } = useViewportContext()
 
-  // Handle viewport state (mobile detection, visibility)
-  // ===================================================
+  // Resize handling with refs for cleanup
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const finalResizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isResizingRef = useRef(false)
 
-  // Handle resize events
+  // Handle resize events with proper physics timing
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    const updateViewport = () => {
-      isResizing.current = true
+    const handleResize = () => {
+      // Mark as resizing immediately
+      isResizingRef.current = true
+      setIsResizing(true)
       setIsVisible(false)
 
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(() => {
-        setIsMobile(size.width < MOBILE_BREAKPOINT)
-        setIsVisible(true)
+      // Clear any existing timeouts
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      if (finalResizeTimeoutRef.current) {
+        clearTimeout(finalResizeTimeoutRef.current)
+      }
 
-        // Add a small delay before allowing scroll handler to run again
-        setTimeout(() => {
-          isResizing.current = false
-        }, 100)
+      // First stage: Update mobile state based on new dimensions
+      resizeTimeoutRef.current = setTimeout(() => {
+        setIsMobile(size.width < MOBILE_BREAKPOINT)
+
+        // Second stage: Allow enough time for physics to settle
+        finalResizeTimeoutRef.current = setTimeout(() => {
+          setIsVisible(true)
+          setIsResizing(false)
+          isResizingRef.current = false
+        }, 300) // Physics settling time
       }, RESIZE_DELAY)
     }
 
-    updateViewport()
+    // Initial size check
+    handleResize()
+
+    // No need for window event listener as useThree's size changes trigger this effect
 
     return () => {
-      clearTimeout(timeoutId)
-      isResizing.current = false
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      if (finalResizeTimeoutRef.current) {
+        clearTimeout(finalResizeTimeoutRef.current)
+      }
     }
-  }, [size.width, setIsMobile, setIsVisible])
+  }, [size.width, setIsMobile, setIsVisible, setIsResizing])
 
   // Handle scroll events for mobile view
   useEffect(() => {
@@ -51,7 +68,7 @@ export const ViewportManager = () => {
 
     const handleScroll = () => {
       // Skip scroll handling during resize operations
-      if (isResizing.current) return
+      if (isResizingRef.current) return
 
       const scrollY = window.scrollY
       const viewportHeight = window.innerHeight

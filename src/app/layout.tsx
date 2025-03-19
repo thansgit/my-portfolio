@@ -10,8 +10,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en' className={`w-full bg-black ${inter.variable} ${roboto_mono.variable}`} suppressHydrationWarning>
-      <body className='m-0 min-h-screen w-full bg-black p-0 antialiased'>
+    <html lang='en' className={`w-full ${inter.variable} ${roboto_mono.variable}`} suppressHydrationWarning>
+      <body className='m-0 min-h-screen w-full p-0 antialiased'>
         <ClientLayout>{children}</ClientLayout>
         <Analytics />
         <SpeedInsights />

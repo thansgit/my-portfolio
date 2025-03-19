@@ -26,9 +26,9 @@ const TetheredCardWrapper = () => {
 
 // Physics and visible content container
 const SceneContent = () => {
-  const { isVisible } = useViewportContext()
+  const { isVisible, isResizing } = useViewportContext()
 
-  if (!isVisible) {
+  if (!isVisible || isResizing) {
     return null
   }
 
@@ -44,19 +44,47 @@ const SceneContent = () => {
  * including positioning, physics, lighting, and environment setup
  */
 export const TetheredCardManager: React.FC = () => {
-  const { isMobile } = useViewportContext()
+  const { isMobile, isResizing, setIsResizing } = useViewportContext()
   const { viewport } = useThree()
-  const { setCardExperiencePosition, setRopeColor, setRopeRadius } = useTetheredCardContext()
+  const { setCardExperiencePosition } = useTetheredCardContext()
+  const positionUpdateQueued = useRef(false)
+  const physicsSettleTimer = useRef<NodeJS.Timeout | null>(null)
 
+  // Enhanced position calculation with proper physics timing
   useEffect(() => {
-    const [x, y, z] = calculateCardPosition(viewport, isMobile)
-    setCardExperiencePosition(new THREE.Vector3(x, y, z))
-  }, [viewport.width, viewport.height, isMobile, setCardExperiencePosition])
+    // First, set resizing state to true and clear any pending updates
+    setIsResizing(true)
+    positionUpdateQueued.current = true
 
-  const updateRopeVisuals = (color: string, radius: number) => {
-    setRopeColor(color)
-    setRopeRadius(radius)
-  }
+    if (physicsSettleTimer.current) {
+      clearTimeout(physicsSettleTimer.current)
+    }
+
+    // Stage 1: Initial delay to let the viewport update fully
+    const stageOneDelay = setTimeout(() => {
+      // Calculate position first time
+      const [x, y, z] = calculateCardPosition(viewport, isMobile)
+      setCardExperiencePosition(new THREE.Vector3(x, y, z))
+
+      // Stage 2: Wait for physics to initialize (longer delay)
+      physicsSettleTimer.current = setTimeout(() => {
+        // Calculate position again after physics have settled
+        const [finalX, finalY, finalZ] = calculateCardPosition(viewport, isMobile)
+        setCardExperiencePosition(new THREE.Vector3(finalX, finalY, finalZ))
+
+        // Mark physics as settled and clear resize state
+        setIsResizing(false)
+        positionUpdateQueued.current = false
+      }, 300) // Physics needs more time to settle
+    }, 100)
+
+    return () => {
+      clearTimeout(stageOneDelay)
+      if (physicsSettleTimer.current) {
+        clearTimeout(physicsSettleTimer.current)
+      }
+    }
+  }, [isMobile, viewport, setCardExperiencePosition, setIsResizing])
 
   return (
     <Suspense fallback={null}>

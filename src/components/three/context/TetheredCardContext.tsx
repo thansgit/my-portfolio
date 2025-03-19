@@ -2,9 +2,20 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import * as THREE from 'three'
-import { TetheredCardContextState } from '../utils/types'
 
 // Create the context
+export interface TetheredCardContextState {
+  cardExperiencePosition: THREE.Vector3
+  currentTextureIndex: number
+  ropeColor: string
+  ropeRadius: number
+
+  setCardExperiencePosition: (position: THREE.Vector3) => void
+  setCurrentTextureIndex: (index: number) => void
+  setRopeColor: (color: string) => void
+  setRopeRadius: (radius: number) => void
+}
+
 export const TetheredCardContext = createContext<TetheredCardContextState | null>(null)
 
 interface TetheredCardProviderProps {
