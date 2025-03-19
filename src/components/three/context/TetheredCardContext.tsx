@@ -9,11 +9,13 @@ export interface TetheredCardContextState {
   currentTextureIndex: number
   ropeColor: string
   ropeRadius: number
+  isVisible: boolean
 
   setCardExperiencePosition: (position: THREE.Vector3) => void
   setCurrentTextureIndex: (index: number) => void
   setRopeColor: (color: string) => void
   setRopeRadius: (radius: number) => void
+  setIsVisible: (value: boolean) => void
 }
 
 export const TetheredCardContext = createContext<TetheredCardContextState | null>(null)
@@ -21,11 +23,13 @@ export const TetheredCardContext = createContext<TetheredCardContextState | null
 interface TetheredCardProviderProps {
   children: ReactNode
   initialCardPosition?: [number, number, number]
+  initialIsVisible?: boolean
 }
 
 export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
   children,
   initialCardPosition = [0, 0, 0],
+  initialIsVisible = false,
 }) => {
   // Experience position (for viewport layout)
   const [cardExperiencePosition, setCardExperiencePosition] = useState<THREE.Vector3>(
@@ -34,6 +38,9 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
 
   // Store the current texture index instead of rotation count
   const [currentTextureIndex, setCurrentTextureIndex] = useState(0)
+
+  // Visibility state
+  const [isVisible, setIsVisible] = useState(initialIsVisible)
 
   // Rope visuals
   const [ropeColor, setRopeColor] = useState('#000000')
@@ -45,12 +52,14 @@ export const TetheredCardProvider: React.FC<TetheredCardProviderProps> = ({
     currentTextureIndex,
     ropeColor,
     ropeRadius,
+    isVisible,
 
     // Handlers
     setCardExperiencePosition,
     setCurrentTextureIndex,
     setRopeColor,
     setRopeRadius,
+    setIsVisible,
   }
 
   return <TetheredCardContext.Provider value={contextValue}>{children}</TetheredCardContext.Provider>

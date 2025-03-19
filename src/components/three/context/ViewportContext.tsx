@@ -5,19 +5,15 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 
 interface ViewportContextState {
   isMobile: boolean
-  isVisible: boolean
   isResizing: boolean
   setIsMobile: (value: boolean) => void
-  setIsVisible: (value: boolean) => void
   setIsResizing: (value: boolean) => void
 }
 
 const defaultState: ViewportContextState = {
   isMobile: false,
-  isVisible: true,
   isResizing: false,
   setIsMobile: () => {},
-  setIsVisible: () => {},
   setIsResizing: () => {},
 }
 
@@ -34,25 +30,18 @@ export const useViewportContext = () => {
 interface ViewportProviderProps {
   children: React.ReactNode
   initialIsMobile?: boolean
-  initialIsVisible?: boolean
 }
 
 export const ViewportProvider: React.FC<ViewportProviderProps> = ({
   children,
   initialIsMobile = typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false,
-  initialIsVisible = true,
 }) => {
   const [isMobile, setIsMobile] = useState(initialIsMobile)
-  const [isVisible, setIsVisible] = useState(initialIsVisible)
   const [isResizing, setIsResizing] = useState(false)
 
   // Memoize setter functions to prevent unnecessary rerenders
   const setIsMobileMemo = useCallback((value: boolean) => {
     setIsMobile(value)
-  }, [])
-
-  const setIsVisibleMemo = useCallback((value: boolean) => {
-    setIsVisible(value)
   }, [])
 
   const setIsResizingMemo = useCallback((value: boolean) => {
@@ -63,13 +52,11 @@ export const ViewportProvider: React.FC<ViewportProviderProps> = ({
   const contextValue = useMemo(
     () => ({
       isMobile,
-      isVisible,
       isResizing,
       setIsMobile: setIsMobileMemo,
-      setIsVisible: setIsVisibleMemo,
       setIsResizing: setIsResizingMemo,
     }),
-    [isMobile, isVisible, isResizing, setIsMobileMemo, setIsVisibleMemo, setIsResizingMemo],
+    [isMobile, isResizing, setIsMobileMemo, setIsResizingMemo],
   )
 
   return <ViewportContext.Provider value={contextValue}>{children}</ViewportContext.Provider>

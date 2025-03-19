@@ -7,11 +7,11 @@ import { MOBILE_BREAKPOINT, RESIZE_DELAY } from '@/components/three/utils/consta
 
 /**
  * ViewportManager handles viewport state management
- * (mobile detection, visibility, etc.) and updates the ViewportContext.
+ * (mobile detection and resize state)
  */
 export const ViewportManager = () => {
   const { size } = useThree()
-  const { isMobile, isVisible, setIsMobile, setIsVisible, setIsResizing } = useViewportContext()
+  const { isMobile, setIsMobile, setIsResizing } = useViewportContext()
 
   // Resize handling with refs for cleanup
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -24,7 +24,6 @@ export const ViewportManager = () => {
       // Mark as resizing immediately
       isResizingRef.current = true
       setIsResizing(true)
-      setIsVisible(false)
 
       // Clear any existing timeouts
       if (resizeTimeoutRef.current) {
@@ -40,7 +39,6 @@ export const ViewportManager = () => {
 
         // Second stage: Allow enough time for physics to settle
         finalResizeTimeoutRef.current = setTimeout(() => {
-          setIsVisible(true)
           setIsResizing(false)
           isResizingRef.current = false
         }, 300) // Physics settling time
@@ -60,31 +58,7 @@ export const ViewportManager = () => {
         clearTimeout(finalResizeTimeoutRef.current)
       }
     }
-  }, [size.width, setIsMobile, setIsVisible, setIsResizing])
-
-  // Handle scroll events for mobile view
-  useEffect(() => {
-    if (!isMobile) return
-
-    const handleScroll = () => {
-      // Skip scroll handling during resize operations
-      if (isResizingRef.current) return
-
-      const scrollY = window.scrollY
-      const viewportHeight = window.innerHeight
-      const scrollThreshold = viewportHeight * 0.5
-
-      const shouldBeVisible = scrollY < scrollThreshold
-      if (isVisible !== shouldBeVisible) {
-        setIsVisible(shouldBeVisible)
-      }
-    }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
-
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isMobile, isVisible, setIsVisible])
+  }, [size.width, setIsMobile, setIsResizing])
 
   // This component doesn't render anything - it just manages viewport state
   return null
