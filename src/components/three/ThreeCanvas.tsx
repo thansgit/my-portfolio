@@ -6,8 +6,7 @@ import { Perf } from 'r3f-perf'
 import { ConfigProvider, EnvironmentProvider, TetheredCardProvider, useLoading } from './context'
 import { ViewportProvider } from './context/ViewportContext'
 import { CameraManager, TetheredCardManager } from './core'
-import { ViewportManager } from './viewport/ViewportManager'
-import { LoadingTracker } from './viewport/LoadingTracker'
+import { LoadingTracker } from './core/LoadingTracker'
 
 /**
  * Renderer configuration component
@@ -63,6 +62,8 @@ export const ThreeCanvas = () => {
             height: '100%',
             pointerEvents: 'auto',
             background: 'transparent',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 1s ease-in-out',
           }}
         >
           {process.env.NODE_ENV === 'development' && <Perf position='top-left' />}
@@ -70,14 +71,13 @@ export const ThreeCanvas = () => {
             <RendererSettings />
             <ConfigProvider>
               <EnvironmentProvider ambientLightIntensity={0.5}>
-                <TetheredCardProvider>
-                  <ViewportProvider>
-                    <ViewportManager />
+                <ViewportProvider>
+                  <TetheredCardProvider>
                     <CameraManager>
                       <TetheredCardManager />
                     </CameraManager>
-                  </ViewportProvider>
-                </TetheredCardProvider>
+                  </TetheredCardProvider>
+                </ViewportProvider>
               </EnvironmentProvider>
             </ConfigProvider>
           </Suspense>

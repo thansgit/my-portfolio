@@ -20,5 +20,4 @@ export { EnvironmentProvider, useEnvironment } from './context/EnvironmentContex
 export { LoadingProvider, useLoading, type LoadingContextType } from './context/LoadingContext'
 
 // Viewport components
-export { LoadingTracker } from './viewport/LoadingTracker'
-export { ViewportManager } from './viewport/ViewportManager'
+export { LoadingTracker } from './core/LoadingTracker'
