@@ -15,6 +15,7 @@ import {
   SiTailwindcss,
 } from 'react-icons/si'
 import { cn } from '@/lib/utils'
+import { SkillContainer } from '@/components/three/experiences/skills'
 
 export function AboutSection() {
   const services: ServiceItem[] = [
@@ -40,19 +41,39 @@ export function AboutSection() {
     },
   ]
 
+  // Define the skills for the 3D showcase
   const skills = [
-    { name: 'React', icon: <FaReact className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Node.js', icon: <FaNodeJs className='h-8 w-8 text-neu-accent' /> },
-    { name: 'TypeScript', icon: <SiTypescript className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Next.js', icon: <SiNextdotjs className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Tailwind', icon: <SiTailwindcss className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Express', icon: <SiExpress className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Django', icon: <SiDjango className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Kotlin', icon: <SiKotlin className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Python', icon: <FaPython className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Three.js', icon: <SiThreedotjs className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Blender', icon: <SiBlender className='h-8 w-8 text-neu-accent' /> },
-    { name: 'Cypress', icon: <SiCypress className='h-8 w-8 text-neu-accent' /> },
+    {
+      name: 'TypeScript',
+      description:
+        'My primary language for app development, offering static typing to enhance code quality and catch errors early.',
+      modelName: 'typescript',
+    },
+    {
+      name: 'React',
+      description: 'Component-based library for building user interfaces with reusable elements.',
+      modelName: 'react',
+    },
+    {
+      name: 'Next.js',
+      description: 'The React framework I use for building server-rendered applications with optimized performance.',
+      modelName: 'nextjs',
+    },
+    {
+      name: 'Three.js',
+      description: 'JavaScript 3D library for creating and displaying 3D graphics in a web browser.',
+      modelName: 'threejs',
+    },
+    {
+      name: 'Node.js',
+      description: 'JavaScript runtime for server-side development with a non-blocking, event-driven architecture.',
+      modelName: 'nodejs',
+    },
+    {
+      name: 'Tailwind CSS',
+      description: 'Utility-first CSS framework for rapid UI development with pre-defined classes.',
+      modelName: 'tailwind',
+    },
   ]
 
   return (
@@ -114,7 +135,7 @@ export function AboutSection() {
           </div>
         </div>
 
-        {/* Skills */}
+        {/* Skills - Now with 3D models */}
         <div>
           <NeuSectionTitle
             withIcon
@@ -127,15 +148,14 @@ export function AboutSection() {
           >
             Skills
           </NeuSectionTitle>
-          <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
+          <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
             {skills.map((skill) => (
-              <NeuContainer
+              <SkillContainer
                 key={skill.name}
-                className={cn('flex flex-col items-center p-4 transition-all duration-300 hover:translate-y-[2px]')}
-              >
-                {skill.icon}
-                <span className='mt-2 text-neu-text'>{skill.name}</span>
-              </NeuContainer>
+                skillName={skill.modelName}
+                title={skill.name}
+                description={skill.description}
+              />
             ))}
           </div>
         </div>
