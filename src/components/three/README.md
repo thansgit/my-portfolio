@@ -3,7 +3,7 @@
 This directory contains all Three.js related components organized in an exemplary structure that follows best practices
 for React Three Fiber projects.
 
-## Directory Structure
+## Directory Structuree
 
 ```
 src/components/three/
